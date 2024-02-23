@@ -1,8 +1,9 @@
 ﻿//@BaseCode
 //MdStart
+
 namespace PlantUML.ConApp
 {
-    internal partial class Program
+    public partial class Application
     {
         #region Class-Constructors
         /// <summary>
@@ -11,7 +12,7 @@ namespace PlantUML.ConApp
         /// <remarks>
         /// This static constructor sets up the necessary properties for the program.
         /// </remarks>
-        static Program()
+        static Application()
         {
             ClassConstructing();
             Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -44,28 +45,28 @@ namespace PlantUML.ConApp
         /// Gets or sets the home path.
         /// </summary>
         /// <value>The home path.</value>
-        internal static string? HomePath { get; set; }
+        public static string? HomePath { get; set; }
         /// <summary>
         /// Gets or sets the user path.
         /// </summary>
         /// <value>
         /// The user path.
         /// </value>
-        internal static string UserPath { get; set; }
+        public static string UserPath { get; set; }
         /// <summary>
         /// Gets or sets the source path.
         /// </summary>
         /// <value>
         /// The user path.
         /// </value>
-        internal static string SourcePath { get; set; }
+        public static string SourcePath { get; set; }
         /// <summary>
         /// Gets or sets the solution path.
         /// </summary>
         /// <value>
         /// The source path.
         /// </value>
-        internal static string SolutionPath { get; set; }
+        public static string SolutionPath { get; set; }
         #endregion properties
 
         #region file and path methods
@@ -75,7 +76,7 @@ namespace PlantUML.ConApp
         /// <returns>
         /// The current solution path as a string.
         /// </returns>
-        internal static string GetCurrentSolutionPath()
+        public static string GetCurrentSolutionPath()
         {
             int endPos = AppContext.BaseDirectory
                                    .IndexOf($"{nameof(PlantUML)}", StringComparison.CurrentCultureIgnoreCase);
@@ -88,39 +89,6 @@ namespace PlantUML.ConApp
             return result;
         }
         #endregion file and path methods
-
-        #region print methods
-        /// <summary>
-        /// Prints the header for the Template Tools.
-        /// </summary>
-        private static void PrintHeader(string sourcePath)
-        {
-            var count = 0;
-            var saveForeColor = Display.ForegroundColor;
-
-            Console.ForegroundColor = ConsoleColor.Green;
-
-            count = Display.PrintLine(nameof(PlantUML));
-            Display.PrintLine('=', count);
-            Display.PrintLine();
-            Display.ForegroundColor = saveForeColor;
-            Display.PrintLine($"Solution path: {sourcePath}");
-            Display.PrintLine();
-        }
-        /// <summary>
-        /// Prints a footer in the console.
-        /// </summary>
-        private static void PrintFooter()
-        {
-            Display.PrintLine();
-            Display.Print("Choose: ");
-        }
-        #endregion print methods
-
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
     }
 }
 //MdEnd
