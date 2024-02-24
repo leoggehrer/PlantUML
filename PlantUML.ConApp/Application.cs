@@ -3,7 +3,13 @@
 
 namespace PlantUML.ConApp
 {
-    public partial class Application
+    /// <summary>
+    /// Represents the base application class.
+    /// </summary>
+    /// <remarks>
+    /// This class provides common properties and methods for the application.
+    /// </remarks>
+    public abstract partial class Application
     {
         #region Class-Constructors
         /// <summary>
@@ -42,40 +48,36 @@ namespace PlantUML.ConApp
 
         #region properties
         /// <summary>
+        /// Gets or sets a value indicating whether the operation should be forced.
+        /// </summary>
+        public static bool Force { get; set; } = false;
+        /// <summary>
         /// Gets or sets the home path.
         /// </summary>
-        /// <value>The home path.</value>
         public static string? HomePath { get; set; }
         /// <summary>
         /// Gets or sets the user path.
         /// </summary>
-        /// <value>
-        /// The user path.
-        /// </value>
         public static string UserPath { get; set; }
         /// <summary>
         /// Gets or sets the source path.
         /// </summary>
-        /// <value>
-        /// The user path.
-        /// </value>
         public static string SourcePath { get; set; }
         /// <summary>
         /// Gets or sets the solution path.
         /// </summary>
-        /// <value>
-        /// The source path.
-        /// </value>
         public static string SolutionPath { get; set; }
         #endregion properties
 
-        #region file and path methods
+        #region methods for changing the properties
         /// <summary>
-        /// Retrieves the current solution path.
+        /// Changes the value of the Force property.
         /// </summary>
-        /// <returns>
-        /// The current solution path as a string.
-        /// </returns>
+        public static void ChangeForce() => Force = !Force;
+        /// <summary>
+        /// Gets the current solution path.
+        /// </summary>
+        /// <returns>The current solution path.</returns>
         public static string GetCurrentSolutionPath()
         {
             int endPos = AppContext.BaseDirectory
@@ -88,7 +90,37 @@ namespace PlantUML.ConApp
             }
             return result;
         }
-        #endregion file and path methods
+        /// <summary>
+        /// Gets the parent directory of the specified path.
+        /// </summary>
+        /// <param name="path">The path to get the parent directory of.</param>
+        /// <returns>The parent directory of the specified path.</returns>
+        public static string GetParentDirectory(string path)
+        {
+            var result = Directory.GetParent(path);
+
+            return result != null ? result.FullName : path;
+        }
+        /// <summary>
+        /// Retrieves a collection of source code files in the specified directory and its subdirectories based on the given search patterns.
+        /// </summary>
+        /// <param name="path">The directory path to search for source code files.</param>
+        /// <param name="searchPatterns">An array of search patterns to match against the names of files in the specified directory and its subdirectories.</param>
+        /// <returns>A collection of source code file paths.</returns>
+        public static List<string> GetSourceCodeFiles(string path, string[] searchPatterns)
+        {
+            var result = new List<string>();
+            var ignoreFolders = new string[] { $"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", $"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}" };
+
+            foreach (var searchPattern in searchPatterns)
+            {
+                result.AddRange(Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories)
+                      .Where(f => ignoreFolders.Any(e => f.Contains(e)) == false)
+                      .OrderBy(i => i));
+            }
+            return result;
+        }
+        #endregion methods for changing the properties
     }
 }
 //MdEnd

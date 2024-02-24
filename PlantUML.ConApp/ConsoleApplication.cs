@@ -5,11 +5,15 @@ using PlantUML.Logic.Extensions;
 
 namespace PlantUML.ConApp
 {
+    /// <summary>
+    /// Represents an abstract console application.
+    /// </summary>
     public abstract partial class ConsoleApplication : Application
     {
         #region menuitem
         /// Represents a menu item.
         /// Gets or sets the unique key of the menu item.
+        /// Gets or sets the non-unique optional key of the menu item.
         /// Gets or sets the displayed text of the menu item.
         /// Gets or sets the action to be performed when the menu item is selected.
         protected partial class MenuItem
@@ -17,49 +21,83 @@ namespace PlantUML.ConApp
             /// <summary>
             /// Gets or sets the key.
             /// </summary>
-            /// <value>
-            /// The key value.
-            /// </value>
             public required string Key { get; set; }
+            /// <summary>
+            /// Gets or sets the optional key.
+            /// </summary>
+            public string OptionalKey  { get; set; } = string.Empty;
             /// <summary>
             /// Gets or sets the text.
             /// </summary>
-            /// <value>
-            /// The text.
-            /// </value>
             public required string Text { get; set; }
             /// <summary>
             /// Gets or sets the action associated with the property.
             /// </summary>
-            /// <value>
-            /// The action associated with the property.
-            /// </value>
             public required Action Action { get; set; }
         }
         #endregion menuitem
 
         #region console-properties
+        /// <summary>
+        /// Gets or sets the foreground color of the console.
+        /// </summary>
         public static ConsoleColor ForegroundColor
         {
             get => Console.ForegroundColor;
             set => Console.ForegroundColor = value;
         }
-
+        /// <summary>
+        /// Clears the console screen.
+        /// </summary>
+        public static void Clear() => Console.Clear();
+        /// <summary>
+        /// Prints the specified message to the console.
+        /// </summary>
+        /// <param name="message">The message to be printed.</param>
+        /// <returns>The length of the printed message.</returns>
         public static int Print(string message)
         {
             Console.Write(message);
             return message.Length;
         }
 
+        /// <summary>
+        /// Prints a message with a specified character and length.
+        /// </summary>
+        /// <param name="chr">The character to print.</param>
+        /// <param name="message">The message to print.</param>
+        /// <param name="length">The desired length of the output.</param>
+        public static void Print(char chr, string message, int length)
+        {
+            for (int i = message.Length; i < length; i++)
+            {
+                Console.Write(chr);
+            }
+            Console.Write(message);
+        }
+        /// <summary>
+        /// Prints a new line to the console.
+        /// </summary>
         public static void PrintLine()
         {
             Console.WriteLine();
         }
+        /// <summary>
+        /// Prints a message to the console and returns the length of the message.
+        /// </summary>
+        /// <param name="message">The message to be printed.</param>
+        /// <returns>The length of the message.</returns>
         public static int PrintLine(string message)
         {
             Console.WriteLine(message);
             return message.Length;
         }
+        /// <summary>
+        /// Prints a line consisting of a specified character repeated a specified number of times.
+        /// </summary>
+        /// <param name="chr">The character to be repeated.</param>
+        /// <param name="count">The number of times the character should be repeated.</param>
+        /// <returns>The length of the printed line.</returns>
         public static int PrintLine(char chr, int count)
         {
             string message = new string(chr, count);
@@ -67,23 +105,44 @@ namespace PlantUML.ConApp
             Console.WriteLine(message);
             return message.Length;
         }
+        /// <summary>
+        /// Reads a line of input from the console.
+        /// </summary>
+        /// <returns>The line of input read from the console, or an empty string if no input is available.</returns>
+        public static string ReadLine()
+        {
+            return Console.ReadLine() ?? string.Empty;
+        }
+        /// <summary>
+        /// Reads a line of input from the console with the specified message.
+        /// </summary>
+        /// <param name="message">The message to display before reading the input.</param>
+        /// <returns>The line of input read from the console.</returns>
+        public static string ReadLine(string message)
+        {
+            Print(message);
+            return ReadLine();
+        }
+        /// <summary>
+        /// Gets the current cursor position in the console.
+        /// </summary>
+        /// <returns>A tuple containing the left and top position of the cursor.</returns>
+        public static (int Left, int Top) GetCursorPosition()
+        {
+            return (Console.CursorLeft, Console.CursorTop);
+        }
+        /// <summary>
+        /// Sets the position of the cursor in the console window.
+        /// </summary>
+        /// <param name="left">The column position of the cursor.</param>
+        /// <param name="top">The row position of the cursor.</param>
+        public static void SetCursorPosition(int left, int top)
+        {
+            Console.SetCursorPosition(left, top);
+        }
         #endregion console-properties
 
         #region progressbar-properties
-        /// <summary>
-        /// Gets or sets a value indicating whether the RunBusyProgress is active or not.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if the RunBusyProgress is active; otherwise, <c>false</c>.
-        /// </value>
-        private static bool RunBusyProgress { get; set; }
-        /// <summary>
-        /// Indicates whether printing is allowed when the application is busy.
-        /// </summary>
-        /// <value>
-        /// true if printing is allowed when the application is busy; otherwise, false.
-        /// </value>
-        public static bool CanBusyPrint { get; set; } = true;
         /// <summary>
         /// Gets or sets the foreground color of the console.
         /// </summary>
@@ -91,7 +150,22 @@ namespace PlantUML.ConApp
         /// The foreground color of the console.
         /// </value>
         public static ConsoleColor ProgressBarForegroundColor { get; set; } = ForegroundColor;
+        /// <summary>
+        /// Gets or sets a value indicating whether the RunBusyProgress is active or not.
+        /// </summary>
+        private static bool RunProgressBar { get; set; }
+        /// <summary>
+        /// Indicates whether printing is allowed when the application is busy.
+        /// </summary>
+        public static bool CanProgressBarPrint { get; set; } = true;
         #endregion progressbar-properties
+
+        #region app-properties
+        /// <summary>
+        /// Gets or sets a value indicating whether the application should continue running.
+        /// </summary>
+        protected static bool RunApp { get; set; } = false;
+        #endregion app-properties
 
         #region progressbar-methods
         /// <summary>
@@ -105,30 +179,30 @@ namespace PlantUML.ConApp
                 var saveCursorLeft = Console.CursorLeft;
                 var saveForeColor = Console.ForegroundColor;
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.SetCursorPosition(cursorLeft, cursorTop);
-                Console.Write(output);
-                Console.SetCursorPosition(saveCursorLeft, saveCursorTop);
-                Console.ForegroundColor = saveForeColor;
+                ForegroundColor = ConsoleColor.Green;
+                SetCursorPosition(cursorLeft, cursorTop);
+                Print(output);
+                SetCursorPosition(saveCursorLeft, saveCursorTop);
+                ForegroundColor = saveForeColor;
             }
-            if (RunBusyProgress == false)
+            if (RunProgressBar == false)
             {
                 var head = '>';
                 var runSign = '=';
                 var counter = 0;
 
-                RunBusyProgress = true;
-                Console.WriteLine();
+                RunProgressBar = true;
+                PrintLine();
 
-                var (Left, Top) = Console.GetCursorPosition();
+                var (Left, Top) = GetCursorPosition();
 
-                Console.WriteLine();
-                Console.WriteLine();
+                PrintLine();
+                PrintLine();
                 Task.Factory.StartNew(async () =>
                 {
-                    while (RunBusyProgress)
+                    while (RunProgressBar)
                     {
-                        if (CanBusyPrint)
+                        if (CanProgressBarPrint)
                         {
                             if (Left > 60)
                             {
@@ -162,7 +236,7 @@ namespace PlantUML.ConApp
         /// </summary>
         public static void StopProgressBar()
         {
-            RunBusyProgress = false;
+            RunProgressBar = false;
         }
         #endregion progressbar-methods
 
@@ -175,28 +249,70 @@ namespace PlantUML.ConApp
         #region main-method
         public virtual void Run(string[] args)
         {
-            var running = true;
-            var input = default(string?);
+            var choose = default(string[]);
             var saveForeColor = Console.ForegroundColor;
 
+            RunApp = true;
             do
             {
                 var menuItems = CreateMenuItems();
 
-                Console.Clear();
+                Clear();
                 ForegroundColor = ProgressBarForegroundColor;
                 PrintHeader(SolutionPath);
-                menuItems.ForEach(m => Console.WriteLine($"[{m.Key}] {m.Text}"));
+                menuItems.ForEach(m => PrintLine($"[{m.Key,3}] {m.Text}"));
                 PrintFooter();
 
-                input = Console.ReadLine()?.ToLower() ?? String.Empty;
+                choose = ReadLine().ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var chooseIterator = choose.GetEnumerator();
+
                 ForegroundColor = saveForeColor;
-                menuItems.FirstOrDefault(m => m.Key.Equals(input))?.Action();
-                running = input.Equals("x") == false;
-                StopProgressBar();
-            } while (running);
+                while (RunApp && chooseIterator.MoveNext())
+                {
+                    var actions = menuItems.Where(m => m.Key.Equals(chooseIterator.Current) || m.OptionalKey.Equals(chooseIterator.Current));
+                    var actioIterator = actions.GetEnumerator();
+
+                    while (RunApp && actioIterator.MoveNext())
+                    {
+                        actioIterator.Current?.Action();
+                    }
+                    RunApp = chooseIterator.Current.Equals("x") == false;
+                    StopProgressBar();
+                }
+            } while (RunApp);
         }
         #endregion main-method
+
+        #region file and path methods
+        /// <summary>
+        /// Changes the source path for the solution.
+        /// </summary>
+        public static void ChangeSolutionPath()
+        {
+            PrintLine();
+            Print("Enter solution path: ");
+            var newPath = ReadLine();
+
+            if (Directory.Exists(newPath))
+            {
+                SolutionPath = newPath;
+            }
+        }
+        /// <summary>
+        /// Changes the source path for the application.
+        /// </summary>
+        public static void ChangeSourcePath()
+        {
+            PrintLine();
+            Print("Enter source path: ");
+            var newPath = ReadLine();
+
+            if (Directory.Exists(newPath))
+            {
+                SourcePath = newPath;
+            }
+        }
+        #endregion file and path methods
     }
 }
 //MdEnd

@@ -49,11 +49,12 @@ namespace PlantUML.Logic
 
         #region diagram creation
         /// <summary>
-        /// Creates an activity diagram for the specified source code and saves it to the specified path.
+        /// Creates activity diagrams for each method in the provided source code and saves them to the specified path.
         /// </summary>
-        /// <param name="path">The path where the activity diagram will be saved.</param>
-        /// <param name="source">The source code to generate the activity diagram from.</param>
-        public static void CreateActivityDiagram(string path, string source)
+        /// <param name="path">The path where the activity diagrams will be saved.</param>
+        /// <param name="source">The source code to generate the activity diagrams from.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing activity diagrams if they already exist.</param>
+        public static void CreateActivityDiagram(string path, string source, bool force)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var syntaxRoot = syntaxTree.GetRoot();
@@ -80,7 +81,10 @@ namespace PlantUML.Logic
 
                     diagramData.Add("stop");
                     diagramData.Add("@enduml");
-                    File.WriteAllLines(filePath, diagramData);
+                    if (force || Path.Exists(filePath) == false)
+                    {
+                        File.WriteAllLines(filePath, diagramData);
+                    }
                 }
             }
         }
@@ -99,6 +103,44 @@ namespace PlantUML.Logic
                 AnalysisStatement(statement, diagramData, 0);
             }
             return diagramData;
+        }
+
+        public static void CreateClassDiagram(string path, string source, bool force)
+        {
+            var result = new List<string>();
+            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var syntaxRoot = syntaxTree.GetRoot();
+            var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+
+            if (Path.Exists(path) == false)
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            foreach (var classNode in classNodes)
+            {
+                var fileName = $"{classNode.Identifier.Text}.puml";
+                var filePath = Path.Combine(path, fileName);
+                var diagramData = CreateClassDiagram(classNode);
+
+                diagramData.Insert(0, $"@startuml {classNode.Identifier.Text}");
+                diagramData.Insert(1, $"title {classNode.Identifier.Text}");
+
+                diagramData.Add("@enduml");
+                if (force || Path.Exists(filePath) == false)
+                {
+                    File.WriteAllLines(filePath, diagramData);
+                }
+            }
+        }
+
+        public static List<string> CreateClassDiagram(ClassDeclarationSyntax classNode)
+        {
+            var result = new List<string>();
+
+            AnalysisStatement(classNode, result, 0);
+
+            return result;
         }
 
         /// <summary>
@@ -267,6 +309,9 @@ namespace PlantUML.Logic
         /// <param name="level">The indentation level for the diagram data.</param>
         public static void AnalysisStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
+            const string yesLabel = "<color:green>yes";
+            const string noLabel = "<color:red>no";
+
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
                 diagramData.Add($":{localDeclarationStatement.Declaration};".SetIndent(level));
@@ -299,7 +344,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is IfStatementSyntax ifStatement)
             {
-                diagramData.Add($"if ({ifStatement.Condition}) then (yes)".SetIndent(level));
+                diagramData.Add($"if ({ifStatement.Condition}) then ({yesLabel})".SetIndent(level));
                 AnalysisStatement(ifStatement.Statement, diagramData, level + 1);
                 if (ifStatement.Else != null)
                     AnalysisStatement(ifStatement.Else, diagramData, level + 1);
@@ -308,7 +353,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ElseClauseSyntax elseClause)
             {
-                diagramData.Add($"else (no)".SetIndent(level));
+                diagramData.Add($"else ({noLabel})".SetIndent(level));
                 AnalysisStatement(elseClause.Statement, diagramData, level + 1);
             }
             else if (syntaxNode is SwitchStatementSyntax switchStatement)
@@ -346,30 +391,30 @@ namespace PlantUML.Logic
             {
                 diagramData.Add("repeat".SetIndent(level));
                 AnalysisStatement(doStatement.Statement, diagramData, level + 1);
-                diagramData.Add($"repeat while ({doStatement.Condition}) is (yes)".SetIndent(level));
+                diagramData.Add($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level));
             }
             else if (syntaxNode is WhileStatementSyntax whileStatement)
             {
-                diagramData.Add($"while ({whileStatement.Condition}) is (yes)".SetIndent(level));
+                diagramData.Add($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level));
                 AnalysisStatement(whileStatement.Statement, diagramData, level + 1);
-                diagramData.Add("endwhile (no)".SetIndent(level));
+                diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
                 diagramData.Add($":{forStatement.Declaration};".SetIndent(level));
-                diagramData.Add($"while ({forStatement.Condition}) is (yes)".SetIndent(level));
+                diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
                 AnalysisStatement(forStatement.Statement, diagramData, level + 1);
                 if (forStatement.Incrementors.Count > 0)
                     diagramData.Add($":{forStatement.Incrementors};".SetIndent(level));
 
-                diagramData.Add("endwhile (no)".SetIndent(level));
+                diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
             }
             else if (syntaxNode is ForEachStatementSyntax forEachStatement)
             {
                 var statements = new List<string>();
 
                 diagramData.Add($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level));
-                diagramData.Add($"while (iterator.MoveNext()) is (yes)".SetIndent(level));
+                diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
                 diagramData.Add($":current = iterator.Current();".SetIndent(level));
 
                 AnalysisStatement(forEachStatement.Statement, statements, level + 1);
@@ -379,11 +424,17 @@ namespace PlantUML.Logic
                     diagramData.Add(statement.Replace(forEachStatement.Identifier.ToString(), "current").SetIndent(level + 1));
                 }
 
-                diagramData.Add("endwhile (no)".SetIndent(level));
+                diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
             }
             else if (syntaxNode is ReturnStatementSyntax returnStatement)
             {
                 System.Diagnostics.Debug.WriteLine($"{nameof(returnStatement)} is known but not used!");
+            }
+            else if (syntaxNode is ClassDeclarationSyntax classDeclaration)
+            {
+                foreach (SyntaxToken modifier in classDeclaration.Modifiers)
+                {
+                }
             }
             else
             {
@@ -414,7 +465,7 @@ namespace PlantUML.Logic
             }
             else if (type.IsClass)
             {
-                var prefix = type.IsPublic ? "+" : String.Empty;
+                var prefix = type.IsPublic ? "+" : string.Empty;
 
                 if (type.IsAbstract)
                     result.Add($"{prefix}abstract class {type.Name} #white " + "{");
