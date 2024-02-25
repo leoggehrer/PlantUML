@@ -111,6 +111,11 @@ namespace PlantUML.Logic
             return diagramData;
         }
 
+        /// <summary>        /// Creates a class diagram from the provided source code and saves it to the specified path.
+        /// </summary>
+        /// <param name="path">The path where the class diagram files will be saved.</param>
+        /// <param name="source">The source code from which the class diagram will be generated.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing class diagram files.</param>
         public static void CreateClassDiagram(string path, string source, bool force)
         {
             var result = new List<string>();
@@ -143,6 +148,12 @@ namespace PlantUML.Logic
             CreateCompleteClassDiagram(path, force);
         }
 
+        /// <summary>
+        /// Creates a complete class diagram by extracting UML items and relations from multiple PlantUML files.
+        /// The diagram is saved as a PlantUML file named "CompleteClassDiagram.puml" in the specified path.
+        /// </summary>
+        /// <param name="path">The directory path where the PlantUML files are located.</param>
+        /// <param name="force">A flag indicating whether to overwrite an existing diagram file with the same name.</param>
         public static void CreateCompleteClassDiagram(string path, bool force)
         {
             var result = new List<string>();
@@ -183,6 +194,11 @@ namespace PlantUML.Logic
             }
         }
 
+        /// <summary>
+        /// Extracts UML items from the given lines.
+        /// </summary>
+        /// <param name="lines">The lines to extract UML items from.</param>
+        /// <returns>An enumerable collection of UML items.</returns>
         private static IEnumerable<UMLItem> ExtractUMLItems(IEnumerable<string> lines)
         {
             var result = new List<UMLItem>();
@@ -213,6 +229,9 @@ namespace PlantUML.Logic
             }
             return result;
         }
+        /// <summary>
+        /// Represents a UML item.
+        /// </summary>
         private static UMLItem ExtractUMLRelations(IEnumerable<string> lines)
         {
             var result = new UMLItem();

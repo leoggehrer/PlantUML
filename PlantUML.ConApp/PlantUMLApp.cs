@@ -5,8 +5,6 @@ public partial class PlantUMLApp : ConsoleApplication
     #region Class-Constructors
     /// <summary>
     /// Initializes the <see cref="Program"/> class.
-    /// </summary>
-    /// <remarks>
     /// This static constructor sets up the necessary properties for the program.
     /// </remarks>
     static PlantUMLApp()
