@@ -1,11 +1,29 @@
 ﻿namespace PlantUML.ConApp;
 
-public class PlantUMLApp : ConsoleApplication
+public partial class PlantUMLApp : ConsoleApplication
 {
+    #region Class-Constructors
+    /// <summary>
+    /// Initializes the <see cref="Program"/> class.
+    /// </summary>
+    /// <remarks>
+    /// This static constructor sets up the necessary properties for the program.
+    /// </remarks>
     static PlantUMLApp()
     {
-        SourcePath = "/Users/ggehrer/source/repos/leoggehrer/2324-34_ABIF_ACIF_POSE";
+        ClassConstructing();
+        ClassConstructed();
     }
+    /// <summary>
+    /// This method is called during the construction of the class.
+    /// </summary>
+    static partial void ClassConstructing();
+    /// <summary>
+    /// Represents a method that is called when a class is constructed.
+    /// </summary>
+    static partial void ClassConstructed();
+    #endregion Class-Constructors
+
     /// <summary>
     /// Represents the type of diagram.
     /// </summary>
@@ -14,11 +32,12 @@ public class PlantUMLApp : ConsoleApplication
         Activity,
         Class,
     }
+
     #region app properties
     /// <summary>
     /// Gets or sets the selected diagram type.
     /// </summary>
-    public static DiagramBuilderType DiagramBuilder { get; set; } = DiagramBuilderType.Class;
+    public static DiagramBuilderType DiagramBuilder { get; set; } = DiagramBuilderType.Activity;
     /// <summary>
     /// Gets or sets the folder path for diagrams.
     /// </summary>
@@ -154,6 +173,7 @@ public class PlantUMLApp : ConsoleApplication
     /// <param name="force">A flag indicating whether to force the creation of the diagram.</param>
     private static void CreateDiagram(string filePath, bool force)
     {
+        StartProgressBar();
         UMLDiagramBuilder diagram = DiagramBuilder switch
         {
             DiagramBuilderType.Activity => new ActivityDiagramBuilder(filePath, DiagramFolder, force),

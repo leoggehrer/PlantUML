@@ -47,6 +47,12 @@ namespace PlantUML.Logic
         };
         #endregion skinparam
 
+        #region class definitions
+        private class UMLItem : List<string>
+        {
+        }
+        #endregion class definitions
+
         #region diagram creation
         /// <summary>
         /// Creates activity diagrams for each method in the provided source code and saves them to the specified path.
@@ -71,7 +77,7 @@ namespace PlantUML.Logic
 
                 foreach (var methodNode in methodNodes)
                 {
-                    var fileName = $"{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
+                    var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
                     var filePath = Path.Combine(path, fileName);
                     var diagramData = CreateActivityDiagram(methodNode);
 
@@ -110,22 +116,65 @@ namespace PlantUML.Logic
             var result = new List<string>();
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var syntaxRoot = syntaxTree.GetRoot();
-            var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+            var typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
 
             if (Path.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
 
-            foreach (var classNode in classNodes)
+            foreach (var itemNode in typeDeclarations)
             {
-                var fileName = $"{classNode.Identifier.Text}.puml";
+                var fileName = $"cd_{itemNode.Identifier.Text}.puml";
                 var filePath = Path.Combine(path, fileName);
-                var diagramData = CreateClassDiagram(classNode);
+                var diagramData = new List<string>();
 
-                diagramData.Insert(0, $"@startuml {classNode.Identifier.Text}");
-                diagramData.Insert(1, $"title {classNode.Identifier.Text}");
+                AnalysisStatement(itemNode, diagramData, 0);
+                diagramData.Insert(0, $"@startuml {itemNode.Identifier.Text}");
+                diagramData.Insert(1, $"title {itemNode.Identifier.Text}");
 
+                diagramData.Add("@enduml");
+                if (force || Path.Exists(filePath) == false)
+                {
+                    File.WriteAllLines(filePath, diagramData);
+                }
+            }
+
+            CreateCompleteClassDiagram(path, force);
+        }
+
+        public static void CreateCompleteClassDiagram(string path, bool force)
+        {
+            var result = new List<string>();
+            var umlItems = new List<UMLItem>();
+            var umlRelations = new List<UMLItem>();
+            var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
+                                 .Where(f => Path.GetFileName(f).StartsWith("cd_"));
+
+            foreach (var file in files)
+            {
+                var lines = File.ReadAllLines(file);
+
+                umlItems.AddRange(ExtractUMLItems(lines));
+                umlRelations.Add(ExtractUMLRelations(lines));
+            }
+
+            var fileName = "CompleteClassDiagram.puml";
+            var filePath = Path.Combine(path, fileName);
+            var diagramData = new List<string>();
+
+            foreach (var item in umlItems)
+            {
+                diagramData.AddRange(item);
+            }
+            foreach (var item in umlRelations)
+            {
+                diagramData.AddRange(item);
+            }
+            if (diagramData.Count > 0)
+            {
+                diagramData.Insert(0, "@startuml CompleteClassDiagram");
+                diagramData.Insert(1, "title CompleteClassDiagram");
                 diagramData.Add("@enduml");
                 if (force || Path.Exists(filePath) == false)
                 {
@@ -134,12 +183,47 @@ namespace PlantUML.Logic
             }
         }
 
-        public static List<string> CreateClassDiagram(ClassDeclarationSyntax classNode)
+        private static IEnumerable<UMLItem> ExtractUMLItems(IEnumerable<string> lines)
         {
-            var result = new List<string>();
+            var result = new List<UMLItem>();
+            var isItem = false;
+            var umlItem = default(UMLItem);
 
-            AnalysisStatement(classNode, result, 0);
+            foreach (var line in lines)
+            {
+                if (line.Trim().EndsWith("{") && (line.Contains("class") || line.Contains("interface")))
+                {
+                    isItem = true;
+                    umlItem = new UMLItem
+                    {
+                        line
+                    };
+                }
+                else if (isItem && umlItem != default && line.Trim().StartsWith("}") == false)
+                {
+                    umlItem.Add(line);
+                }
+                else if (isItem && umlItem != default && line.Trim().StartsWith("}"))
+                {
+                    umlItem.Add(line);
+                    result.Add(umlItem);
+                    umlItem = default;
+                    isItem = false;
+                }
+            }
+            return result;
+        }
+        private static UMLItem ExtractUMLRelations(IEnumerable<string> lines)
+        {
+            var result = new UMLItem();
 
+            foreach (var line in lines)
+            {
+                if (line.Contains("<|--") || line.Contains("--|>"))
+                {
+                    result.Add(line);
+                }
+            }
             return result;
         }
 
@@ -309,6 +393,97 @@ namespace PlantUML.Logic
         /// <param name="level">The indentation level for the diagram data.</param>
         public static void AnalysisStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
+            static string ConvertModifiers(IEnumerable<SyntaxToken> modifiers)
+            {
+                string result = string.Empty;
+
+                foreach (SyntaxToken modifier in modifiers)
+                {
+                    if (modifier.Text == "public")
+                        result = $"+{result}";
+                    else if (modifier.Text == "internal")
+                        result = $"#{result}";
+                    else if (modifier.Text == "abstract")
+                        result += "abstract";
+                    else if (modifier.Text == "static")
+                        result += "{static}";
+                }
+                return result;
+            }
+            static string ConvertFieldDeclaration(FieldDeclarationSyntax declaration)
+            {
+                var result = string.Empty;
+                var data = declaration.ToString().Split(' ');
+
+                foreach (var item in data)
+                {
+                    if (item == "public")
+                        result = $"+{result}";
+                    else if (item == "internal")
+                        result = $"#{result}";
+                    else if (item == "private")
+                        result = $"-{result}";
+                    else if (item == "abstract")
+                        result += "{abstract}";
+                    else if (item == "static")
+                        result += "{static}";
+                    else if (item != ";")
+                        result += $" {item}";
+                }
+                return result.Replace(";", string.Empty);
+            }
+            static string[] ConvertPropertyDeclaration(PropertyDeclarationSyntax declaration)
+            {
+                var result = new List<string>();
+                var modifier = ConvertModifiers(declaration.Modifiers);
+
+                if (declaration.AccessorList != null)
+                {
+                    foreach (AccessorDeclarationSyntax item in declaration.AccessorList!.Accessors)
+                    {
+                        var accessModifier = modifier;
+
+                        if (item.Modifiers.Any())
+                        {
+                            accessModifier = ConvertModifiers(item.Modifiers);
+                        }
+                        if (item.Keyword.Text == "get")
+                        {
+                            result.Add($"{accessModifier} {declaration.Type} get{declaration.Identifier}()");
+                        }
+                        else if (item.Keyword.Text == "set")
+                        {
+                            result.Add($"{accessModifier} Void set{declaration.Identifier}({declaration.Type} value)");
+                        }
+                    }
+                }
+                else
+                {
+                    result.Add($"{modifier} {declaration.Type} get{declaration.Identifier}()");
+                }
+                return result.ToArray();
+            }
+            static string ConvertMethodDeclaration(MethodDeclarationSyntax declaration)
+            {
+                var modifiers = ConvertModifiers(declaration.Modifiers);
+                var parameterList = "(";
+
+                if (declaration.ParameterList != default)
+                {
+                    int paramCount = 0;
+
+                    foreach (var item in declaration.ParameterList.Parameters)
+                    {
+                        if (paramCount++ > 0)
+                            parameterList += ", ";
+
+                        parameterList += $"{item.Type} {item.Identifier}";
+                    }
+                }
+                parameterList += ")";
+
+                return $"{modifiers} {declaration.ReturnType} {declaration.Identifier}{parameterList}";
+            }
             const string yesLabel = "<color:green>yes";
             const string noLabel = "<color:red>no";
 
@@ -430,11 +605,89 @@ namespace PlantUML.Logic
             {
                 System.Diagnostics.Debug.WriteLine($"{nameof(returnStatement)} is known but not used!");
             }
+            else if (syntaxNode is EnumDeclarationSyntax enumDeclaration)
+            {
+                diagramData.Add($"enum {enumDeclaration.Identifier} #lightblue".SetIndent(level));
+                foreach (var member in enumDeclaration.Members)
+                {
+                    diagramData.Add($"{member.Identifier}".SetIndent(level + 1));
+                }
+                diagramData.Add("}".SetIndent(level));
+            }
+            else if (syntaxNode is StructDeclarationSyntax structDeclaration)
+            {
+                diagramData.Add($"struct {structDeclaration.Identifier} #lightyellow".SetIndent(level));
+                foreach (var member in structDeclaration.Members)
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("}".SetIndent(level));
+            }
+            else if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclaration)
+            {
+                string declaration = ConvertModifiers(interfaceDeclaration.Modifiers);
+
+                declaration += $"interface {interfaceDeclaration.Identifier} #lightgrey";
+                declaration += " {";
+                diagramData.Add(declaration.SetIndent(level));
+                foreach (var member in interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("---".SetIndent(level));
+                foreach (var member in interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("---".SetIndent(level));
+                foreach (var member in interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("}".SetIndent(level));
+            }
             else if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
-                foreach (SyntaxToken modifier in classDeclaration.Modifiers)
+                string declaration = ConvertModifiers(classDeclaration.Modifiers);
+
+                declaration += $"class {classDeclaration.Identifier}";
+                declaration += declaration.Contains("abstract") ? " #white" : " #whitesmoke";
+                declaration += " {";
+                diagramData.Add(declaration.SetIndent(level));
+                foreach (var member in classDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
+                    AnalysisStatement(member, diagramData, level + 1);
                 }
+                diagramData.Add("---".SetIndent(level));
+                foreach (var member in classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("---".SetIndent(level));
+                foreach (var member in classDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
+                {
+                    AnalysisStatement(member, diagramData, level + 1);
+                }
+                diagramData.Add("}".SetIndent(level));
+                if (classDeclaration.BaseList != null)
+                {
+                    foreach (var baseType in classDeclaration.BaseList.Types)
+                    {
+                        diagramData.Add($"{classDeclaration.Identifier} <|-- {baseType.Type}".SetIndent(level));
+                    }
+                }
+            }
+            else if (syntaxNode is FieldDeclarationSyntax fieldDeclaration)
+            {
+                diagramData.Add(ConvertFieldDeclaration(fieldDeclaration).SetIndent(level));
+            }
+            else if (syntaxNode is PropertyDeclarationSyntax propertyDeclaration)
+            {
+                diagramData.AddRange(ConvertPropertyDeclaration(propertyDeclaration));
+            }
+            else if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
+            {
+                diagramData.Add(ConvertMethodDeclaration(methodDeclaration));
             }
             else
             {
