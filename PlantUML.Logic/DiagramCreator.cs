@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using PlantUML.Logic.Extensions;
 using System.Collections;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace PlantUML.Logic
@@ -93,6 +94,7 @@ namespace PlantUML.Logic
                     }
                 }
             }
+            CreateCompleteActivityDiagram(path, force);
         }
         /// <summary>
         /// Creates an activity diagram based on the provided method declaration syntax.
@@ -102,16 +104,79 @@ namespace PlantUML.Logic
         public static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode)
         {
             var diagramData = new List<string>();
+            var islocalDeclaration = false;
             var statements = methodNode?.Body?.Statements;
 
             foreach (StatementSyntax statement in statements!)
             {
-                AnalysisStatement(statement, diagramData, 0);
+                if (statement is LocalDeclarationStatementSyntax localDeclarationStatement)
+                {
+                    if (islocalDeclaration == false)
+                    {
+                        islocalDeclaration = true;
+                        diagramData.Add($"#LightBlue:{localDeclarationStatement.Declaration}");
+                    }
+                    else
+                    {
+                        diagramData.Add($"{localDeclarationStatement.Declaration}");
+                    }
+                }
+                else
+                {
+                    if (islocalDeclaration)
+                    {
+                        islocalDeclaration = false;
+                        diagramData[diagramData.Count - 1] += ";";
+                    }
+                    AnalysisStatement(statement, diagramData, 0);
+                }
             }
             return diagramData;
         }
+        public static void CreateCompleteActivityDiagram(string path, bool force)
+        {
+            var result = new List<string>();
+            var umlItems = new List<UMLItem>();
+            var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
+                                 .Where(f => Path.GetFileName(f).StartsWith("ac_"));
 
-        /// <summary>        /// Creates a class diagram from the provided source code and saves it to the specified path.
+            foreach (var file in files)
+            {
+                var lines = File.ReadAllLines(file);
+                var acItems = ExtractUMLItems(lines).ToArray();
+                var acTitles = lines.Where(l => l.StartsWith("title")).ToArray();
+
+                if (acItems.Length == acTitles.Length)
+                {
+                    for (int i = 0; i < acItems.Length; i++)
+                    {
+                        acItems[i].Insert(1, $"note right: {acTitles[i].Replace("title", string.Empty)}");
+                    }
+                }
+                umlItems.AddRange(acItems.Where(e => e.Count > 3));
+            }
+
+            var fileName = "CompleteActivityDiagram.puml";
+            var filePath = Path.Combine(path, fileName);
+            var diagramData = new List<string>();
+
+            foreach (var item in umlItems)
+            {
+                diagramData.AddRange(item);
+            }
+            if (diagramData.Count > 0)
+            {
+                diagramData.Insert(0, "@startuml CompleteActivityDiagram");
+                diagramData.Insert(1, "title CompleteActivityDiagram");
+                diagramData.Add("@enduml");
+                if (force || Path.Exists(filePath) == false)
+                {
+                    File.WriteAllLines(filePath, diagramData);
+                }
+            }
+        }
+        /// <summary>
+        /// Creates a class diagram from the provided source code and saves it to the specified path.
         /// </summary>
         /// <param name="path">The path where the class diagram files will be saved.</param>
         /// <param name="source">The source code from which the class diagram will be generated.</param>
@@ -144,7 +209,6 @@ namespace PlantUML.Logic
                     File.WriteAllLines(filePath, diagramData);
                 }
             }
-
             CreateCompleteClassDiagram(path, force);
         }
 
@@ -207,20 +271,39 @@ namespace PlantUML.Logic
 
             foreach (var line in lines)
             {
-                if (line.Trim().EndsWith("{") && (line.Contains("class") || line.Contains("interface")))
+                if (isItem == false && line.Trim().EndsWith("{") && (line.Contains("class") || line.Contains("interface")))
                 {
+                    // item is class or interface
                     isItem = true;
                     umlItem = new UMLItem
                     {
                         line
                     };
                 }
-                else if (isItem && umlItem != default && line.Trim().StartsWith("}") == false)
+                else if (isItem == false && line.Trim().StartsWith("start", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    // item is activity 
+                    isItem = true;
+                    umlItem = new UMLItem
+                    {
+                        line
+                    };
+                }
+                else if (isItem && umlItem != default && line.Trim().StartsWith("}") == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false)
                 {
                     umlItem.Add(line);
                 }
                 else if (isItem && umlItem != default && line.Trim().StartsWith("}"))
                 {
+                    // end of item from class or interface
+                    umlItem.Add(line);
+                    result.Add(umlItem);
+                    umlItem = default;
+                    isItem = false;
+                }
+                else if (isItem && umlItem != default && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    // end of item from activity
                     umlItem.Add(line);
                     result.Add(umlItem);
                     umlItem = default;
@@ -508,7 +591,7 @@ namespace PlantUML.Logic
 
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
-                diagramData.Add($":{localDeclarationStatement.Declaration};".SetIndent(level));
+                diagramData.Add($"#LightBlue:{localDeclarationStatement.Declaration};".SetIndent(level));
             }
             else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
             {
