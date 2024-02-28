@@ -123,7 +123,7 @@ public partial class PlantUMLApp : ConsoleApplication
 
         ForegroundColor = ConsoleColor.Green;
 
-        count = Display.PrintLine(nameof(PlantUML));
+        count = PrintLine(nameof(PlantUML));
         PrintLine('=', count);
         PrintLine();
         ForegroundColor = saveForeColor;
