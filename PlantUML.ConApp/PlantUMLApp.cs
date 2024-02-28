@@ -116,7 +116,7 @@ public partial class PlantUMLApp : ConsoleApplication
     /// Prints the header for the PlantUML application.
     /// </summary>
     /// <param name="sourcePath">The path of the solution.</param>
-    protected override void PrintHeader(string sourcePath)
+    protected override void PrintHeader()
     {
         var count = 0;
         var saveForeColor = ForegroundColor;
@@ -128,7 +128,7 @@ public partial class PlantUMLApp : ConsoleApplication
         PrintLine();
         ForegroundColor = saveForeColor;
         PrintLine($"Force flag:  {Force}");
-        PrintLine($"Source path: {sourcePath}");
+        PrintLine($"Source path: {SourcePath}");
         PrintLine();
         PrintLine($"Diagram folder:  {DiagramFolder}");
         PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}]");

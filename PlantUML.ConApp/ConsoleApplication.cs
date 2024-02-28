@@ -241,7 +241,7 @@ namespace PlantUML.ConApp
         #endregion progressbar-methods
 
         #region abstract-methods
-        protected abstract void PrintHeader(string sourcePath);
+        protected abstract void PrintHeader();
         protected abstract MenuItem[] CreateMenuItems();
         protected abstract void PrintFooter();
         #endregion abstract-methods
@@ -259,7 +259,7 @@ namespace PlantUML.ConApp
 
                 Clear();
                 ForegroundColor = ProgressBarForegroundColor;
-                PrintHeader(SolutionPath);
+                PrintHeader();
                 menuItems.ForEach(m => PrintLine($"[{m.Key,3}] {m.Text}"));
                 PrintFooter();
 
