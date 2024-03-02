@@ -25,7 +25,7 @@ namespace PlantUML.ConApp
             /// <summary>
             /// Gets or sets the optional key.
             /// </summary>
-            public string OptionalKey  { get; set; } = string.Empty;
+            public string OptionalKey { get; set; } = string.Empty;
             /// <summary>
             /// Gets or sets the text.
             /// </summary>
@@ -33,11 +33,21 @@ namespace PlantUML.ConApp
             /// <summary>
             /// Gets or sets the action associated with the property.
             /// </summary>
-            public required Action Action { get; set; }
+            public required Action<MenuItem> Action { get; set; }
+
+            /// <summary>
+            /// Gets or sets the parameters for the console application.
+            /// </summary>
+            public Dictionary<string, object> Params { get; set; } = [];
+
+            /// <summary>
+            /// Gets or sets the foreground color of the console.
+            /// </summary>
+            public ConsoleColor ForegroundColor { get; set; } = ConsoleApplication.ForegroundColor;
         }
         #endregion menuitem
 
-        #region console-properties
+        #region properties
         /// <summary>
         /// Gets or sets the foreground color of the console.
         /// </summary>
@@ -46,6 +56,9 @@ namespace PlantUML.ConApp
             get => Console.ForegroundColor;
             set => Console.ForegroundColor = value;
         }
+        #endregion properties
+
+        #region console-methods
         /// <summary>
         /// Clears the console screen.
         /// </summary>
@@ -100,11 +113,12 @@ namespace PlantUML.ConApp
         /// <returns>The length of the printed line.</returns>
         public static int PrintLine(char chr, int count)
         {
-            string message = new string(chr, count);
+            string message = new(chr, count);
 
             Console.WriteLine(message);
             return message.Length;
         }
+
         /// <summary>
         /// Reads a line of input from the console.
         /// </summary>
@@ -140,7 +154,33 @@ namespace PlantUML.ConApp
         {
             Console.SetCursorPosition(left, top);
         }
-        #endregion console-properties
+
+        /// <summary>
+        /// Converts the given label and text into a formatted label text.
+        /// </summary>
+        /// <param name="label">The label to be displayed.</param>
+        /// <param name="text">The text to be displayed.</param>
+        /// <returns>The formatted label text.</returns>
+        public static string ToLabelText(string label, string text)
+        {
+            return ToLabelText(label, text, 20, '.');
+        }
+        /// <summary>
+        /// Formats a label and text into a single string with a specified width and padding character.
+        /// </summary>
+        /// <param name="label">The label to be displayed.</param>
+        /// <param name="text">The text to be displayed.</param>
+        /// <param name="width">The total width of the resulting string.</param>
+        /// <param name="chr">The character used for padding.</param>
+        /// <returns>A formatted string with the label and text.</returns>
+        public static string ToLabelText(string label, string text, int width, char chr)
+        {
+            var diff = width - label.Length;
+            var space = new string(chr, Math.Max(0, diff));
+
+            return $"{label}{space}{text}";
+        }
+        #endregion console-methods
 
         #region progressbar-properties
         /// <summary>
@@ -161,10 +201,11 @@ namespace PlantUML.ConApp
         #endregion progressbar-properties
 
         #region app-properties
+        protected MenuItem[] MenuItems { get; set; } = [];
         /// <summary>
         /// Gets or sets a value indicating whether the application should continue running.
         /// </summary>
-        protected static bool RunApp { get; set; } = false;
+        protected bool RunApp { get; set; } = false;
         #endregion app-properties
 
         #region progressbar-methods
@@ -204,7 +245,7 @@ namespace PlantUML.ConApp
                     {
                         if (CanProgressBarPrint)
                         {
-                            if (Left > 60)
+                            if (Left > 65)
                             {
                                 var timeInSec = counter / 5;
 
@@ -230,7 +271,6 @@ namespace PlantUML.ConApp
                 });
             }
         }
-
         /// <summary>
         /// Stops the execution of the busy progress.
         /// </summary>
@@ -241,46 +281,116 @@ namespace PlantUML.ConApp
         #endregion progressbar-methods
 
         #region abstract-methods
+        /// <summary>
+        /// Prints the header.
+        /// </summary>
         protected abstract void PrintHeader();
+        /// <summary>
+        /// Creates an array of menu items.
+        /// </summary>
+        /// <returns>An array of <see cref="MenuItem"/> objects.</returns>
         protected abstract MenuItem[] CreateMenuItems();
+        /// <summary>
+        /// Creates the exit menu items for the application.
+        /// </summary>
+        /// <returns>An array of MenuItem objects representing the exit menu items.</returns>
+        protected virtual MenuItem[] CreateExitMenuItems()
+        {
+            return [ new()
+                     {
+                        Key = "===",
+                        Text = new string('=', 65),
+                        Action = (self) => { },
+                        ForegroundColor = ConsoleColor.DarkGreen,
+                     },
+
+                     new()
+                     {
+                        Key = "x|X",
+                        Text = ToLabelText("Exit", "Exits the application"),
+                        Action = (self) => { RunApp = false; },
+                     },
+            ];
+        }
+        /// <summary>
+        /// Prints the footer.
+        /// </summary>
         protected abstract void PrintFooter();
+        /// <summary>
+        /// Prints the screen with the menu items.
+        /// </summary>
+        protected virtual void PrintScreen()
+        {
+            var saveForegrondColor = ForegroundColor;
+
+            MenuItems = CreateMenuItems();
+            Clear();
+            ForegroundColor = saveForegrondColor;
+            PrintHeader();
+            MenuItems.ForEach(m =>
+            {
+                ForegroundColor = m.ForegroundColor;
+                PrintLine($"[{m.Key,3}] {m.Text}");
+            });
+            ForegroundColor = saveForegrondColor;
+            PrintFooter();
+        }
         #endregion abstract-methods
 
         #region main-method
+        /// <summary>
+        /// This method is called before the execution of the program's main logic.
+        /// </summary>
+        /// <param name="args">The command-line arguments passed to the program.</param>
+        protected virtual void BeforeRun(string[] args) { }
+        /// <summary>
+        /// This method is called before the execution of the main logic.
+        /// </summary>
+        protected virtual void BeforeExecution() { }
+        /// <summary>
+        /// Runs the console application.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
         public virtual void Run(string[] args)
         {
             var choose = default(string[]);
-            var saveForeColor = Console.ForegroundColor;
+            var saveForegrondColor = ForegroundColor;
 
+            BeforeRun(args);
             RunApp = true;
             do
             {
-                var menuItems = CreateMenuItems();
-
-                Clear();
-                ForegroundColor = ProgressBarForegroundColor;
-                PrintHeader();
-                menuItems.ForEach(m => PrintLine($"[{m.Key,3}] {m.Text}"));
-                PrintFooter();
+                PrintScreen();
 
                 choose = ReadLine().ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries);
                 var chooseIterator = choose.GetEnumerator();
 
-                ForegroundColor = saveForeColor;
+                BeforeExecution();
+                ForegroundColor = saveForegrondColor;
                 while (RunApp && chooseIterator.MoveNext())
                 {
-                    var actions = menuItems.Where(m => m.Key.Equals(chooseIterator.Current) || m.OptionalKey.Equals(chooseIterator.Current));
-                    var actioIterator = actions.GetEnumerator();
+                    var actions = MenuItems.Where(m => m.Key.Equals(chooseIterator.Current) || m.OptionalKey.Equals(chooseIterator.Current));
+                    var actionIterator = actions.GetEnumerator();
 
-                    while (RunApp && actioIterator.MoveNext())
+                    while (RunApp && actionIterator.MoveNext())
                     {
-                        actioIterator.Current?.Action();
+                        actionIterator.Current?.Action(actionIterator.Current);
                     }
-                    RunApp = chooseIterator.Current.Equals("x") == false;
+                    RunApp = RunApp && chooseIterator.Current.Equals("x") == false;
                     StopProgressBar();
                 }
+                AfterExecution();
             } while (RunApp);
+            AfterRun();
         }
+        /// <summary>
+        /// This method is called after the execution of the main logic in the derived class.
+        /// </summary>
+        protected virtual void AfterExecution() { }
+        /// <summary>
+        /// This method is called after the execution of the Run method.
+        /// </summary>
+        protected virtual void AfterRun() { }
         #endregion main-method
 
         #region file and path methods
@@ -311,6 +421,126 @@ namespace PlantUML.ConApp
             {
                 SourcePath = newPath;
             }
+        }
+        /// <summary>
+        /// Changes the path for the application.
+        /// </summary>
+        public static string ChangePath(string path)
+        {
+            return ChangePath("Enter path: ", path);
+        }
+        /// <summary>
+        /// Changes the path for the application.
+        /// </summary>
+        public static string ChangePath(string title, string path)
+        {
+            PrintLine();
+            Print(title);
+            var newPath = ReadLine();
+
+            if (Directory.Exists(newPath))
+            {
+                path = newPath;
+            }
+            return path;
+        }
+        /// <summary>
+        /// Changes the template solution path based on the current path and a list of query paths.
+        /// </summary>
+        /// <param name="currentPath">The current path.</param>
+        /// <param name="queryPaths">The query paths.</param>
+        /// <returns>The updated solution path.</returns>
+        public static string ChangeTemplateSolutionPath(string currentPath, params string[] queryPaths)
+        {
+            var result = currentPath;
+            var solutionPath = GetCurrentSolutionPath();
+            var qtSolutionPaths = new List<string>();
+            var saveForeColor = ForegroundColor;
+
+            queryPaths.ForEach(qp => TemplatePath.GetTemplateSolutions(qp).ForEach(s => qtSolutionPaths.Add(s)));
+
+            if (qtSolutionPaths.Contains(solutionPath) == false && solutionPath != currentPath)
+            {
+                qtSolutionPaths.Add(solutionPath);
+            }
+
+            var qtSelectSolutions = qtSolutionPaths.Distinct().OrderBy(e => e).ToArray();
+
+            for (int i = 0; i < qtSelectSolutions.Length; i++)
+            {
+                if (i == 0)
+                    PrintLine();
+
+                ForegroundColor = i % 2 == 0 ? ConsoleColor.DarkYellow : saveForeColor;
+                PrintLine($"[{i + 1,3}] Change path to: {qtSelectSolutions[i]}");
+            }
+            ForegroundColor = saveForeColor;
+            PrintLine();
+            Print("Select or enter source path: ");
+            var selectOrPath = ReadLine();
+
+            if (int.TryParse(selectOrPath, out int number))
+            {
+                if ((number - 1) >= 0 && (number - 1) < qtSelectSolutions.Length)
+                {
+                    result = qtSelectSolutions[number - 1];
+                }
+            }
+            else if (string.IsNullOrEmpty(selectOrPath) == false
+                     && Directory.Exists(selectOrPath))
+            {
+                result = selectOrPath;
+            }
+            return result;
+        }
+        /// <summary>
+        /// Selects or changes the current path to a subpath based on the provided query paths.
+        /// </summary>
+        /// <param name="currentPath">The current path.</param>
+        /// <param name="queryPaths">The query paths.</param>
+        /// <returns>The selected or changed path.</returns>
+        public static string SelectOrChangeToSubPath(string currentPath, params string[] queryPaths)
+        {
+            var result = currentPath;
+            var solutionPath = GetCurrentSolutionPath();
+            var qtSolutionPaths = new List<string>();
+            var saveForeColor = ForegroundColor;
+
+            queryPaths.ForEach(qp => TemplatePath.GetSubPaths(qp).ForEach(s => qtSolutionPaths.Add(s)));
+
+            if (qtSolutionPaths.Contains(solutionPath) == false && solutionPath != currentPath)
+            {
+                qtSolutionPaths.Add(solutionPath);
+            }
+
+            var qtSelectSolutions = qtSolutionPaths.Distinct().OrderBy(e => e).ToArray();
+
+            for (int i = 0; i < qtSelectSolutions.Length; i++)
+            {
+                if (i == 0)
+                    PrintLine();
+
+                ForegroundColor = i % 2 == 0 ? ConsoleColor.DarkYellow : saveForeColor;
+                PrintLine($"[{i + 1,3}] Change path to: {qtSelectSolutions[i]}");
+            }
+            ForegroundColor = saveForeColor;
+            PrintLine();
+            Print("Select or enter target path: ");
+            var selectOrPath = ReadLine();
+
+            if (Int32.TryParse(selectOrPath, out int number))
+            {
+                if ((number - 1) >= 0 && (number - 1) < qtSelectSolutions.Length)
+                {
+                    result = qtSelectSolutions[number - 1];
+                }
+            }
+            else if (string.IsNullOrEmpty(selectOrPath) == false
+                     && Directory.Exists(selectOrPath))
+            {
+                result = selectOrPath;
+            }
+            return result;
         }
         #endregion file and path methods
     }
