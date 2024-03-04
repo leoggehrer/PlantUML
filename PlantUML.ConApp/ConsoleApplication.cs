@@ -11,25 +11,37 @@ namespace PlantUML.ConApp
     public abstract partial class ConsoleApplication : Application
     {
         #region menuitem
+        /// <summary>
+        /// Represents a menu item in a console application.
+        /// </summary>
         /// Represents a menu item.
+        /// <remarks
         /// Gets or sets the unique key of the menu item.
         /// Gets or sets the non-unique optional key of the menu item.
         /// Gets or sets the displayed text of the menu item.
         /// Gets or sets the action to be performed when the menu item is selected.
+        /// </remarks>
         protected partial class MenuItem
         {
+            /// <summary>
+            /// Gets or sets a value indicating whether the item is displayed.
+            /// </summary>
+            public bool IsDisplayed { get; set; } = true;
             /// <summary>
             /// Gets or sets the key.
             /// </summary>
             public required string Key { get; set; }
+
             /// <summary>
             /// Gets or sets the optional key.
             /// </summary>
             public string OptionalKey { get; set; } = string.Empty;
+
             /// <summary>
             /// Gets or sets the text.
             /// </summary>
             public required string Text { get; set; }
+
             /// <summary>
             /// Gets or sets the action associated with the property.
             /// </summary>
@@ -38,7 +50,7 @@ namespace PlantUML.ConApp
             /// <summary>
             /// Gets or sets the parameters for the console application.
             /// </summary>
-            public Dictionary<string, object> Params { get; set; } = [];
+            public Dictionary<string, object> Params { get; set; } = new Dictionary<string, object>();
 
             /// <summary>
             /// Gets or sets the foreground color of the console.
@@ -201,6 +213,9 @@ namespace PlantUML.ConApp
         #endregion progressbar-properties
 
         #region app-properties
+        /// <summary>
+        /// Gets or sets the menu items.
+        /// </summary>
         protected MenuItem[] MenuItems { get; set; } = [];
         /// <summary>
         /// Gets or sets a value indicating whether the application should continue running.
@@ -327,7 +342,7 @@ namespace PlantUML.ConApp
             Clear();
             ForegroundColor = saveForegrondColor;
             PrintHeader();
-            MenuItems.ForEach(m =>
+            MenuItems.Where(mi => mi.IsDisplayed).ForEach(m =>
             {
                 ForegroundColor = m.ForegroundColor;
                 PrintLine($"[{m.Key,3}] {m.Text}");

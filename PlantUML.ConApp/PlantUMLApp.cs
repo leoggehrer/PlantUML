@@ -40,6 +40,14 @@
         /// Gets or sets the folder path for diagrams.
         /// </summary>
         public static string DiagramFolder { get; set; } = "Diagrams";
+        /// <summary>
+        /// Gets or sets the current page index.
+        /// </summary>
+        private int PageIndex { get; set; } = 0;
+        /// <summary>
+        /// Gets or sets the page size for pagination.
+        /// </summary>
+        private int PageSize { get; set; } = 10;
         #endregion app properties
 
         #region overrides
@@ -92,18 +100,61 @@
                 },
             };
 
-            var files = GetSourceCodeFiles(SourcePath, ["*.cs"]);
+            var files = GetSourceCodeFiles(SourcePath, ["*.cs"]).ToArray();
 
-            foreach (var file in files.OrderBy(f => f))
+            for (int i = PageIndex * PageSize; i < files.Length && i < (PageIndex + 1) * PageSize; i++)
             {
-                menuItems.Add(new()
+                var file = files[i];
+                var text = file;
+
+                menuItems.Add(new MenuItem
                 {
-                    Key = $"{++mnuIdx}",
-                    OptionalKey = "a",  // it's for choose option all
+                    Key = (++mnuIdx).ToString(),
+                    OptionalKey = "a", // it's for choose option all
                     Text = ToLabelText("File", $"{file.Replace(SourcePath, string.Empty)}"),
-                    Action = (self) => { CreateDiagram(file, Force); },
+                    Action = (self) =>
+                    {
+                        var path = self.Params["file"]?.ToString() ?? string.Empty;
+
+                        CreateDiagram(file, Force);
+                    },
+                    Params = new() { { "file", file } },
                 });
             }
+
+            var pageLabel = $"{PageIndex * PageSize}..{Math.Min((PageIndex + 1) * PageSize, files.Length)}/{files.Length}";
+
+            menuItems.Add(new()
+            {
+                Key = "   ",
+                Text = ToLabelText(pageLabel, string.Empty, 20, ' '),
+                Action = (self) => { },
+                ForegroundColor = ConsoleColor.DarkGreen,
+            });
+            menuItems.Add(new()
+            {
+                Key = "+",
+                Text = ToLabelText("Next", "Load next path page"),
+                Action = (self) =>
+                {
+                    PageIndex = (PageIndex + 1) * PageSize <= files.Length ? PageIndex + 1 : PageIndex;
+                    PrintScreen();
+                },
+                ForegroundColor = ConsoleColor.DarkGreen,
+            });
+
+            menuItems.Add(new()
+            {
+                Key = "-",
+                Text = ToLabelText("Previous", "Load previous path page"),
+                Action = (self) =>
+                {
+                    PageIndex = Math.Max(0, PageIndex - 1);
+                    PrintScreen();
+                },
+                ForegroundColor = ConsoleColor.DarkGreen,
+            });
+
             return [.. menuItems.Union(CreateExitMenuItems())];
         }
 
