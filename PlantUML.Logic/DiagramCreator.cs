@@ -6,11 +6,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using PlantUML.Logic.Extensions;
 using System.Collections;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 
 namespace PlantUML.Logic
 {
+    /// <summary>
+    /// Represents a class that is responsible for creating various types of diagrams based on source code.
+    /// </summary>
     public class DiagramCreator
     {
         #region skinparam
@@ -49,6 +51,9 @@ namespace PlantUML.Logic
         #endregion skinparam
 
         #region class definitions
+        /// <summary>
+        /// Represents a collection of strings that make up a UML item.
+        /// </summary>
         private class UMLItem : List<string>
         {
         }
@@ -139,6 +144,13 @@ namespace PlantUML.Logic
             }
             return diagramData;
         }
+        /// <summary>
+        /// Creates a complete activity diagram by processing all the .puml files in the specified directory and its subdirectories.
+        /// The diagram is generated in PlantUML format and saved as "CompleteActivityDiagram.puml" in the specified directory.
+        /// Optionally, the diagram can be forced to be created even if it already exists.
+        /// </summary>
+        /// <param name="path">The path to the directory containing the .puml files.</param>
+        /// <param name="force">A boolean value indicating whether to force the creation of the diagram even if it already exists.</param>
         public static void CreateCompleteActivityDiagram(string path, bool force)
         {
             var result = new List<string>();
@@ -691,7 +703,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
-                diagramData.Add($":{forStatement.Declaration};".SetIndent(level));
+                diagramData.Add($"#LightBlue:{forStatement.Declaration};".SetIndent(level));
                 diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
                 AnalysisStatement(forStatement.Statement, diagramData, level + 1);
                 if (forStatement.Incrementors.Count > 0)
