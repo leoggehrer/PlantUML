@@ -126,7 +126,7 @@
 
             menuItems.Add(new()
             {
-                Key = "   ",
+                Key = "---",
                 Text = ToLabelText(pageLabel, string.Empty, 20, ' '),
                 Action = (self) => { },
                 ForegroundColor = ConsoleColor.DarkGreen,

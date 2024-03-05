@@ -83,9 +83,15 @@ namespace PlantUML.Logic
                     var diagramData = CreateActivityDiagram(methodNode);
 
                     diagramData.Insert(0, $"@startuml {classNode.Identifier.Text}.{methodNode.Identifier.Text}");
-                    diagramData.Insert(1, $"title {classNode.Identifier.Text}.{methodNode.Identifier.Text}");
-                    diagramData.Insert(2, "start");
+                    diagramData.Insert(1, "header");
+                    diagramData.Insert(2, $"generated on {DateTime.Now}");
+                    diagramData.Insert(3, "end header");
+                    diagramData.Insert(4, $"title {classNode.Identifier.Text}.{methodNode.Identifier.Text}");
+                    diagramData.Insert(5, "start");
 
+                    diagramData.Add("footer");
+                    diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                    diagramData.Add("end footer");
                     diagramData.Add("stop");
                     diagramData.Add("@enduml");
                     if (force || Path.Exists(filePath) == false)
@@ -167,7 +173,14 @@ namespace PlantUML.Logic
             if (diagramData.Count > 0)
             {
                 diagramData.Insert(0, "@startuml CompleteActivityDiagram");
-                diagramData.Insert(1, "title CompleteActivityDiagram");
+                diagramData.Insert(1, "header");
+                diagramData.Insert(2, $"generated on {DateTime.Now}");
+                diagramData.Insert(3, "end header");
+                diagramData.Insert(4, "title CompleteActivityDiagram");
+
+                diagramData.Add("footer");
+                diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                diagramData.Add("end footer");
                 diagramData.Add("@enduml");
                 if (force || Path.Exists(filePath) == false)
                 {
