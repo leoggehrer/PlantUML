@@ -24,7 +24,7 @@
 
         #region Instance-Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// Initializes a new instance of the <see cref="PlantUMLApp"/> class.
         /// </summary>
         public PlantUMLApp()
         {
