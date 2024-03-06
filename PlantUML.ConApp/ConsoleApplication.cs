@@ -1,8 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-
-using PlantUML.Logic.Extensions;
-
 namespace PlantUML.ConApp
 {
     /// <summary>
@@ -109,6 +106,14 @@ namespace PlantUML.ConApp
             get => Console.ForegroundColor;
             set => Console.ForegroundColor = value;
         }
+        /// <summary>
+        /// Gets or sets the current page index.
+        /// </summary>
+        protected int PageIndex { get; set; } = 0;
+        /// <summary>
+        /// Gets or sets the page size for pagination.
+        /// </summary>
+        protected int PageSize { get; set; } = 10;
         #endregion properties
 
         #region console-methods
@@ -336,7 +341,7 @@ namespace PlantUML.ConApp
         }
         #endregion progressbar-methods
 
-        #region abstract-methods
+        #region abstract and virtual methods
         /// <summary>
         /// Prints the header.
         /// </summary>
@@ -368,6 +373,103 @@ namespace PlantUML.ConApp
                      },
             ];
         }
+                /// <summary>
+        /// Creates an array of menu items for a given list of items, taking into account pagination.
+        /// </summary>
+        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <param name="mnuIdx">A reference to the menu index.</param>
+        /// <param name="items">The array of items.</param>
+        /// <param name="newMenuItemHandler">An optional handler for creating new menu items.</param>
+        /// <returns>An array of menu items.</returns>
+        protected virtual MenuItem[] CreatePageMenuItems<T>(ref int mnuIdx, T[] items, Action<T, MenuItem> newMenuItemHandler)
+        {
+            List<MenuItem> result = new();
+
+            if (items.Length > PageSize)
+            {
+                for (int i = PageIndex * PageSize; i < items.Length && i < (PageIndex + 1) * PageSize; i++)
+                {
+                    var item = items[i];
+                    var menuItem = new MenuItem
+                    {
+                        Key = (++mnuIdx).ToString(),
+                        OptionalKey = "a", // it's for choose option all
+                        Text = string.Empty,
+                        Action = (self) =>
+                        {
+                        },
+                    };
+                    newMenuItemHandler?.Invoke(item, menuItem);
+                    result.Add(menuItem);
+                }
+                var pageLabel = $"{(PageIndex * PageSize) + 1}..{Math.Min((PageIndex + 1) * PageSize, items.Length)}/{items.Length}";
+
+                result.Add(new()
+                {
+                    Key = "---",
+                    Text = new string('-', 65),
+                    Action = (self) => { },
+                    ForegroundColor = ConsoleColor.DarkGreen,
+                });
+                result.Add(new()
+                {
+                    Key = "",
+                    Text = ToLabelText(pageLabel, string.Empty, 20, ' '),
+                    Action = (self) => { },
+                    ForegroundColor = ConsoleColor.DarkGreen,
+                });
+                result.Add(new()
+                {
+                    Key = "---",
+                    Text = new string('-', 65),
+                    Action = (self) => { },
+                    ForegroundColor = ConsoleColor.DarkGreen,
+                });
+                result.Add(new()
+                {
+                    Key = "+",
+                    Text = ToLabelText("Next", "Load next page"),
+                    Action = (self) =>
+                    {
+                        PageIndex = (PageIndex + 1) * PageSize < items.Length ? PageIndex + 1 : PageIndex;
+                        PrintScreen();
+                    },
+                    ForegroundColor = ConsoleColor.DarkGreen,
+                });
+
+                result.Add(new()
+                {
+                    Key = "-",
+                    Text = ToLabelText("Previous", "Load previous page"),
+                    Action = (self) =>
+                    {
+                        PageIndex = Math.Max(0, PageIndex - 1);
+                        PrintScreen();
+                    },
+                    ForegroundColor = ConsoleColor.DarkGreen,
+                });
+            }
+            else
+            {
+                PageIndex = 0;
+                for (int i = 0; i < items.Length; i++)
+                {
+                    var item = items[i];
+                    var menuItem = new MenuItem
+                    {
+                        Key = (++mnuIdx).ToString(),
+                        OptionalKey = "a", // it's for choose option all
+                        Text = string.Empty,
+                        Action = (self) =>
+                        {
+                        },
+                    };
+                    newMenuItemHandler?.Invoke(item, menuItem);
+                    result.Add(menuItem);
+                }
+            }
+            return result.ToArray();
+        }
         /// <summary>
         /// Prints the footer.
         /// </summary>
@@ -383,7 +485,7 @@ namespace PlantUML.ConApp
             Clear();
             ForegroundColor = saveForegrondColor;
             PrintHeader();
-            MenuItems.Where(mi => mi.IsDisplayed).ForEach(m =>
+            MenuItems.Where(mi => mi.IsDisplayed).ToList().ForEach(m =>
             {
                 ForegroundColor = m.ForegroundColor;
                 PrintLine($"[{m.Key,3}] {m.Text}");
@@ -391,7 +493,7 @@ namespace PlantUML.ConApp
             ForegroundColor = saveForegrondColor;
             PrintFooter();
         }
-        #endregion abstract-methods
+        #endregion abstract and virtual methods
 
         #region main-method
         /// <summary>
@@ -513,7 +615,8 @@ namespace PlantUML.ConApp
             var qtSolutionPaths = new List<string>();
             var saveForeColor = ForegroundColor;
 
-            queryPaths.ForEach(qp => TemplatePath.GetTemplateSolutions(qp).ForEach(s => qtSolutionPaths.Add(s)));
+            queryPaths.ToList().ForEach(qp => TemplatePath.GetTemplateSolutions(qp)
+                      .ToList().ForEach(s => qtSolutionPaths.Add(s)));
 
             if (qtSolutionPaths.Contains(solutionPath) == false && solutionPath != currentPath)
             {
@@ -562,7 +665,8 @@ namespace PlantUML.ConApp
             var qtSolutionPaths = new List<string>();
             var saveForeColor = ForegroundColor;
 
-            queryPaths.ForEach(qp => TemplatePath.GetSubPaths(qp).ForEach(s => qtSolutionPaths.Add(s)));
+            queryPaths.ToList().ForEach(qp => TemplatePath.GetSubPaths(qp)
+                      .ToList().ForEach(s => qtSolutionPaths.Add(s)));
 
             if (qtSolutionPaths.Contains(solutionPath) == false && solutionPath != currentPath)
             {
