@@ -10,6 +10,47 @@ namespace PlantUML.ConApp
     /// </summary>
     public abstract partial class ConsoleApplication : Application
     {
+        #region Class-Constructors
+        /// <summary>
+        /// Initializes the <see cref="ConsoleApplication"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This static constructor sets up the necessary properties for the program.
+        /// </remarks>
+        static ConsoleApplication()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the class.
+        /// </summary>
+        static partial void ClassConstructing();
+        /// <summary>
+        /// Represents a method that is called when a class is constructed.
+        /// </summary>
+        static partial void ClassConstructed();
+        #endregion Class-Constructors
+
+        #region Instance-Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsoleApplication"/> class.
+        /// </summary>
+        public ConsoleApplication()
+        {
+            Constructing();
+            Constructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the object.
+        /// </summary>
+        partial void Constructing();
+        /// <summary>
+        /// This method is called when the object is constructed.
+        /// </summary>
+        partial void Constructed();
+        #endregion Instance-Constructors
+
         #region menuitem
         /// <summary>
         /// Represents a menu item in a console application.

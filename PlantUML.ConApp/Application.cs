@@ -13,7 +13,7 @@ namespace PlantUML.ConApp
     {
         #region Class-Constructors
         /// <summary>
-        /// Initializes the <see cref="Program"/> class.
+        /// Initializes the <see cref="Application"/> class.
         /// </summary>
         /// <remarks>
         /// This static constructor sets up the necessary properties for the program.
@@ -45,6 +45,25 @@ namespace PlantUML.ConApp
         /// </summary>
         static partial void ClassConstructed();
         #endregion Class-Constructors
+
+        #region Instance-Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        public Application()
+        {
+            Constructing();
+            Constructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the object.
+        /// </summary>
+        partial void Constructing();
+        /// <summary>
+        /// This method is called when the object is constructed.
+        /// </summary>
+        partial void Constructed();
+        #endregion Instance-Constructors
 
         #region properties
         /// <summary>

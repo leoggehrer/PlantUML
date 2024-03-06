@@ -22,6 +22,25 @@
         static partial void ClassConstructed();
         #endregion Class-Constructors
 
+        #region Instance-Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        public PlantUMLApp()
+        {
+            Constructing();
+            Constructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the object.
+        /// </summary>
+        partial void Constructing();
+        /// <summary>
+        /// This method is called when the object is constructed.
+        /// </summary>
+        partial void Constructed();
+        #endregion Instance-Constructors
+
         /// <summary>
         /// Represents the type of diagram.
         /// </summary>
