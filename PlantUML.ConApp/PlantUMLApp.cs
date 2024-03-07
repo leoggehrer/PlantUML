@@ -1,6 +1,6 @@
 ﻿namespace PlantUML.ConApp
 {
-    internal partial class PlantUMLApp : ConsoleApplication
+    internal partial class PlantUMLApp : CommonTool.ConsoleApplication
     {
         #region Class-Constructors
         /// <summary>

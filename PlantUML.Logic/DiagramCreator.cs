@@ -68,6 +68,7 @@ namespace PlantUML.Logic
         /// <param name="force">A flag indicating whether to overwrite existing activity diagrams if they already exist.</param>
         public static void CreateActivityDiagram(string path, string source, bool force)
         {
+            var infoData = new List<string>();
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var syntaxRoot = syntaxTree.GetRoot();
             var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
@@ -83,15 +84,16 @@ namespace PlantUML.Logic
 
                 foreach (var methodNode in methodNodes)
                 {
+                    var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
                     var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
                     var filePath = Path.Combine(path, fileName);
                     var diagramData = CreateActivityDiagram(methodNode);
 
-                    diagramData.Insert(0, $"@startuml {classNode.Identifier.Text}.{methodNode.Identifier.Text}");
+                    diagramData.Insert(0, $"@startuml {title}");
                     diagramData.Insert(1, "header");
                     diagramData.Insert(2, $"generated on {DateTime.Now}");
                     diagramData.Insert(3, "end header");
-                    diagramData.Insert(4, $"title {classNode.Identifier.Text}.{methodNode.Identifier.Text}");
+                    diagramData.Insert(4, $"title {title}");
                     diagramData.Insert(5, "start");
 
                     diagramData.Add("footer");
@@ -99,11 +101,19 @@ namespace PlantUML.Logic
                     diagramData.Add("end footer");
                     diagramData.Add("stop");
                     diagramData.Add("@enduml");
+
                     if (force || Path.Exists(filePath) == false)
                     {
                         File.WriteAllLines(filePath, diagramData);
                     }
+                    infoData.Add($"{nameof(title)}:{title}");
+                    infoData.Add($"{nameof(fileName)}:{fileName}");
                 }
+            }
+
+            if (force) 
+            {
+                File.WriteAllLines(Path.Combine(path, "ac_info.txt"), infoData);
             }
             CreateCompleteActivityDiagram(path, force);
         }
@@ -154,11 +164,31 @@ namespace PlantUML.Logic
         public static void CreateCompleteActivityDiagram(string path, bool force)
         {
             var result = new List<string>();
+            var umlFiles = new List<string>();
             var umlItems = new List<UMLItem>();
+            var infoFilePath = Path.Combine(path, "ac_info.txt");
             var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
                                  .Where(f => Path.GetFileName(f).StartsWith("ac_"));
 
-            foreach (var file in files)
+            if (File.Exists(infoFilePath))
+            {
+                var infoData = File.ReadAllLines(infoFilePath);
+
+                foreach (var infoItem in infoData.Select(l => l.Split(':'))
+                                                 .Where(d => d[0].Equals("fileName", StringComparison.OrdinalIgnoreCase))
+                                                 .Select(d => d[1]))
+                {
+                    var query = files.Where(f => Path.GetFileName(f) == infoItem).Distinct();
+
+                    umlFiles.AddRange(query);
+                }
+            }
+            else
+            {
+                umlFiles.AddRange(files);
+            }
+
+            foreach (var file in umlFiles)
             {
                 var lines = File.ReadAllLines(file);
                 var acItems = ExtractUMLItems(lines).ToArray();

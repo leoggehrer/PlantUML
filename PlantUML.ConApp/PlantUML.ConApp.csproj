@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PlantUML.Logic\PlantUML.Logic.csproj" />
+    <ProjectReference Include="..\..\CommonTool\CommonTool\CommonTool.csproj" />
   </ItemGroup>
 
 </Project>
