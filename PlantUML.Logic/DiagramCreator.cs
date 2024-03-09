@@ -90,15 +90,15 @@ namespace PlantUML.Logic
                     var diagramData = CreateActivityDiagram(methodNode);
 
                     diagramData.Insert(0, $"@startuml {title}");
-                    diagramData.Insert(1, "header");
-                    diagramData.Insert(2, $"generated on {DateTime.Now}");
-                    diagramData.Insert(3, "end header");
-                    diagramData.Insert(4, $"title {title}");
-                    diagramData.Insert(5, "start");
+                    // diagramData.Insert(1, "header");
+                    // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+                    // diagramData.Insert(3, "end header");
+                    diagramData.Insert(1, $"title {title}");
+                    diagramData.Insert(2, "start");
 
-                    diagramData.Add("footer");
-                    diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
-                    diagramData.Add("end footer");
+                    // diagramData.Add("footer");
+                    // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                    // diagramData.Add("end footer");
                     diagramData.Add("stop");
                     diagramData.Add("@enduml");
 
@@ -108,10 +108,12 @@ namespace PlantUML.Logic
                     }
                     infoData.Add($"{nameof(title)}:{title}");
                     infoData.Add($"{nameof(fileName)}:{fileName}");
+                    infoData.Add($"generated_on:{DateTime.UtcNow}");
+                    infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
                 }
             }
 
-            if (force) 
+            if (force)
             {
                 File.WriteAllLines(Path.Combine(path, "ac_info.txt"), infoData);
             }
@@ -216,7 +218,7 @@ namespace PlantUML.Logic
             {
                 diagramData.Insert(0, "@startuml CompleteActivityDiagram");
                 diagramData.Insert(1, "header");
-                diagramData.Insert(2, $"generated on {DateTime.Now}");
+                diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
                 diagramData.Insert(3, "end header");
                 diagramData.Insert(4, "title CompleteActivityDiagram");
 
@@ -238,7 +240,7 @@ namespace PlantUML.Logic
         /// <param name="force">A flag indicating whether to overwrite existing class diagram files.</param>
         public static void CreateClassDiagram(string path, string source, bool force)
         {
-            var result = new List<string>();
+            var infoData = new List<string>();
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var syntaxRoot = syntaxTree.GetRoot();
             var typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
@@ -250,19 +252,26 @@ namespace PlantUML.Logic
 
             foreach (var itemNode in typeDeclarations)
             {
+                var title = $"{itemNode.Identifier.Text}";
                 var fileName = $"cd_{itemNode.Identifier.Text}.puml";
                 var filePath = Path.Combine(path, fileName);
                 var diagramData = new List<string>();
 
                 AnalysisStatement(itemNode, diagramData, 0);
-                diagramData.Insert(0, $"@startuml {itemNode.Identifier.Text}");
-                diagramData.Insert(1, $"title {itemNode.Identifier.Text}");
+                diagramData.Insert(0, $"@startuml {title}");
+                diagramData.Insert(1, $"title {title}");
 
                 diagramData.Add("@enduml");
                 if (force || Path.Exists(filePath) == false)
                 {
                     File.WriteAllLines(filePath, diagramData);
                 }
+                infoData.Add($"{nameof(title)}:{title}");
+                infoData.Add($"{nameof(fileName)}:{fileName}");
+            }
+            if (force)
+            {
+                File.WriteAllLines(Path.Combine(path, "cd_info.txt"), infoData);
             }
             CreateCompleteClassDiagram(path, force);
         }
@@ -760,7 +769,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ReturnStatementSyntax returnStatement)
             {
-                System.Diagnostics.Debug.WriteLine($"{nameof(returnStatement)} is known but not used!");
+                diagramData.Add($"#Lavender:return {returnStatement.Expression};".SetIndent(level));
             }
             else if (syntaxNode is EnumDeclarationSyntax enumDeclaration)
             {
