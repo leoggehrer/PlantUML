@@ -113,7 +113,7 @@ namespace PlantUML.Logic
                 }
             }
 
-            if (force)
+            if (force || Path.Exists(Path.Combine(path, "ac_info.txt")) == false)
             {
                 File.WriteAllLines(Path.Combine(path, "ac_info.txt"), infoData);
             }
