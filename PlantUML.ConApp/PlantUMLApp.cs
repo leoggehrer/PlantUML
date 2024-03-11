@@ -71,13 +71,7 @@
             var mnuIdx = 0;
             var menuItems = new List<MenuItem>
             {
-                new()
-                {
-                    Key = "---",
-                    Text = new string('-', 65),
-                    Action = (self) => { },
-                    ForegroundColor = ConsoleColor.DarkGreen,
-                },
+                CreateMenuSeparator(),
                 new()
                 {
                     Key = $"{++mnuIdx}",
@@ -90,13 +84,7 @@
                     Text = ToLabelText("Path", "Change source path"),
                     Action = (self) => ChangeSourcePath(),
                 },
-                new()
-                {
-                    Key = "---",
-                    Text = new string('-', 65),
-                    Action = (self) => { },
-                    ForegroundColor = ConsoleColor.DarkGreen,
-                },
+                CreateMenuSeparator(),
                 new()
                 {
                     Key = $"{++mnuIdx}",
@@ -109,13 +97,7 @@
                     Text = ToLabelText("Builder", "Change diagram builder"),
                     Action = (self) => ChangeDiagramBuilder(),
                 },
-                new()
-                {
-                    Key = "---",
-                    Text = new string('-', 65),
-                    Action = (self) => { },
-                    ForegroundColor = ConsoleColor.DarkGreen,
-                },
+                CreateMenuSeparator(),
             };
 
             var files = GetSourceCodeFiles(SourcePath, ["*.cs"]).ToArray();
