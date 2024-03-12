@@ -58,7 +58,7 @@
         /// <summary>
         /// Gets or sets the folder path for diagrams.
         /// </summary>
-        public static string DiagramFolder { get; set; } = "Diagrams";
+        public static string DiagramFolder { get; set; } = "diagrams";
         #endregion app properties
 
         #region overrides

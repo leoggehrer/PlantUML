@@ -13,8 +13,47 @@ namespace PlantUML.Logic
     /// <summary>
     /// Represents a class that is responsible for creating various types of diagrams based on source code.
     /// </summary>
-    public class DiagramCreator
+    public partial class DiagramCreator
     {
+        #region Class-Constructors
+        /// <summary>
+        /// Initializes the <see cref="Program"/> class.
+        /// This static constructor sets up the necessary properties for the program.
+        /// </remarks>
+        static DiagramCreator()
+        {
+            ClassConstructing();
+            ClassConstructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the class.
+        /// </summary>
+        static partial void ClassConstructing();
+        /// <summary>
+        /// Represents a method that is called when a class is constructed.
+        /// </summary>
+        static partial void ClassConstructed();
+        #endregion Class-Constructors
+
+        #region Instance-Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlantUMLApp"/> class.
+        /// </summary>
+        public DiagramCreator()
+        {
+            Constructing();
+            Constructed();
+        }
+        /// <summary>
+        /// This method is called during the construction of the object.
+        /// </summary>
+        partial void Constructing();
+        /// <summary>
+        /// This method is called when the object is constructed.
+        /// </summary>
+        partial void Constructed();
+        #endregion Instance-Constructors
+
         #region skinparam
         /// <summary>
         /// Gets the default class skin parameters.
@@ -48,6 +87,14 @@ namespace PlantUML.Logic
             " BorderColor darkgrey",
             "}",
         };
+        private static string ParamsColor { get; set; } = "#Lavender";
+        private static string ReturnColor { get; set; } = "#Lavender";
+        private static string DeclarationColor { get; set; } = "#LightBlue";
+        private static string EnumDeclarationColor { get; set; } = "#LightBlue";
+        private static string StructDeclarationColor { get; set; } = "#Lightyellow";
+        private static string ClassDeclarationColor { get; set; } = "#White";
+        private static string AbstractClassDeclarationColor { get; set; } = "#White";
+        private static string InterfaceDeclarationColor { get; set; } = "#LightGrey";
         #endregion skinparam
 
         #region class definitions
@@ -128,7 +175,29 @@ namespace PlantUML.Logic
         {
             var diagramData = new List<string>();
             var islocalDeclaration = false;
-            var statements = methodNode?.Body?.Statements;
+            var parameters = methodNode.ParameterList?.Parameters ?? [];
+            var statements = methodNode?.Body?.Statements ?? [];
+            var paramsCount = 0;
+            var paramsStatement = string.Empty;
+
+            if (parameters.Count > 0)
+            {
+                paramsStatement = $"{ParamsColor}:Params(";
+            }
+            foreach (var parameter in parameters)
+            {
+                if (paramsCount > 0)
+                {
+                    paramsStatement += ", ";
+                }
+                paramsStatement += $"{parameter}";
+                paramsCount++;
+            }
+            if (paramsStatement.Length > 0)
+            {
+                paramsStatement += ");";
+                diagramData.Add(paramsStatement);
+            }
 
             foreach (StatementSyntax statement in statements!)
             {
@@ -137,7 +206,7 @@ namespace PlantUML.Logic
                     if (islocalDeclaration == false)
                     {
                         islocalDeclaration = true;
-                        diagramData.Add($"#LightBlue:{localDeclarationStatement.Declaration}");
+                        diagramData.Add($"{DeclarationColor}:{localDeclarationStatement.Declaration}");
                     }
                     else
                     {
@@ -655,7 +724,7 @@ namespace PlantUML.Logic
 
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
-                diagramData.Add($"#LightBlue:{localDeclarationStatement.Declaration};".SetIndent(level));
+                diagramData.Add($"{DeclarationColor}:{localDeclarationStatement.Declaration};".SetIndent(level));
             }
             else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
             {
@@ -742,7 +811,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
-                diagramData.Add($"#LightBlue:{forStatement.Declaration};".SetIndent(level));
+                diagramData.Add($"{DeclarationColor}:{forStatement.Declaration};".SetIndent(level));
                 diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
                 AnalysisStatement(forStatement.Statement, diagramData, level + 1);
                 if (forStatement.Incrementors.Count > 0)
@@ -769,11 +838,11 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ReturnStatementSyntax returnStatement)
             {
-                diagramData.Add($"#Lavender:return {returnStatement.Expression};".SetIndent(level));
+                diagramData.Add($"{ReturnColor}:return {returnStatement.Expression};".SetIndent(level));
             }
             else if (syntaxNode is EnumDeclarationSyntax enumDeclaration)
             {
-                diagramData.Add($"enum {enumDeclaration.Identifier} #lightblue".SetIndent(level));
+                diagramData.Add($"enum {enumDeclaration.Identifier} {EnumDeclarationColor}".SetIndent(level));
                 foreach (var member in enumDeclaration.Members)
                 {
                     diagramData.Add($"{member.Identifier}".SetIndent(level + 1));
@@ -782,7 +851,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
             {
-                diagramData.Add($"struct {structDeclaration.Identifier} #lightyellow".SetIndent(level));
+                diagramData.Add($"struct {structDeclaration.Identifier} {StructDeclarationColor}".SetIndent(level));
                 foreach (var member in structDeclaration.Members)
                 {
                     AnalysisStatement(member, diagramData, level + 1);
@@ -793,7 +862,7 @@ namespace PlantUML.Logic
             {
                 string declaration = ConvertModifiers(interfaceDeclaration.Modifiers);
 
-                declaration += $"interface {interfaceDeclaration.Identifier} #lightgrey";
+                declaration += $"interface {interfaceDeclaration.Identifier} {InterfaceDeclarationColor}";
                 declaration += " {";
                 diagramData.Add(declaration.SetIndent(level));
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
@@ -817,7 +886,7 @@ namespace PlantUML.Logic
                 string declaration = ConvertModifiers(classDeclaration.Modifiers);
 
                 declaration += $"class {classDeclaration.Identifier}";
-                declaration += declaration.Contains("abstract") ? " #white" : " #whitesmoke";
+                declaration += declaration.Contains("abstract") ? $" {ClassDeclarationColor}" : $" {AbstractClassDeclarationColor}";
                 declaration += " {";
                 diagramData.Add(declaration.SetIndent(level));
                 foreach (var member in classDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
@@ -887,9 +956,9 @@ namespace PlantUML.Logic
                 var prefix = type.IsPublic ? "+" : string.Empty;
 
                 if (type.IsAbstract)
-                    result.Add($"{prefix}abstract class {type.Name} #white " + "{");
+                    result.Add($"{prefix}abstract class {type.Name} {ClassDeclarationColor} " + "{");
                 else
-                    result.Add($"{prefix}class {type.Name} #whitesmoke " + "{");
+                    result.Add($"{prefix}class {type.Name} {AbstractClassDeclarationColor} " + "{");
                 if ((diagramCreationFlags & DiagramCreationFlags.ClassMembers) > 0)
                 {
                     result.AddRange(CreateItemMembers(type).SetIndent(1));
@@ -898,7 +967,7 @@ namespace PlantUML.Logic
             }
             else if (type.IsInterface)
             {
-                result.Add($"interface {type.Name} #lightgrey " + "{");
+                result.Add($"interface {type.Name} {InterfaceDeclarationColor} " + "{");
                 if ((diagramCreationFlags & DiagramCreationFlags.InterfaceMembers) > 0)
                 {
                     result.AddRange(CreateItemMembers(type).SetIndent(1));
