@@ -10,6 +10,7 @@
         static PlantUMLApp()
         {
             ClassConstructing();
+            DocumentsPath = SourcePath;
             ClassConstructed();
         }
         /// <summary>
@@ -59,6 +60,7 @@
         /// Gets or sets the folder path for diagrams.
         /// </summary>
         public static string DiagramFolder { get; set; } = "diagrams";
+        public static string DocumentsPath { get; set; }
         #endregion app properties
 
         #region overrides
@@ -82,7 +84,7 @@
                 {
                     Key = $"{++mnuIdx}",
                     Text = ToLabelText("Path", "Change source path"),
-                    Action = (self) => ChangeSourcePath(),
+                    Action = (self) => DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, [ SourcePath ]),
                 },
                 CreateMenuSeparator(),
                 new()
@@ -100,11 +102,11 @@
                 CreateMenuSeparator(),
             };
 
-            var files = GetSourceCodeFiles(SourcePath, ["*.cs"]).ToArray();
+            var files = GetSourceCodeFiles(DocumentsPath, ["*.cs"]).ToArray();
 
             menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, files, (item, menuItem) =>
             {
-                menuItem.Text = ToLabelText("File", $"{item.Replace(SourcePath, string.Empty)}");
+                menuItem.Text = ToLabelText("File", $"{item.Replace(DocumentsPath, string.Empty)}");
                 menuItem.Action = (self) =>
                 {
                     var path = self.Params["file"]?.ToString() ?? string.Empty;

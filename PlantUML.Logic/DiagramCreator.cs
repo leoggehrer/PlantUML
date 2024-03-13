@@ -118,9 +118,10 @@ namespace PlantUML.Logic
             public static string AbstractClass { get; set; } = "#White";
             public static string Interface { get; set; } = "#LightGrey";
 
-            public static string Parameters { get; set; } = "#Lavender";
-            public static string Declaration { get; set; } = "#LightBlue";
+            public static string Parameters { get; set; } = "#LightGreen";
+            public static string Declaration { get; set; } = "#LightSkyBlue";
 
+            public static string Expression { get; set; } = "#WhiteSmoke";
             public static string Return { get; set; } = "#Lavender";
         }
         #endregion skinparam
@@ -768,7 +769,7 @@ namespace PlantUML.Logic
                 expression = expression.Replace("System.Console.Read", "Read");
                 expression = expression.Replace("Console.Read", "Read");
 
-                diagramData.Add($":{expression}".SetIndent(level));
+                diagramData.Add($"{Color.Expression}:{expression}".SetIndent(level));
             }
             else if (syntaxNode is BlockSyntax blockSyntax)
             {
