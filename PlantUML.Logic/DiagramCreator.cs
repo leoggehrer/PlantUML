@@ -135,7 +135,7 @@ namespace PlantUML.Logic
         }
         #endregion class definitions
 
-        #region diagram creation
+        #region create activity diagram
         /// <summary>
         /// Creates activity diagrams for each method in the provided source code and saves them to the specified path.
         /// </summary>
@@ -249,7 +249,7 @@ namespace PlantUML.Logic
                         islocalDeclaration = false;
                         diagramData[diagramData.Count - 1] += ";";
                     }
-                    AnalysisStatement(statement, diagramData, 0);
+                    AnalyzeStatement(statement, diagramData, 0);
                 }
             }
             return diagramData;
@@ -330,6 +330,9 @@ namespace PlantUML.Logic
                 }
             }
         }
+        #endregion create activity diagram
+
+        #region create class diagram
         /// <summary>
         /// Creates a class diagram from the provided source code and saves it to the specified path.
         /// </summary>
@@ -355,7 +358,7 @@ namespace PlantUML.Logic
                 var filePath = Path.Combine(path, fileName);
                 var diagramData = new List<string>();
 
-                AnalysisStatement(itemNode, diagramData, 0);
+                AnalyzeStatement(itemNode, diagramData, 0);
                 diagramData.Insert(0, $"@startuml {title}");
                 diagramData.Insert(1, $"title {title}");
 
@@ -419,7 +422,167 @@ namespace PlantUML.Logic
                 }
             }
         }
+        #endregion create class diagram
 
+        #region create sequence diagram
+        public static void CreateSequenceDiagram(string path, string source, bool force)
+        {
+            var infoData = new List<string>();
+            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var syntaxRoot = syntaxTree.GetRoot();
+            var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+
+            if (Path.Exists(path) == false)
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            foreach (var classNode in classNodes)
+            {
+                var methodNodes = classNode.DescendantNodes().OfType<MethodDeclarationSyntax>();
+
+                foreach (var methodNode in methodNodes)
+                {
+                    var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
+                    var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
+                    var filePath = Path.Combine(path, fileName);
+                    var diagramData = CreateSequenceDiagram(methodNode);
+
+                    diagramData.Insert(0, $"@startuml {title}");
+                    // diagramData.Insert(1, "header");
+                    // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+                    // diagramData.Insert(3, "end header");
+                    diagramData.Insert(1, $"title {title}");
+                    diagramData.Insert(2, "start");
+
+                    // diagramData.Add("footer");
+                    // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                    // diagramData.Add("end footer");
+                    diagramData.Add("stop");
+                    diagramData.Add("@enduml");
+
+                    if (force || Path.Exists(filePath) == false)
+                    {
+                        File.WriteAllLines(filePath, diagramData);
+                    }
+                    infoData.Add($"{nameof(title)}:{title}");
+                    infoData.Add($"{nameof(fileName)}:{fileName}");
+                    infoData.Add($"generated_on:{DateTime.UtcNow}");
+                    infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+                }
+            }
+
+            if (force || Path.Exists(Path.Combine(path, "sq_info.txt")) == false)
+            {
+                File.WriteAllLines(Path.Combine(path, "sq_info.txt"), infoData);
+            }
+            CreateCompleteSequenceDiagram(path, force);
+        }
+        public static List<string> CreateSequenceDiagram(MethodDeclarationSyntax methodNode)
+        {
+            var diagramData = new List<string>();
+            var parameters = methodNode.ParameterList?.Parameters ?? [];
+            var statements = methodNode?.Body?.Statements ?? [];
+            var paramsCount = 0;
+            var paramsStatement = string.Empty;
+
+            if (parameters.Count > 0)
+            {
+                paramsStatement = $"{Color.Parameters}:Params(";
+            }
+            foreach (var parameter in parameters)
+            {
+                if (paramsCount > 0)
+                {
+                    paramsStatement += ", ";
+                }
+                paramsStatement += $"{parameter}";
+                paramsCount++;
+            }
+            if (paramsStatement.Length > 0)
+            {
+                paramsStatement += ");";
+                diagramData.Add(paramsStatement);
+            }
+
+            foreach (StatementSyntax statement in statements!)
+            {
+                AnalyzeCallGraph(statement, diagramData, 0);
+            }
+            return diagramData;
+        }
+        public static void CreateCompleteSequenceDiagram(string path, bool force)
+        {
+            var result = new List<string>();
+            var umlFiles = new List<string>();
+            var umlItems = new List<UMLItem>();
+            var infoFilePath = Path.Combine(path, "ac_info.txt");
+            var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
+                                 .Where(f => Path.GetFileName(f).StartsWith("ac_"));
+
+            if (File.Exists(infoFilePath))
+            {
+                var infoData = File.ReadAllLines(infoFilePath);
+
+                foreach (var infoItem in infoData.Select(l => l.Split(':'))
+                                                 .Where(d => d[0].Equals("fileName", StringComparison.OrdinalIgnoreCase))
+                                                 .Select(d => d[1]))
+                {
+                    var query = files.Where(f => Path.GetFileName(f) == infoItem).Distinct();
+
+                    umlFiles.AddRange(query);
+                }
+            }
+            else
+            {
+                umlFiles.AddRange(files);
+            }
+
+            foreach (var file in umlFiles)
+            {
+                var lines = File.ReadAllLines(file);
+                var acItems = ExtractUMLItems(lines).ToArray();
+                var acTitles = lines.Where(l => l.StartsWith("title")).ToArray();
+
+                if (acItems.Length == acTitles.Length)
+                {
+                    for (int i = 0; i < acItems.Length; i++)
+                    {
+                        acItems[i].Insert(1, $"note right: {acTitles[i].Replace("title", string.Empty)}");
+                    }
+                }
+                umlItems.AddRange(acItems.Where(e => e.Count > 3));
+            }
+
+            var fileName = "CompleteActivityDiagram.puml";
+            var filePath = Path.Combine(path, fileName);
+            var diagramData = new List<string>();
+
+            foreach (var item in umlItems)
+            {
+                diagramData.AddRange(item);
+            }
+            if (diagramData.Count > 0)
+            {
+                diagramData.Insert(0, "@startuml CompleteActivityDiagram");
+                diagramData.Insert(1, "header");
+                diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+                diagramData.Insert(3, "end header");
+                diagramData.Insert(4, "title CompleteActivityDiagram");
+
+                diagramData.Add("footer");
+                diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                diagramData.Add("end footer");
+                diagramData.Add("@enduml");
+                if (force || Path.Exists(filePath) == false)
+                {
+                    File.WriteAllLines(filePath, diagramData);
+                }
+            }
+        }
+        #endregion create sequence diagram
+
+        #region create object and class diagrams with types
         /// <summary>
         /// Extracts UML items from the given lines.
         /// </summary>
@@ -646,16 +809,26 @@ namespace PlantUML.Logic
             CreateMapStateRec(objects, result, 0);
             return result;
         }
-        #endregion diagram creation
+        #endregion create object and class diagrams with types
 
         #region diagram helpers
+        public static void AnalyzeCallGraph(SyntaxNode syntaxNode, List<string> diagramData, int level)
+        {
+            if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
+            {
+            }
+            else if (syntaxNode is ExpressionStatementSyntax expressionStatementSyntax)
+            {
+            }
+        }
+
         /// <summary>
         /// Analyzes a syntax node and generates diagram data based on the structure of the code.
         /// </summary>
         /// <param name="syntaxNode">The syntax node to analyze.</param>
         /// <param name="diagramData">The list to store the generated diagram data.</param>
         /// <param name="level">The indentation level for the diagram data.</param>
-        public static void AnalysisStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
+        public static void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
             static string ConvertModifiers(IEnumerable<SyntaxToken> modifiers)
             {
@@ -748,6 +921,7 @@ namespace PlantUML.Logic
 
                 return $"{modifiers} {declaration.ReturnType} {declaration.Identifier}{parameterList}";
             }
+
             const string yesLabel = "<color:green>yes";
             const string noLabel = "<color:red>no";
 
@@ -777,23 +951,23 @@ namespace PlantUML.Logic
                 {
                     if (node is StatementSyntax statementSyntax)
                     {
-                        AnalysisStatement(statementSyntax, diagramData, level + 1);
+                        AnalyzeStatement(statementSyntax, diagramData, level + 1);
                     }
                 }
             }
             else if (syntaxNode is IfStatementSyntax ifStatement)
             {
                 diagramData.Add($"if ({ifStatement.Condition}) then ({yesLabel})".SetIndent(level));
-                AnalysisStatement(ifStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(ifStatement.Statement, diagramData, level + 1);
                 if (ifStatement.Else != null)
-                    AnalysisStatement(ifStatement.Else, diagramData, level + 1);
+                    AnalyzeStatement(ifStatement.Else, diagramData, level + 1);
 
                 diagramData.Add("endif".SetIndent(level));
             }
             else if (syntaxNode is ElseClauseSyntax elseClause)
             {
                 diagramData.Add($"else ({noLabel})".SetIndent(level));
-                AnalysisStatement(elseClause.Statement, diagramData, level + 1);
+                AnalyzeStatement(elseClause.Statement, diagramData, level + 1);
             }
             else if (syntaxNode is SwitchStatementSyntax switchStatement)
             {
@@ -812,7 +986,7 @@ namespace PlantUML.Logic
                     {
                         if (node is StatementSyntax statementSyntax)
                         {
-                            AnalysisStatement(statementSyntax, diagramData, level + 1);
+                            AnalyzeStatement(statementSyntax, diagramData, level + 1);
                         }
                     }
                 }
@@ -829,20 +1003,20 @@ namespace PlantUML.Logic
             else if (syntaxNode is DoStatementSyntax doStatement)
             {
                 diagramData.Add("repeat".SetIndent(level));
-                AnalysisStatement(doStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(doStatement.Statement, diagramData, level + 1);
                 diagramData.Add($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level));
             }
             else if (syntaxNode is WhileStatementSyntax whileStatement)
             {
                 diagramData.Add($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level));
-                AnalysisStatement(whileStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(whileStatement.Statement, diagramData, level + 1);
                 diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
                 diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
                 diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
-                AnalysisStatement(forStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(forStatement.Statement, diagramData, level + 1);
                 if (forStatement.Incrementors.Count > 0)
                     diagramData.Add($":{forStatement.Incrementors};".SetIndent(level));
 
@@ -856,7 +1030,7 @@ namespace PlantUML.Logic
                 diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
                 diagramData.Add($":current = iterator.Current();".SetIndent(level));
 
-                AnalysisStatement(forEachStatement.Statement, statements, level + 1);
+                AnalyzeStatement(forEachStatement.Statement, statements, level + 1);
 
                 foreach (var statement in statements)
                 {
@@ -883,7 +1057,7 @@ namespace PlantUML.Logic
                 diagramData.Add($"struct {structDeclaration.Identifier} {Color.Struct}".SetIndent(level));
                 foreach (var member in structDeclaration.Members)
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("}".SetIndent(level));
             }
@@ -896,17 +1070,17 @@ namespace PlantUML.Logic
                 diagramData.Add(declaration.SetIndent(level));
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("---".SetIndent(level));
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("---".SetIndent(level));
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("}".SetIndent(level));
             }
@@ -920,17 +1094,17 @@ namespace PlantUML.Logic
                 diagramData.Add(declaration.SetIndent(level));
                 foreach (var member in classDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("---".SetIndent(level));
                 foreach (var member in classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("---".SetIndent(level));
                 foreach (var member in classDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
                 {
-                    AnalysisStatement(member, diagramData, level + 1);
+                    AnalyzeStatement(member, diagramData, level + 1);
                 }
                 diagramData.Add("}".SetIndent(level));
                 if (classDeclaration.BaseList != null)
