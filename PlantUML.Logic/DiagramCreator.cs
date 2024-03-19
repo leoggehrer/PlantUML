@@ -212,7 +212,7 @@ namespace PlantUML.Logic
 
             if (paramsStatement.HasContent())
             {
-                diagramData.Add($"{Color.Parameters}:Params{paramsStatement}");
+                diagramData.Add($"{Color.Parameters}:Params{paramsStatement};");
             }
             foreach (StatementSyntax statement in methodNode?.Body?.Statements ?? [])
             {
