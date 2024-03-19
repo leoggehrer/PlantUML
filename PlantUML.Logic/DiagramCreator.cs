@@ -3,10 +3,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 using PlantUML.Logic.Extensions;
 using System.Collections;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -413,6 +411,12 @@ namespace PlantUML.Logic
         #endregion create class diagram
 
         #region create sequence diagram
+        /// <summary>
+        /// Creates sequence diagrams for each method in the provided source code and saves them to the specified path.
+        /// </summary>
+        /// <param name="path">The path where the sequence diagrams will be saved.</param>
+        /// <param name="source">The source code to generate the sequence diagrams from.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing sequence diagrams.</param>
         public static void CreateSequenceDiagram(string path, string source, bool force)
         {
             var infoData = new List<string>();
@@ -465,6 +469,11 @@ namespace PlantUML.Logic
                 File.WriteAllLines(Path.Combine(path, "sq_info.txt"), infoData);
             }
         }
+        /// <summary>
+        /// Creates a sequence diagram based on the given method declaration syntax.
+        /// </summary>
+        /// <param name="methodNode">The method declaration syntax to create the sequence diagram from.</param>
+        /// <returns>A list of strings representing the sequence diagram data.</returns>
         public static List<string> CreateSequenceDiagram(MethodDeclarationSyntax methodNode)
         {
             var diagramData = new List<string>();
@@ -730,6 +739,13 @@ namespace PlantUML.Logic
         #endregion create object and class diagrams with types
 
         #region diagram helpers
+        /// <summary>
+        /// Analyzes the call sequence within a method declaration and populates the participants and diagram data.
+        /// </summary>
+        /// <param name="methodDeclaration">The method declaration syntax node.</param>
+        /// <param name="participants">The list of participants in the call sequence.</param>
+        /// <param name="diagramData">The list of diagram data.</param>
+        /// <param name="level">The current level of the call sequence.</param>
         public static void AnalyzeCallSequence(MethodDeclarationSyntax methodDeclaration, List<string> participants, List<string> diagramData, int level)
         {
             var statements = methodDeclaration?.Body?.Statements ?? [];
@@ -739,6 +755,14 @@ namespace PlantUML.Logic
                 AnalyzeCallSequence(methodDeclaration!, statement, participants, diagramData, level);
             }
         }
+        /// <summary>
+        /// Analyzes the call sequence within a method declaration and generates diagram data.
+        /// </summary>
+        /// <param name="methodDeclaration">The method declaration syntax node.</param>
+        /// <param name="syntaxNode">The syntax node to analyze.</param>
+        /// <param name="participants">The list of participants in the call sequence.</param>
+        /// <param name="diagramData">The list to store the generated diagram data.</param>
+        /// <param name="level">The current level of analysis.</param>
         public static void AnalyzeCallSequence(MethodDeclarationSyntax methodDeclaration, SyntaxNode syntaxNode, List<string> participants, List<string> diagramData, int level)
         {
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
@@ -827,11 +851,11 @@ namespace PlantUML.Logic
         }
 
         /// <summary>
-        /// Analyzes a syntax node and generates diagram data based on the structure of the code.
+        /// Analyzes a syntax node and generates diagram data based on the type of the node.
         /// </summary>
         /// <param name="syntaxNode">The syntax node to analyze.</param>
         /// <param name="diagramData">The list to store the generated diagram data.</param>
-        /// <param name="level">The indentation level for the diagram data.</param>
+        /// <param name="level">The indentation level for the generated diagram data.</param>
         public static void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
             static string ConvertModifiers(IEnumerable<SyntaxToken> modifiers)
