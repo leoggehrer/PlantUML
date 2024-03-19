@@ -802,7 +802,7 @@ namespace PlantUML.Logic
             {
                 AnalyzeCallSequence(methodDeclaration, expressionStatement.Expression, participants, diagramData, level);
             }
-            if (syntaxNode is InvocationExpressionSyntax invocationExpression)
+            else if (syntaxNode is InvocationExpressionSyntax invocationExpression)
             {
                 var participantTo = CreateParticipantName(invocationExpression);
 
@@ -821,7 +821,7 @@ namespace PlantUML.Logic
                     }
                 }
             }
-            if (syntaxNode is AssignmentExpressionSyntax assignmentExpression)
+            else if (syntaxNode is AssignmentExpressionSyntax assignmentExpression)
             {
                 var rightExpression = assignmentExpression.Right as InvocationExpressionSyntax;
                 var participantTo = rightExpression != null ? CreateParticipantName(rightExpression) : string.Empty;
@@ -843,10 +843,17 @@ namespace PlantUML.Logic
                     }
                 }
             }
-            if (syntaxNode is BinaryExpressionSyntax binaryExpression)
+            else if (syntaxNode is BinaryExpressionSyntax binaryExpression)
             {
                 AnalyzeCallSequence(methodDeclaration, binaryExpression.Left, participants, diagramData, level);
                 AnalyzeCallSequence(methodDeclaration, binaryExpression.Right, participants, diagramData, level);
+            }
+            else
+            {
+                foreach (var item in syntaxNode.ChildNodes())
+                {
+                    AnalyzeCallSequence(methodDeclaration, item, participants, diagramData, level + 1);
+                }
             }
         }
 
