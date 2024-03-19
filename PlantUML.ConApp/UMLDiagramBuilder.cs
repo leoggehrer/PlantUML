@@ -9,7 +9,7 @@
         #endregion properties
 
         #region methods
-        public abstract void Create();
+        public abstract void CreateFromFile();
         #endregion methods
     }
 }

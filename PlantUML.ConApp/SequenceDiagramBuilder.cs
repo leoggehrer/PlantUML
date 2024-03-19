@@ -9,7 +9,7 @@
     /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
     internal partial class SequenceDiagramBuilder(string filePath, string diagramFolder, bool force) : UMLDiagramBuilder(filePath, diagramFolder, force)
     {
-        public override void Create()
+        public override void CreateFromFile()
         {
             var fileDirectory = Path.GetDirectoryName(FilePath!);
             var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);

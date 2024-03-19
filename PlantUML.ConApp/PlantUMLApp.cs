@@ -49,7 +49,6 @@
         {
             Activity,
             Class,
-            Sequence,
         }
 
         #region app properties
@@ -138,8 +137,16 @@
             PrintLine($"Source path: {SourcePath}");
             PrintLine();
             PrintLine($"Diagram folder:  {DiagramFolder}");
-            PrintLine($"Diagram builder: {DiagramBuilder} [{string.Join("|", Enum.GetNames(typeof(DiagramBuilderType)))}]");
+            PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}]");
             PrintLine();
+        }
+        /// <summary>
+        /// Prints the footer of the application.
+        /// </summary>
+        protected override void PrintFooter()
+        {
+            PrintLine();
+            Print("Choose [n|n,n|a...all|x|X]: ");
         }
         #endregion overrides
 
@@ -159,8 +166,7 @@
             DiagramBuilder = DiagramBuilder.ToString().ToLower() switch
             {
                 "activity" => DiagramBuilderType.Class,
-                "class" => DiagramBuilderType.Sequence,
-                "sequence" => DiagramBuilderType.Activity,
+                "class" => DiagramBuilderType.Activity,
                 _ => DiagramBuilder,
             };
         }
@@ -176,11 +182,10 @@
             {
                 DiagramBuilderType.Activity => new ActivityDiagramBuilder(filePath, DiagramFolder, force),
                 DiagramBuilderType.Class => new ClassDiagramBuilder(filePath, DiagramFolder, force),
-                DiagramBuilderType.Sequence => new SequenceDiagramBuilder(filePath, DiagramFolder, force),
                 _ => throw new InvalidOperationException("Invalid diagram builder type."),
             };
 
-            diagram.Create();
+            diagram.CreateFromFile();
         }
         #endregion methods for app
     }

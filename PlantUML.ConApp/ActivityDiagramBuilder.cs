@@ -9,7 +9,7 @@
     /// <param name="force">A flag indicating whether to force the creation of the diagram.</param>
     internal partial class ActivityDiagramBuilder(string filePath, string diagramFolder, bool force) : UMLDiagramBuilder(filePath, diagramFolder, force)
     {
-        public override void Create()
+        public override void CreateFromFile()
         {
             var fileDirectory = Path.GetDirectoryName(FilePath!);
             var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);

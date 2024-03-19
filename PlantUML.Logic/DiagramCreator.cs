@@ -3,8 +3,10 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using PlantUML.Logic.Extensions;
 using System.Collections;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -113,7 +115,7 @@ namespace PlantUML.Logic
             #endregion Class-Constructors
 
             public static string Enum { get; set; } = "#LightBlue";
-            public static string Struct { get; set; } = "#Lightyellow";
+            public static string Struct { get; set; } = "#LightYellow";
             public static string Class { get; set; } = "#White";
             public static string AbstractClass { get; set; } = "#White";
             public static string Interface { get; set; } = "#LightGrey";
@@ -123,6 +125,9 @@ namespace PlantUML.Logic
 
             public static string Expression { get; set; } = "#WhiteSmoke";
             public static string Return { get; set; } = "#Lavender";
+
+            public static string Participant { get; set; } = "#LightGreen";
+            public static string StartParticipant { get; set; } = "#LightYellow";
         }
         #endregion skinparam
 
@@ -205,30 +210,13 @@ namespace PlantUML.Logic
             var diagramData = new List<string>();
             var islocalDeclaration = false;
             var parameters = methodNode.ParameterList?.Parameters ?? [];
-            var statements = methodNode?.Body?.Statements ?? [];
-            var paramsCount = 0;
-            var paramsStatement = string.Empty;
+            var paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
 
-            if (parameters.Count > 0)
+            if (paramsStatement.HasContent())
             {
-                paramsStatement = $"{Color.Parameters}:Params(";
+                diagramData.Add($"{Color.Parameters}:Params{paramsStatement}");
             }
-            foreach (var parameter in parameters)
-            {
-                if (paramsCount > 0)
-                {
-                    paramsStatement += ", ";
-                }
-                paramsStatement += $"{parameter}";
-                paramsCount++;
-            }
-            if (paramsStatement.Length > 0)
-            {
-                paramsStatement += ");";
-                diagramData.Add(paramsStatement);
-            }
-
-            foreach (StatementSyntax statement in statements!)
+            foreach (StatementSyntax statement in methodNode?.Body?.Statements ?? [])
             {
                 if (statement is LocalDeclarationStatementSyntax localDeclarationStatement)
                 {
@@ -444,7 +432,7 @@ namespace PlantUML.Logic
                 foreach (var methodNode in methodNodes)
                 {
                     var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
-                    var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
+                    var fileName = $"sq_{classNode.Identifier.Text}_{methodNode.Identifier.Text}.puml";
                     var filePath = Path.Combine(path, fileName);
                     var diagramData = CreateSequenceDiagram(methodNode);
 
@@ -453,12 +441,12 @@ namespace PlantUML.Logic
                     // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
                     // diagramData.Insert(3, "end header");
                     diagramData.Insert(1, $"title {title}");
-                    diagramData.Insert(2, "start");
+                    //diagramData.Insert(2, "start");
 
                     // diagramData.Add("footer");
                     // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
                     // diagramData.Add("end footer");
-                    diagramData.Add("stop");
+                    //diagramData.Add("stop");
                     diagramData.Add("@enduml");
 
                     if (force || Path.Exists(filePath) == false)
@@ -476,109 +464,39 @@ namespace PlantUML.Logic
             {
                 File.WriteAllLines(Path.Combine(path, "sq_info.txt"), infoData);
             }
-            CreateCompleteSequenceDiagram(path, force);
         }
         public static List<string> CreateSequenceDiagram(MethodDeclarationSyntax methodNode)
         {
             var diagramData = new List<string>();
+            var participants = new List<string>();
             var parameters = methodNode.ParameterList?.Parameters ?? [];
-            var statements = methodNode?.Body?.Statements ?? [];
-            var paramsCount = 0;
-            var paramsStatement = string.Empty;
+            var paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
+            var invocationExpressions = methodNode?.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray() ?? [];
 
-            if (parameters.Count > 0)
+            participants.Add(CreateParticipantName(methodNode!));
+            diagramData.Add($"participant \"{methodNode?.Identifier}{paramsStatement}\" as {CreateParticipantName(methodNode!)} {Color.StartParticipant}");
+            foreach (var invocationExpression in invocationExpressions)
             {
-                paramsStatement = $"{Color.Parameters}:Params(";
-            }
-            foreach (var parameter in parameters)
-            {
-                if (paramsCount > 0)
+                var identifier = invocationExpression.Expression.ToString();
+
+                if (identifier.Contains("ToString") == false)
                 {
-                    paramsStatement += ", ";
-                }
-                paramsStatement += $"{parameter}";
-                paramsCount++;
-            }
-            if (paramsStatement.Length > 0)
-            {
-                paramsStatement += ");";
-                diagramData.Add(paramsStatement);
-            }
+                    var arguments = invocationExpression.ArgumentList?.Arguments ?? [];
+                    var argsStatement = arguments.Any() ? $"({string.Join(", ", arguments.Select((item, index) => $"a{index}"))})" : "()";
+                    var participantName = CreateParticipantName(invocationExpression);
+                    var participantDeclaration = $"participant \"{identifier}{argsStatement}\" as {participantName} {Color.Participant}";
 
-            foreach (StatementSyntax statement in statements!)
-            {
-                AnalyzeCallGraph(statement, diagramData, 0);
-            }
-            return diagramData;
-        }
-        public static void CreateCompleteSequenceDiagram(string path, bool force)
-        {
-            var result = new List<string>();
-            var umlFiles = new List<string>();
-            var umlItems = new List<UMLItem>();
-            var infoFilePath = Path.Combine(path, "ac_info.txt");
-            var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
-                                 .Where(f => Path.GetFileName(f).StartsWith("ac_"));
-
-            if (File.Exists(infoFilePath))
-            {
-                var infoData = File.ReadAllLines(infoFilePath);
-
-                foreach (var infoItem in infoData.Select(l => l.Split(':'))
-                                                 .Where(d => d[0].Equals("fileName", StringComparison.OrdinalIgnoreCase))
-                                                 .Select(d => d[1]))
-                {
-                    var query = files.Where(f => Path.GetFileName(f) == infoItem).Distinct();
-
-                    umlFiles.AddRange(query);
-                }
-            }
-            else
-            {
-                umlFiles.AddRange(files);
-            }
-
-            foreach (var file in umlFiles)
-            {
-                var lines = File.ReadAllLines(file);
-                var acItems = ExtractUMLItems(lines).ToArray();
-                var acTitles = lines.Where(l => l.StartsWith("title")).ToArray();
-
-                if (acItems.Length == acTitles.Length)
-                {
-                    for (int i = 0; i < acItems.Length; i++)
+                    if (diagramData.Contains(participantDeclaration) == false)
                     {
-                        acItems[i].Insert(1, $"note right: {acTitles[i].Replace("title", string.Empty)}");
+                        participants.Add(participantName);
+                        diagramData.Add(participantDeclaration);
                     }
                 }
-                umlItems.AddRange(acItems.Where(e => e.Count > 3));
             }
 
-            var fileName = "CompleteActivityDiagram.puml";
-            var filePath = Path.Combine(path, fileName);
-            var diagramData = new List<string>();
-
-            foreach (var item in umlItems)
-            {
-                diagramData.AddRange(item);
-            }
-            if (diagramData.Count > 0)
-            {
-                diagramData.Insert(0, "@startuml CompleteActivityDiagram");
-                diagramData.Insert(1, "header");
-                diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
-                diagramData.Insert(3, "end header");
-                diagramData.Insert(4, "title CompleteActivityDiagram");
-
-                diagramData.Add("footer");
-                diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
-                diagramData.Add("end footer");
-                diagramData.Add("@enduml");
-                if (force || Path.Exists(filePath) == false)
-                {
-                    File.WriteAllLines(filePath, diagramData);
-                }
-            }
+            diagramData.Add("autonumber");
+            AnalyzeCallSequence(methodNode!, participants, diagramData, 0);
+            return diagramData;
         }
         #endregion create sequence diagram
 
@@ -812,13 +730,99 @@ namespace PlantUML.Logic
         #endregion create object and class diagrams with types
 
         #region diagram helpers
-        public static void AnalyzeCallGraph(SyntaxNode syntaxNode, List<string> diagramData, int level)
+        public static void AnalyzeCallSequence(MethodDeclarationSyntax methodDeclaration, List<string> participants, List<string> diagramData, int level)
         {
-            if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
+            var statements = methodDeclaration?.Body?.Statements ?? [];
+
+            foreach (StatementSyntax statement in statements!)
             {
+                AnalyzeCallSequence(methodDeclaration!, statement, participants, diagramData, level);
             }
-            else if (syntaxNode is ExpressionStatementSyntax expressionStatementSyntax)
+        }
+        public static void AnalyzeCallSequence(MethodDeclarationSyntax methodDeclaration, SyntaxNode syntaxNode, List<string> participants, List<string> diagramData, int level)
+        {
+            if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
+                foreach (var variable in localDeclarationStatement.Declaration.Variables)
+                {
+                    AnalyzeCallSequence(methodDeclaration, variable, participants, diagramData, level);
+                }
+            }
+            else if (syntaxNode is VariableDeclaratorSyntax variableDeclarator)
+            {
+                foreach (var item in variableDeclarator.Initializer?.Value?.ChildNodes() ?? [])
+                {
+                    if (item is InvocationExpressionSyntax varInvocationExpression)
+                    {
+                        var participantTo = CreateParticipantName(varInvocationExpression);
+
+                        if (participants.Contains(participantTo))
+                        {
+                            var participantFrom = CreateParticipantName(methodDeclaration);
+                            var argumentList = CreateArgumentList(varInvocationExpression);
+
+                            if (argumentList != "()")
+                            {
+                                diagramData.Add($"{participantFrom} -> {participantTo} : {argumentList}");
+                            }
+                            else
+                            {
+                                diagramData.Add($"{participantFrom} -> {participantTo}");
+                            }
+                            diagramData.Add($"{participantTo} --> {participantFrom} : result");
+                        }
+                    }
+                }
+            }
+            else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
+            {
+                AnalyzeCallSequence(methodDeclaration, expressionStatement.Expression, participants, diagramData, level);
+            }
+            if (syntaxNode is InvocationExpressionSyntax invocationExpression)
+            {
+                var participantTo = CreateParticipantName(invocationExpression);
+
+                if (participants.Contains(participantTo))
+                {
+                    var participantFrom = CreateParticipantName(methodDeclaration);
+                    var argumentList = CreateArgumentList(invocationExpression);
+
+                    if (argumentList != "()")
+                    {
+                        diagramData.Add($"{participantFrom} -> {participantTo} : {argumentList}");
+                    }
+                    else
+                    {
+                        diagramData.Add($"{participantFrom} -> {participantTo}");
+                    }
+                }
+            }
+            if (syntaxNode is AssignmentExpressionSyntax assignmentExpression)
+            {
+                var rightExpression = assignmentExpression.Right as InvocationExpressionSyntax;
+                var participantTo = rightExpression != null ? CreateParticipantName(rightExpression) : string.Empty;
+
+                if (participants.Contains(participantTo))
+                {
+                    var participantFrom = CreateParticipantName(methodDeclaration);
+                    var argumentList = CreateArgumentList(rightExpression!);
+
+                    if (argumentList != "()")
+                    {
+                        diagramData.Add($"{participantFrom} -> {participantTo} : {argumentList}");
+                        diagramData.Add($"{participantTo} --> {participantFrom} : {assignmentExpression.Left}");
+                    }
+                    else
+                    {
+                        diagramData.Add($"{participantFrom} -> {participantTo}");
+                        diagramData.Add($"{participantTo} --> {participantFrom} : {assignmentExpression.Left}");
+                    }
+                }
+            }
+            if (syntaxNode is BinaryExpressionSyntax binaryExpression)
+            {
+                AnalyzeCallSequence(methodDeclaration, binaryExpression.Left, participants, diagramData, level);
+                AnalyzeCallSequence(methodDeclaration, binaryExpression.Right, participants, diagramData, level);
             }
         }
 
@@ -1459,6 +1463,31 @@ namespace PlantUML.Logic
         #endregion diagram helpers
 
         #region helpers
+        private static string CreateParticipantName(MethodDeclarationSyntax methodSyntax)
+        {
+            var identifier = methodSyntax.Identifier;
+            var parameters = methodSyntax.ParameterList?.Parameters ?? [];
+
+            return $"{identifier}" + (parameters.Any() ? $"_{string.Join("_", parameters.Select((item, index) => $"p{index}"))}" : string.Empty);
+        }
+        private static string CreateParticipantName(InvocationExpressionSyntax invocationExpression)
+        {
+            var identifier = invocationExpression.Expression.ToString();
+            var arguments = invocationExpression.ArgumentList?.Arguments ?? [];
+
+            return $"{identifier}" + (arguments.Any() ? $"_{string.Join("_", arguments.Select((item, index) => $"a{index}"))}" : string.Empty);
+        }
+        private static string CreateArgumentList(InvocationExpressionSyntax invocationExpression)
+        {
+            var result = "()";
+            var arguments = invocationExpression.ArgumentList?.Arguments ?? [];
+
+            if (arguments.Any())
+            {
+                result = $"({string.Join(" ,", arguments.Select((item, index) => $"{item}"))})";
+            }
+            return result;
+        }
         /// <summary>
         /// Creates diagram hierarchies for the given types.
         /// </summary>
