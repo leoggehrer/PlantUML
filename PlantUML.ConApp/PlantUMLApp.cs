@@ -49,6 +49,7 @@
         {
             Activity,
             Class,
+            Sequence,
         }
 
         #region app properties
@@ -84,7 +85,16 @@
                 {
                     Key = $"{++mnuIdx}",
                     Text = ToLabelText("Path", "Change source path"),
-                    Action = (self) => DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, [ SourcePath ]),
+                    Action = (self) => 
+                    {
+                        var savePath = DocumentsPath;
+                        
+                        DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, [ SourcePath ]);
+                        if (savePath != DocumentsPath)
+                        {
+                            PageIndex = 0;
+                        }
+                    },
                 },
                 CreateMenuSeparator(),
                 new()
@@ -102,18 +112,14 @@
                 CreateMenuSeparator(),
             };
 
-            var files = GetSourceCodeFiles(DocumentsPath, ["*.cs"]).ToArray();
+            var files = GetSourceCodePaths(DocumentsPath, ["*.cs"]).ToArray();
 
             menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, files, (item, menuItem) =>
             {
-                menuItem.Text = ToLabelText("File", $"{item.Replace(DocumentsPath, string.Empty)}");
-                menuItem.Action = (self) =>
-                {
-                    var path = self.Params["file"]?.ToString() ?? string.Empty;
-
-                    CreateDiagram(item, Force);
-                };
-                menuItem.Params = new() { { "file", item } };
+                menuItem.Text = ToLabelText("Path", $"{item.Replace(DocumentsPath, string.Empty)}");
+                menuItem.Tag = "path";
+                menuItem.Action = (self) => CreateDiagram(self, Force);
+                menuItem.Params = new() { { "path", item } };
             }));
             return [.. menuItems.Union(CreateExitMenuItems())];
         }
@@ -137,7 +143,7 @@
             PrintLine($"Source path: {SourcePath}");
             PrintLine();
             PrintLine($"Diagram folder:  {DiagramFolder}");
-            PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}]");
+            PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
         }
         /// <summary>
@@ -166,26 +172,38 @@
             DiagramBuilder = DiagramBuilder.ToString().ToLower() switch
             {
                 "activity" => DiagramBuilderType.Class,
-                "class" => DiagramBuilderType.Activity,
+                "class" => DiagramBuilderType.Sequence,
+                "sequence" => DiagramBuilderType.Activity,
                 _ => DiagramBuilder,
             };
         }
+
         /// <summary>
-        /// Creates a diagram based on the specified file path and diagram builder type.
+        /// Creates a UML diagram based on the specified <paramref name="menuItem"/> and <paramref name="force"/> flag.
         /// </summary>
-        /// <param name="filePath">The file path of the diagram.</param>
+        /// <param name="menuItem">The menu item containing the parameters and tag for the diagram creation.</param>
         /// <param name="force">A flag indicating whether to force the creation of the diagram.</param>
-        private static void CreateDiagram(string filePath, bool force)
+        private static void CreateDiagram(MenuItem menuItem, bool force)
         {
+            var pathOrFilePath = menuItem.Params[menuItem.Tag]?.ToString() ?? string.Empty;
+
             StartProgressBar();
             UMLDiagramBuilder diagram = DiagramBuilder switch
             {
-                DiagramBuilderType.Activity => new ActivityDiagramBuilder(filePath, DiagramFolder, force),
-                DiagramBuilderType.Class => new ClassDiagramBuilder(filePath, DiagramFolder, force),
+                DiagramBuilderType.Activity => new ActivityDiagramBuilder(pathOrFilePath, DiagramFolder, force),
+                DiagramBuilderType.Class => new ClassDiagramBuilder(pathOrFilePath, DiagramFolder, force),
+                DiagramBuilderType.Sequence => new SequenceDiagramBuilder(pathOrFilePath, DiagramFolder, force),
                 _ => throw new InvalidOperationException("Invalid diagram builder type."),
             };
 
-            diagram.CreateFromFile();
+            if (menuItem.Tag.ToLower() == "path")
+            {
+                diagram.CreateFromPath();
+            }
+            else if (menuItem.Tag.ToLower() == "file")
+            {
+                diagram.CreateFromFile();
+            }
         }
         #endregion methods for app
     }
