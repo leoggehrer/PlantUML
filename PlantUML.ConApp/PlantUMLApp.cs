@@ -42,16 +42,6 @@
         partial void Constructed();
         #endregion Instance-Constructors
 
-        /// <summary>
-        /// Represents the type of diagram.
-        /// </summary>
-        public enum DiagramBuilderType
-        {
-            Activity,
-            Class,
-            Sequence,
-        }
-
         #region app properties
         /// <summary>
         /// Gets or sets the selected diagram type.
@@ -145,14 +135,6 @@
             PrintLine($"Diagram folder:  {DiagramFolder}");
             PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
-        }
-        /// <summary>
-        /// Prints the footer of the application.
-        /// </summary>
-        protected override void PrintFooter()
-        {
-            PrintLine();
-            Print("Choose [n|n,n|a...all|x|X]: ");
         }
         #endregion overrides
 

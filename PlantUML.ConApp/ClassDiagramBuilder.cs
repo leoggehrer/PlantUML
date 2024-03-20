@@ -9,7 +9,7 @@ namespace PlantUML.ConApp
     /// <param name="pathOrFilePath">The path or file path of the input file.</param>
     /// <param name="diagramFolder">The folder where the generated diagrams will be saved.</param>
     /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-   internal partial class ClassDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
+   public partial class ClassDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
     {
         public override void CreateFromFile()
         {
@@ -18,6 +18,7 @@ namespace PlantUML.ConApp
             var source = File.ReadAllText(PathOrFilePath!);
 
             Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, Force);
+            Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
         }
         public override void CreateFromPath()
         {
@@ -37,6 +38,7 @@ namespace PlantUML.ConApp
                 var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
 
                 Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, builder.ToString(), Force);
+                Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
             }
         }
     }

@@ -7,7 +7,6 @@ using PlantUML.Logic.Extensions;
 using System.Collections;
 using System.Reflection;
 using System.Text;
-using System.Xml.Linq;
 
 namespace PlantUML.Logic
 {
@@ -197,7 +196,6 @@ namespace PlantUML.Logic
             {
                 File.WriteAllLines(Path.Combine(path, "ac_info.txt"), infoData);
             }
-            CreateCompleteActivityDiagram(path, force);
         }
         /// <summary>
         /// Creates an activity diagram based on the provided method declaration syntax.
@@ -361,7 +359,6 @@ namespace PlantUML.Logic
             {
                 File.WriteAllLines(Path.Combine(path, "cd_info.txt"), infoData);
             }
-            CreateCompleteClassDiagram(path, force);
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
     /// <param name="pathOrFilePath">The path or file path of the input file.</param>
     /// <param name="diagramFolder">The folder where the generated diagrams will be saved.</param>
     /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-    internal partial class ActivityDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
+    public partial class ActivityDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
     {
         public override void CreateFromFile()
         {
@@ -19,6 +19,7 @@
             var source = File.ReadAllText(PathOrFilePath!);
 
             Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, source, Force);
+            Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
         }
         public override void CreateFromPath()
         {
@@ -38,6 +39,7 @@
                 var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
 
                 Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, builder.ToString(), Force);
+                Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
             }
         }
     }

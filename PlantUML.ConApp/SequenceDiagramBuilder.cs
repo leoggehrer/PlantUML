@@ -10,7 +10,7 @@
     /// <param name="pathOrFilePath">The path or file path of the input file.</param>
     /// <param name="diagramFolder">The folder where the generated diagrams will be saved.</param>
     /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-    internal partial class SequenceDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
+    public partial class SequenceDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, force)
     {
         public override void CreateFromFile()
         {

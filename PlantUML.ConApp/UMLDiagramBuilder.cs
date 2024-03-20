@@ -1,6 +1,6 @@
 ﻿namespace PlantUML.ConApp
 {
-    internal abstract partial class UMLDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force)
+    public abstract partial class UMLDiagramBuilder(string pathOrFilePath, string diagramFolder, bool force)
     {
         #region properties
         public bool Force { get; private set; } = force;
