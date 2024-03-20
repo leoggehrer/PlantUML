@@ -7,6 +7,7 @@ using PlantUML.Logic.Extensions;
 using System.Collections;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace PlantUML.Logic
 {
@@ -114,7 +115,7 @@ namespace PlantUML.Logic
 
             public static string Enum { get; set; } = "#LightBlue";
             public static string Struct { get; set; } = "#LightYellow";
-            public static string Class { get; set; } = "#White";
+            public static string Class { get; set; } = "#GhostWhite";
             public static string AbstractClass { get; set; } = "#White";
             public static string Interface { get; set; } = "#LightGrey";
 
@@ -865,17 +866,35 @@ namespace PlantUML.Logic
         /// <param name="level">The indentation level for the generated diagram data.</param>
         public static void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
+            static string GetVisibility(SyntaxTokenList modifiers, string defaultValue)
+            {
+                var result = defaultValue;
+
+                if (modifiers.Any(SyntaxKind.PublicKeyword))
+                {
+                    result = "+";
+                }
+                else if (modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    result = "-";
+                }
+                else if (modifiers.Any(SyntaxKind.ProtectedKeyword))
+                {
+                    result = "#";
+                }
+                else if (modifiers.Any(SyntaxKind.InternalKeyword))
+                {
+                    result = "#";
+                }
+                return result;
+            }
             static string ConvertModifiers(IEnumerable<SyntaxToken> modifiers)
             {
                 string result = string.Empty;
 
                 foreach (SyntaxToken modifier in modifiers)
                 {
-                    if (modifier.Text == "public")
-                        result = $"+{result}";
-                    else if (modifier.Text == "internal")
-                        result = $"#{result}";
-                    else if (modifier.Text == "abstract")
+                    if (modifier.Text == "abstract")
                         result += "abstract";
                     else if (modifier.Text == "static")
                         result += "{static}";
@@ -884,35 +903,41 @@ namespace PlantUML.Logic
             }
             static string ConvertFieldDeclaration(FieldDeclarationSyntax declaration)
             {
-                var result = string.Empty;
-                var data = declaration.ToString().Split(' ');
+                var result = $"{GetVisibility(declaration.Modifiers, "-")}";
+                var initValue = $"{declaration.Declaration.Variables.FirstOrDefault()?.Initializer?.Value}";
 
-                foreach (var item in data)
+                if (declaration.Modifiers.Any(SyntaxKind.ConstKeyword))
                 {
-                    if (item == "public")
-                        result = $"+{result}";
-                    else if (item == "internal")
-                        result = $"#{result}";
-                    else if (item == "private")
-                        result = $"-{result}";
-                    else if (item == "abstract")
-                        result += "{abstract}";
-                    else if (item == "static")
-                        result += "{static}";
-                    else if (item != ";")
-                        result += $" {item}";
+                    result += " {const}";
                 }
-                return result.Replace(";", string.Empty);
+                if (declaration.Modifiers.Any(SyntaxKind.AbstractKeyword))
+                {
+                    result += " {abstract}";
+                }
+                if (declaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                {
+                    result += " {static}";
+                }
+                result += $" {declaration.Declaration.Type}";
+                result += $" {declaration.Declaration.Variables.First().Identifier.Text}";
+
+                if (initValue.HasContent())
+                {
+                    result += $" = {initValue}";
+                }
+                return result;
             }
             static string[] ConvertPropertyDeclaration(PropertyDeclarationSyntax declaration)
             {
                 var result = new List<string>();
+                var visibility = GetVisibility(declaration.Modifiers, "-");
                 var modifier = ConvertModifiers(declaration.Modifiers);
 
                 if (declaration.AccessorList != null)
                 {
                     foreach (AccessorDeclarationSyntax item in declaration.AccessorList!.Accessors)
                     {
+                        var accessVisibility = GetVisibility(item.Modifiers, visibility);
                         var accessModifier = modifier;
 
                         if (item.Modifiers.Any())
@@ -921,24 +946,25 @@ namespace PlantUML.Logic
                         }
                         if (item.Keyword.Text == "get")
                         {
-                            result.Add($"{accessModifier} {declaration.Type} get{declaration.Identifier}()");
+                            result.Add($"{accessVisibility}{(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}{declaration.Type} get{declaration.Identifier}()");
                         }
                         else if (item.Keyword.Text == "set")
                         {
-                            result.Add($"{accessModifier} Void set{declaration.Identifier}({declaration.Type} value)");
+                            result.Add($"{accessVisibility}{(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}Void set{declaration.Identifier}({declaration.Type} value)");
                         }
                     }
                 }
                 else
                 {
-                    result.Add($"{modifier} {declaration.Type} get{declaration.Identifier}()");
+                    result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()");
                 }
                 return result.ToArray();
             }
             static string ConvertMethodDeclaration(MethodDeclarationSyntax declaration)
             {
+                var visibility = $"{GetVisibility(declaration.Modifiers, "-")}";
                 var modifiers = ConvertModifiers(declaration.Modifiers);
-                var parameterList = "(";
+                var parameterList = string.Empty;
 
                 if (declaration.ParameterList != default)
                 {
@@ -952,9 +978,7 @@ namespace PlantUML.Logic
                         parameterList += $"{item.Type} {item.Identifier}";
                     }
                 }
-                parameterList += ")";
-
-                return $"{modifiers} {declaration.ReturnType} {declaration.Identifier}{parameterList}";
+                return $"{visibility}{modifiers} {declaration.ReturnType} {declaration.Identifier}({parameterList})";
             }
 
             const string yesLabel = "<color:green>yes";
@@ -1121,12 +1145,22 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
-                string declaration = ConvertModifiers(classDeclaration.Modifiers);
+                var declaration = ConvertModifiers(classDeclaration.Modifiers);
+                var autoProperties = classDeclaration.Members.OfType<PropertyDeclarationSyntax>()
+                                                     .Where(p => IsAutoProperty(p));
 
                 declaration += $"class {classDeclaration.Identifier}";
-                declaration += declaration.Contains("abstract") ? $" {Color.Class}" : $" {Color.AbstractClass}";
+                declaration += declaration.Contains("abstract") ? $" {Color.AbstractClass}" : $" {Color.Class}";
                 declaration += " {";
                 diagramData.Add(declaration.SetIndent(level));
+
+                foreach (var autoProperty in autoProperties)
+                {
+                    var modifier = ConvertModifiers(autoProperty.Modifiers);
+
+                    diagramData.Add($"-{modifier}{autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}");
+                }
+
                 foreach (var member in classDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
                     AnalyzeStatement(member, diagramData, level + 1);
@@ -1676,6 +1710,15 @@ namespace PlantUML.Logic
                 result = $"_{value.GetHashCode()}";
             }
             return result.Length > maxLength - 3 ? result[..(maxLength - 2)] + "..." : result;
+        }
+
+        private static bool IsAutoProperty(PropertyDeclarationSyntax propertydeclaration)
+        {
+            var accessorList = propertydeclaration.AccessorList;
+
+            return accessorList != null 
+                && accessorList.Accessors.All(accessor => accessor.Body == null 
+                                              && accessor.ExpressionBody == null);
         }
         #endregion helpers
     }
