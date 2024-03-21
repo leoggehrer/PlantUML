@@ -51,6 +51,9 @@
         /// Gets or sets the folder path for diagrams.
         /// </summary>
         public static string DiagramFolder { get; set; } = "diagrams";
+        /// <summary>
+        /// Gets or sets the path to the documents.
+        /// </summary>
         public static string DocumentsPath { get; set; }
         #endregion app properties
 
@@ -101,6 +104,11 @@
                 },
                 CreateMenuSeparator(),
             };
+
+            if (mnuIdx % 10 != 0)
+            {
+                mnuIdx += 10 - (mnuIdx % 10);
+            }
 
             var files = GetSourceCodePaths(DocumentsPath, ["*.cs"]).ToArray();
 
