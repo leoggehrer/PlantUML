@@ -55,6 +55,10 @@
         /// Gets or sets the path to the documents.
         /// </summary>
         public static string DocumentsPath { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether to create a complete diagram.
+        /// </summary>
+        public static bool CreateCompleteDiagram { get; set; } = true;
         #endregion app properties
 
         #region overrides
@@ -90,6 +94,12 @@
                     },
                 },
                 CreateMenuSeparator(),
+                new()
+                {
+                    Key = $"{++mnuIdx}",
+                    Text = ToLabelText("Create", "Change create complete diagram"),
+                    Action = (self) => CreateCompleteDiagram = !CreateCompleteDiagram,
+                },
                 new()
                 {
                     Key = $"{++mnuIdx}",
@@ -140,8 +150,9 @@
             PrintLine($"Force flag:  {Force}");
             PrintLine($"Source path: {SourcePath}");
             PrintLine();
-            PrintLine($"Diagram folder:  {DiagramFolder}");
-            PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
+            PrintLine($"Diagram complete: {CreateCompleteDiagram}");
+            PrintLine($"Diagram folder:   {DiagramFolder}");
+            PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
         }
         #endregion overrides
@@ -180,9 +191,9 @@
             StartProgressBar();
             UMLDiagramBuilder diagram = DiagramBuilder switch
             {
-                DiagramBuilderType.Activity => new ActivityDiagramBuilder(pathOrFilePath, DiagramFolder, force),
-                DiagramBuilderType.Class => new ClassDiagramBuilder(pathOrFilePath, DiagramFolder, force),
-                DiagramBuilderType.Sequence => new SequenceDiagramBuilder(pathOrFilePath, DiagramFolder, force),
+                DiagramBuilderType.Activity => new ActivityDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
+                DiagramBuilderType.Class => new ClassDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
+                DiagramBuilderType.Sequence => new SequenceDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
                 _ => throw new InvalidOperationException("Invalid diagram builder type."),
             };
 
