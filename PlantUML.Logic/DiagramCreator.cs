@@ -953,7 +953,7 @@ namespace PlantUML.Logic
                 }
                 else
                 {
-                    result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()");
+                    result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Trim());
                 }
                 return result.ToArray();
             }
@@ -975,7 +975,7 @@ namespace PlantUML.Logic
                         parameterList += $"{item.Type} {item.Identifier}";
                     }
                 }
-                return $"{visibility}{modifiers} {declaration.ReturnType} {declaration.Identifier}({parameterList})";
+                return $"{visibility} {modifiers} {declaration.ReturnType} {declaration.Identifier}({parameterList})".Trim();
             }
 
             const string yesLabel = "<color:green>yes";

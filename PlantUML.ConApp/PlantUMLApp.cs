@@ -1,4 +1,6 @@
-﻿namespace PlantUML.ConApp
+﻿using CommonTool;
+
+namespace PlantUML.ConApp
 {
     public partial class PlantUMLApp : CommonTool.ConsoleApplication
     {
@@ -30,6 +32,7 @@
         public PlantUMLApp()
         {
             Constructing();
+            PageSize = 15;
             Constructed();
         }
         /// <summary>
@@ -126,9 +129,12 @@
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var files = GetSourceCodePaths(DocumentsPath, ["*.cs"]).ToArray();
+            var paths = TemplatePath.GetSubPaths(DocumentsPath, MaxSubPathDepth)
+                                    .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
+                                    .OrderBy(p => p)
+                                    .ToArray();
 
-            menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, files, (item, menuItem) =>
+            menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) =>
             {
                 menuItem.Text = ToLabelText("Path", $"{item.Replace(DocumentsPath, string.Empty)}");
                 menuItem.Tag = "path";
