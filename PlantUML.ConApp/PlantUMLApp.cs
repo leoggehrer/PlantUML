@@ -81,12 +81,18 @@
                 new()
                 {
                     Key = $"{++mnuIdx}",
+                    Text = ToLabelText("Depth", "Change max sub path depth"),
+                    Action = (self) => ChangeMaxSubPathDepth(),
+                },
+                new()
+                {
+                    Key = $"{++mnuIdx}",
                     Text = ToLabelText("Path", "Change source path"),
                     Action = (self) => 
                     {
                         var savePath = DocumentsPath;
                         
-                        DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, [ SourcePath ]);
+                        DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, MaxSubPathDepth, [ SourcePath ]);
                         if (savePath != DocumentsPath)
                         {
                             PageIndex = 0;
@@ -147,8 +153,9 @@
             PrintLine('=', count);
             PrintLine();
             ForegroundColor = saveForeColor;
-            PrintLine($"Force flag:  {Force}");
-            PrintLine($"Source path: {SourcePath}");
+            PrintLine($"Force flag:       {Force}");
+            PrintLine($"Max. path depth:  {MaxSubPathDepth}");
+            PrintLine($"Source path:      {DocumentsPath}");
             PrintLine();
             PrintLine($"Diagram complete: {CreateCompleteDiagram}");
             PrintLine($"Diagram folder:   {DiagramFolder}");
