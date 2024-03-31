@@ -14,5 +14,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommonTool\CommonTool\CommonTool.csproj" />
+  </ItemGroup>
 
 </Project>
