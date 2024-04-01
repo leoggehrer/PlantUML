@@ -1,5 +1,9 @@
 ﻿namespace PlantUML.ConApp
 {
+    using CommonTool;
+    using CommonTool.Extensions;
+    using System.Text;
+
     /// <summary>
     /// Represents an abstract class for building UML diagrams.
     /// </summary>
@@ -34,6 +38,35 @@
         /// Creates a UML diagram from a specified path.
         /// </summary>
         public abstract void CreateFromPath();
+
+        public static string[] ReadDefinesFromProjectFiles(string path)
+        {
+            List<string> result = [];
+
+            if (Directory.Exists(path))
+            {
+                var files = Application.FindFilesFromPathAndParentPath(path, "*.csproj");
+
+                foreach (var file in files)
+                {
+                    var lines = File.ReadAllLines(file, Encoding.Default);
+
+                    foreach (var line in lines)
+                    {
+                        var defines = line.ExtractBetween("<DefineConstants>", "</DefineConstants>");
+
+                        if (defines.HasContent())
+                        {
+                            foreach (var define in defines.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                result.Add(define);
+                            }
+                        }
+                    }
+                }
+            }
+            return result.Distinct().ToArray();
+        }
         #endregion methods
     }
 }

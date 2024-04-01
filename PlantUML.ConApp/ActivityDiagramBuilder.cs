@@ -18,8 +18,9 @@
             var fileDirectory = Path.GetDirectoryName(PathOrFilePath!);
             var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);
             var source = File.ReadAllText(PathOrFilePath!);
+            var defines = ReadDefinesFromProjectFiles(fileDirectory!);
 
-            Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, source, Force);
+            Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, source, defines, Force);
             if (CreateCompleteDiagram)
             {
                 Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
@@ -27,13 +28,13 @@
         }
         public override void CreateFromPath()
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             if (Directory.Exists(PathOrFilePath))
             {
-                var files = Application.GetSourceCodeFiles(PathOrFilePath, ["*.cs"]);
+                var soureFiles = Application.GetSourceCodeFiles(PathOrFilePath, ["*.cs"]);
 
-                foreach (var file in files)
+                foreach (var file in soureFiles)
                 {
                     var source = File.ReadAllText(file);
 
@@ -41,8 +42,9 @@
                 }
 
                 var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
+                var defines = ReadDefinesFromProjectFiles(PathOrFilePath!);
 
-                Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, builder.ToString(), Force);
+                Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, builder.ToString(), defines, Force);
                 if (CreateCompleteDiagram)
                 {
                     Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);

@@ -17,8 +17,9 @@ namespace PlantUML.ConApp
             var fileDirectory = Path.GetDirectoryName(PathOrFilePath!);
             var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);
             var source = File.ReadAllText(PathOrFilePath!);
+            var defines = ReadDefinesFromProjectFiles(fileDirectory!);
 
-            Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, Force);
+            Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, defines, Force);
             if (CreateCompleteDiagram)
             {
                 Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
@@ -26,7 +27,7 @@ namespace PlantUML.ConApp
         }
         public override void CreateFromPath()
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             
             if (Directory.Exists(PathOrFilePath))
             {
@@ -40,8 +41,9 @@ namespace PlantUML.ConApp
                 }
 
                 var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
+                var defines = ReadDefinesFromProjectFiles(PathOrFilePath!);
 
-                Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, builder.ToString(), Force);
+                Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, builder.ToString(), defines, Force);
                 if (CreateCompleteDiagram)
                 {
                     Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);

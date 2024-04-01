@@ -18,12 +18,13 @@
             var fileDirectory = Path.GetDirectoryName(PathOrFilePath!);
             var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);
             var source = File.ReadAllText(PathOrFilePath!);
+            var defines = ReadDefinesFromProjectFiles(fileDirectory!);
 
-            Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, source, Force);
+            Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, source, defines, Force);
         }
         public override void CreateFromPath()
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             
             if (Directory.Exists(PathOrFilePath))
             {
@@ -37,8 +38,9 @@
                 }
 
                 var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
+                var defines = ReadDefinesFromProjectFiles(PathOrFilePath!);
 
-                Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, builder.ToString(), Force);
+                Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, builder.ToString(), defines, Force);
             }
         }
     }

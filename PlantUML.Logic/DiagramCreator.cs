@@ -1,6 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-//using CommonTool.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -66,23 +65,24 @@ namespace PlantUML.Logic
         /// <summary>
         /// Gets the default skin parameters for the class diagram.
         /// </summary>
-        public static IEnumerable<string> DefaultClassSkinparam => new[] {
+        public static IEnumerable<string> DefaultClassSkinparam => [
             "skinparam class {",
             " BackgroundColor whitesmoke",
             " ArrowColor grey",
             " BorderColor darkgrey",
             "}",
-        };
+        ];
         /// <summary>
         /// Gets the default skin parameters for objects in the diagram.
         /// </summary>
-        public static IEnumerable<string> DefaultObjectSkinparam => new[] {
+        public static IEnumerable<string> DefaultObjectSkinparam => [
             "skinparam object {",
             " BackgroundColor white",
             " ArrowColor grey",
             " BorderColor darkgrey",
             "}",
-        };
+        ];
+
         /// <summary>
         /// Represents a class that defines color values for different elements in the diagram.
         /// </summary>
@@ -136,16 +136,18 @@ namespace PlantUML.Logic
 
         #region create activity diagram
         /// <summary>
-        /// Creates activity diagrams for each method in the provided source code and saves them to the specified path.
+        /// Creates activity diagrams for the specified source code and saves them to the given path.
         /// </summary>
         /// <param name="path">The path where the activity diagrams will be saved.</param>
         /// <param name="source">The source code to generate the activity diagrams from.</param>
-        /// <param name="force">A flag indicating whether to overwrite existing activity diagrams if they already exist.</param>
-        public static void CreateActivityDiagram(string path, string source, bool force)
+        /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
+        public static void CreateActivityDiagram(string path, string source, string[] defines, bool force)
         {
             var fileCounter = 0;
             var infoData = new List<string>();
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
+            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             var syntaxRoot = syntaxTree.GetRoot();
             var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
 
@@ -239,7 +241,7 @@ namespace PlantUML.Logic
                     if (islocalDeclaration)
                     {
                         islocalDeclaration = false;
-                        diagramData[diagramData.Count - 1] += ";";
+                        diagramData[^1] += ";";
                     }
                     AnalyzeStatement(statement, diagramData, 0);
                 }
@@ -330,12 +332,14 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="path">The path where the class diagram files will be saved.</param>
         /// <param name="source">The source code from which the class diagram will be generated.</param>
+        /// <param name="defines">An array of preprocessor symbols to be used during parsing of the source code.</param>
         /// <param name="force">A flag indicating whether to overwrite existing class diagram files.</param>
-        public static void CreateClassDiagram(string path, string source, bool force)
+        public static void CreateClassDiagram(string path, string source, string[] defines, bool force)
         {
             var fileCounter = 0;
             var infoData = new List<string>();
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
+            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             var syntaxRoot = syntaxTree.GetRoot();
             var typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
 
@@ -446,16 +450,18 @@ namespace PlantUML.Logic
 
         #region create sequence diagram
         /// <summary>
-        /// Creates sequence diagrams for each method in the provided source code and saves them to the specified path.
+        /// Creates sequence diagrams for the specified source code and saves them to the specified path.
         /// </summary>
         /// <param name="path">The path where the sequence diagrams will be saved.</param>
         /// <param name="source">The source code to generate the sequence diagrams from.</param>
-        /// <param name="force">A flag indicating whether to overwrite existing sequence diagrams.</param>
-        public static void CreateSequenceDiagram(string path, string source, bool force)
+        /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing files in the specified path.</param>
+        public static void CreateSequenceDiagram(string path, string source, string[]defines, bool force)
         {
             var fileCounter = 0;
             var infoData = new List<string>();
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
+            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             var syntaxRoot = syntaxTree.GetRoot();
             var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
             var mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location);
@@ -532,8 +538,8 @@ namespace PlantUML.Logic
             var participantAliasse = new List<string>();
             var invocationExpressions = methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray() ?? [];
             var filteredInvocationExpressions = invocationExpressions.Where(ie => ie.Expression.ToString().Contains("ToString") == false
-                                                                               && ie.Expression.ToString().Contains("ConfigureAwait") == false);
-
+                                                                               && ie.Expression.ToString().Contains("ConfigureAwait") == false
+                                                                               && ie.Expression.ToString().Contains("nameof") == false);
             participants.Add(CreateParticipant(methodNode));
             participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
 
@@ -544,7 +550,13 @@ namespace PlantUML.Logic
 
             for (var i = 0; i < participants.Count && i < participantAliasse.Count; i++)
             {
-                diagramData.Add($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}");
+                var isReferenced = messages.Any(l => l.StartsWith($"{participantAliasse[i]}") 
+                                                  || l.Contains($"> {participantAliasse[i]}"));
+
+                if (isReferenced)
+                {
+                    diagramData.Add($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}");
+                }
             }
             diagramData.Add("autonumber");
             diagramData.AddRange(messages);
@@ -558,7 +570,7 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="lines">The lines to extract UML items from.</param>
         /// <returns>An enumerable collection of UML items.</returns>
-        private static IEnumerable<UMLItem> ExtractUMLItems(IEnumerable<string> lines)
+        private static List<UMLItem> ExtractUMLItems(IEnumerable<string> lines)
         {
             var result = new List<UMLItem>();
             var isItem = false;
@@ -566,7 +578,7 @@ namespace PlantUML.Logic
 
             foreach (var line in lines)
             {
-                if (isItem == false && line.Trim().EndsWith("{") && (line.Contains("class") || line.Contains("interface")))
+                if (isItem == false && line.Trim().EndsWith('{') && (line.Contains("class") || line.Contains("interface")))
                 {
                     // item is class or interface
                     isItem = true;
@@ -584,11 +596,11 @@ namespace PlantUML.Logic
                         line
                     };
                 }
-                else if (isItem && umlItem != default && line.Trim().StartsWith("}") == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false)
+                else if (isItem && umlItem != default && line.Trim().StartsWith('}') == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false)
                 {
                     umlItem.Add(line);
                 }
-                else if (isItem && umlItem != default && line.Trim().StartsWith("}"))
+                else if (isItem && umlItem != default && line.Trim().StartsWith('}'))
                 {
                     // end of item from class or interface
                     umlItem.Add(line);
@@ -672,7 +684,7 @@ namespace PlantUML.Logic
                 {
                     var extend = type.GetInterfaceHierarchy();
 
-                    extend.Extends.ForEach(e => result.AddRange(CreateTypeHierachy(new[] { extend.Type!, e.Type! })));
+                    extend.Extends.ForEach(e => result.AddRange(CreateTypeHierachy([extend.Type!, e.Type!])));
                 }
             }
 
@@ -882,7 +894,7 @@ namespace PlantUML.Logic
                 {
                     result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Trim());
                 }
-                return result.ToArray();
+                return [.. result];
             }
             static string ConvertMethodDeclaration(MethodDeclarationSyntax declaration)
             {
@@ -1042,36 +1054,38 @@ namespace PlantUML.Logic
         /// <param name="level">The level of the call sequence.</param>
         public static void AnalyzeCallSequence(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, List<string> participantAliasse, List<string> messages, int level)
         {
+            var methodResults = new Dictionary<string, string>();
             var statements = methodDeclaration?.Body?.Statements ?? [];
 
             foreach (StatementSyntax statement in statements!)
             {
-                AnalyzeCallSequence(semanticModel, methodDeclaration!, statement, participantAliasse, messages, level);
+                AnalyzeCallSequence(semanticModel, methodDeclaration!, statement, participantAliasse, messages, methodResults, level);
             }
         }
         /// <summary>
-        /// Analyzes the call sequence within a method and generates messages for a PlantUML diagram.
+        /// Analyzes the call sequence within a method.
         /// </summary>
         /// <param name="semanticModel">The semantic model of the syntax tree.</param>
         /// <param name="methodDeclaration">The method declaration syntax node.</param>
-        /// <param name="syntaxNode">The current syntax node being analyzed.</param>
+        /// <param name="syntaxNode">The syntax node to analyze.</param>
         /// <param name="participantAliasse">The list of participant aliases.</param>
-        /// <param name="messages">The list of messages for the PlantUML diagram.</param>
-        /// <param name="level">The current level of recursion.</param>
-        public static void AnalyzeCallSequence(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, SyntaxNode syntaxNode, List<string> participantAliasse, List<string> messages, int level)
+        /// <param name="messages">The list of messages.</param>
+        /// <param name="methodResults">The dictionary of method results.</param>
+        /// <param name="level">The current level of analysis.</param>
+        public static void AnalyzeCallSequence(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, SyntaxNode syntaxNode, List<string> participantAliasse, List<string> messages, Dictionary<string, string> methodResults, int level)
         {
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
                 foreach (var variable in localDeclarationStatement.Declaration.Variables)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level + 1);
                 }
             }
             else if (syntaxNode is VariableDeclaratorSyntax variableDeclarator)
             {
                 if (variableDeclarator.Initializer != null)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level + 1);
                 }
 
                 foreach (var item in variableDeclarator.Initializer?.Value?.ChildNodes() ?? [])
@@ -1082,7 +1096,7 @@ namespace PlantUML.Logic
                         {
                             foreach (var argument in varInvocationExpression.ArgumentList.Arguments)
                             {
-                                AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, level + 1);
+                                AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level + 1);
                             }
                         }
                     }
@@ -1090,10 +1104,10 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is InvocationExpressionSyntax invocationExpression)
             {
-                foreach (var item in invocationExpression.ArgumentList.Arguments)
-                {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, level + 1);
-                }
+                //foreach (var item in invocationExpression.ArgumentList.Arguments)
+                //{
+                //    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                //}
 
                 var participantFrom = CreateParticipantAlias(methodDeclaration);
                 var participantTo = CreateParticipantAlias(invocationExpression);
@@ -1101,7 +1115,7 @@ namespace PlantUML.Logic
                 if (participantAliasse.Contains(participantFrom)
                     && participantAliasse.Contains(participantTo))
                 {
-                    var argumentList = CreateArgumentList(invocationExpression);
+                    var argumentList = CreateArgumentList(invocationExpression, methodResults);
 
                     if (argumentList != "()")
                     {
@@ -1119,41 +1133,55 @@ namespace PlantUML.Logic
 
                         if (result?.ToLower() != "void")
                         {
-                            messages.Add($"{participantTo} --> {participantFrom} : result");
+                            var resultVariable = "result";// $"resultOf{methodSymbol.Name}";
+
+                            //if (methodResults.ContainsKey(participantTo) == false)
+                            //{
+                            //    methodResults.Add(participantTo, resultVariable);
+                            //}
+                            //else
+                            //{
+                            //    methodResults[participantTo] = resultVariable;
+                            //}
+                            messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
                         }
+                    }
+                    else if (invocationExpression.Parent is ReturnStatementSyntax)
+                    {
+                        var resultVariable = "result";// $"resultOf{methodDeclaration.Identifier}";
+
+                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
                     }
                 }
                 else
                 {
                     foreach (var item in invocationExpression.ChildNodes())
                     {
-                        AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, level + 1);
+                        AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                     }
                 }
             }
             else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
             {
-                AnalyzeCallSequence(semanticModel, methodDeclaration, expressionStatement.Expression, participantAliasse, messages, level);
+                AnalyzeCallSequence(semanticModel, methodDeclaration, expressionStatement.Expression, participantAliasse, messages, methodResults, level);
             }
             else if (syntaxNode is AssignmentExpressionSyntax assignmentExpression)
             {
-                var rightExpression = assignmentExpression.Right as InvocationExpressionSyntax;
-
-                if (rightExpression != null)
+                if (assignmentExpression.Right is InvocationExpressionSyntax rightExpression)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level + 1);
                 }
             }
             else if (syntaxNode is BinaryExpressionSyntax binaryExpression)
             {
-                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, level + 1);
-                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, level + 1);
+                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level + 1);
+                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level + 1);
             }
             else
             {
                 foreach (var item in syntaxNode.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
             }
         }
@@ -1271,13 +1299,13 @@ namespace PlantUML.Logic
 
                 diagramData.Add($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level));
                 diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
-                diagramData.Add($":current = iterator.Current();".SetIndent(level));
+                diagramData.Add($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level));
 
                 AnalyzeStatement(forEachStatement.Statement, statements, level + 1);
 
                 foreach (var statement in statements)
                 {
-                    diagramData.Add(statement.Replace(forEachStatement.Identifier.ToString(), "current").SetIndent(level + 1));
+                    diagramData.Add(statement.SetIndent(level + 1));
                 }
 
                 diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
@@ -1669,20 +1697,41 @@ namespace PlantUML.Logic
             return Shrink(result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b), '_');
         }
         /// <summary>
-        /// Creates the argument list for an invocation expression.
+        /// Creates an argument list based on the provided invocation expression and method results.
         /// </summary>
-        /// <param name="invocationExpression">The invocation expression syntax.</param>
-        /// <returns>The argument list as a string.</returns>
-        private static string CreateArgumentList(InvocationExpressionSyntax invocationExpression)
+        /// <param name="invocationExpression">The invocation expression to extract arguments from.</param>
+        /// <param name="methodResults">A dictionary containing method results.</param>
+        /// <returns>The created argument list as a string.</returns>
+        private static string CreateArgumentList(InvocationExpressionSyntax invocationExpression, Dictionary<string, string> methodResults)
         {
-            var result = "()";
+            var result = string.Empty;
             var arguments = invocationExpression.ArgumentList?.Arguments ?? [];
 
-            if (arguments.Any())
+            foreach (var item in arguments)
             {
-                result = $"({string.Join(" ,", arguments.Select((item, index) => $"{item}"))})";
+                if (result.Length > 0)
+                {
+                    result += ", ";
+                }
+                if (item.Expression is InvocationExpressionSyntax argumentInvocationExpression)
+                {
+                    var participant = CreateParticipantAlias(argumentInvocationExpression);
+
+                    if (methodResults.TryGetValue(participant, out string? value))
+                    {
+                        result = $"{result}{value}";
+                    }
+                    else
+                    {
+                        result = $"{result}{item}";
+                    }
+                }
+                else
+                {
+                    result = $"{result}{item}";
+                }
             }
-            return result;
+            return $"({result})";
         }
         /// <summary>
         /// Creates diagram hierarchies for the given types.
