@@ -1228,7 +1228,12 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is IfStatementSyntax ifStatement)
             {
-                diagramData.Add($"if ({ifStatement.Condition}) then ({yesLabel})".SetIndent(level));
+                string condition = string.Join(' ', ifStatement.Condition.ToString()
+                                                               .Replace(Environment.NewLine, " ")
+                                                               .Replace("\r", " ")
+                                                               .Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+                diagramData.Add($"if ({condition}) then ({yesLabel})".SetIndent(level));
                 AnalyzeStatement(ifStatement.Statement, diagramData, level + 1);
                 if (ifStatement.Else != null)
                     AnalyzeStatement(ifStatement.Else, diagramData, level + 1);

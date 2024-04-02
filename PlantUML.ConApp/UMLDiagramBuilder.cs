@@ -39,6 +39,11 @@
         /// </summary>
         public abstract void CreateFromPath();
 
+        /// <summary>
+        /// Reads the define constants from project files located in the specified path.
+        /// </summary>
+        /// <param name="path">The path to the directory containing the project files.</param>
+        /// <returns>An array of define constants extracted from the project files.</returns>
         public static string[] ReadDefinesFromProjectFiles(string path)
         {
             List<string> result = [];
