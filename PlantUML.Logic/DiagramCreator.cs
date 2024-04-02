@@ -7,6 +7,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
+using System.Linq.Expressions;
 
 namespace PlantUML.Logic
 {
@@ -540,7 +541,21 @@ namespace PlantUML.Logic
             var filteredInvocationExpressions = invocationExpressions.Where(ie => ie.Expression.ToString().Contains("ToString") == false
                                                                                && ie.Expression.ToString().Contains("ConfigureAwait") == false
                                                                                && ie.Expression.ToString().Contains("nameof") == false);
+
             participants.Add(CreateParticipant(methodNode));
+            //foreach (var item in filteredInvocationExpressions)
+            //{
+            //    var methodDeclaration = FindMethodDeclaration(semanticModel, item);
+
+            //    if (methodDeclaration != null)
+            //    {
+            //        participants.Add(CreateParticipant(methodDeclaration));
+            //    }
+            //    else
+            //    {
+            //        participants.Add(CreateParticipant(item));
+            //    }
+            //}
             participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
 
             participantAliasse.Add(CreateParticipantAlias(methodNode!));
@@ -1651,6 +1666,27 @@ namespace PlantUML.Logic
         #endregion diagram helpers
 
         #region helpers
+        private static MethodDeclarationSyntax? FindMethodDeclaration(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
+        {
+            var result = default(MethodDeclarationSyntax);
+            var symbolInfo = semanticModel.GetSymbolInfo(invocation).Symbol;
+
+            if (symbolInfo != null && symbolInfo is IMethodSymbol methodSymbol)
+            {
+                var methodReferences = methodSymbol.DeclaringSyntaxReferences;
+
+                foreach (var reference in methodReferences)
+                {
+                    var methodDeclaration = reference.GetSyntax() as MethodDeclarationSyntax;
+
+                    if (methodDeclaration != null)
+                    {
+                        result = methodDeclaration;
+                    }
+                }
+            }
+            return result;
+        }
         /// <summary>
         /// Creates a participant string representation based on the provided method syntax.
         /// </summary>
@@ -1684,9 +1720,9 @@ namespace PlantUML.Logic
         private static string CreateParticipant(InvocationExpressionSyntax invocationSyntax)
         {
             var arguments = invocationSyntax.ArgumentList?.Arguments ?? [];
-            var argsStatement = arguments.Any() ? $"({string.Join(",", arguments)})" : string.Empty;
+            var argsStatement = arguments.Any() ? string.Join(",", arguments.Select((item, index) => $"a{index}")) : string.Empty;
 
-            return $"{invocationSyntax?.Expression}{argsStatement}";
+            return $"{invocationSyntax?.Expression}({argsStatement})";
         }
         /// <summary>
         /// Creates an alias for a participant based on the given invocation expression.
