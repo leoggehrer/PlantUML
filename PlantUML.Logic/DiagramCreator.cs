@@ -195,7 +195,7 @@ namespace PlantUML.Logic
                     {
                         File.WriteAllLines(filePath, diagramData);
                     }
-                    infoData.Add($"{nameof(title)}:{title}");
+                    infoData.Add($"{nameof(title)}:{title} (AC)");
                     infoData.Add($"{nameof(fileName)}:{fileName}");
                     infoData.Add($"generated_on:{DateTime.UtcNow}");
                     infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
@@ -380,7 +380,7 @@ namespace PlantUML.Logic
                 {
                     File.WriteAllLines(filePath, diagramData);
                 }
-                infoData.Add($"{nameof(title)}:{title}");
+                infoData.Add($"{nameof(title)}:{title} (CD)");
                 infoData.Add($"{nameof(fileName)}:{fileName}");
             }
             if (force)
@@ -497,38 +497,41 @@ namespace PlantUML.Logic
                     var fileName = $"sq_{classNode.Identifier.Text}_{methodNode.Identifier.Text}";
                     var diagramData = CreateSequenceDiagram(semanticModel, methodNode);
 
-                    if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false)
+                    if (diagramData.Count > 0)
                     {
-                        fileName = $"{fileName}{PlantUMLExtension}";
+                        if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false)
+                        {
+                            fileName = $"{fileName}{PlantUMLExtension}";
+                        }
+                        else
+                        {
+                            fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
+                        }
+
+                        diagramData.Insert(0, $"@startuml {title}");
+                        // diagramData.Insert(1, "header");
+                        // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+                        // diagramData.Insert(3, "end header");
+                        diagramData.Insert(1, $"title {title}");
+                        //diagramData.Insert(2, "start");
+
+                        // diagramData.Add("footer");
+                        // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+                        // diagramData.Add("end footer");
+                        //diagramData.Add("stop");
+                        diagramData.Add("@enduml");
+
+                        var filePath = Path.Combine(path, fileName);
+
+                        if (force || Path.Exists(filePath) == false)
+                        {
+                            File.WriteAllLines(filePath, diagramData);
+                        }
+                        infoData.Add($"{nameof(title)}:{title} (SQ)");
+                        infoData.Add($"{nameof(fileName)}:{fileName}");
+                        infoData.Add($"generated_on:{DateTime.UtcNow}");
+                        infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
                     }
-                    else
-                    {
-                        fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
-                    }
-
-                    diagramData.Insert(0, $"@startuml {title}");
-                    // diagramData.Insert(1, "header");
-                    // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
-                    // diagramData.Insert(3, "end header");
-                    diagramData.Insert(1, $"title {title}");
-                    //diagramData.Insert(2, "start");
-
-                    // diagramData.Add("footer");
-                    // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
-                    // diagramData.Add("end footer");
-                    //diagramData.Add("stop");
-                    diagramData.Add("@enduml");
-
-                    var filePath = Path.Combine(path, fileName);
-
-                    if (force || Path.Exists(filePath) == false)
-                    {
-                        File.WriteAllLines(filePath, diagramData);
-                    }
-                    infoData.Add($"{nameof(title)}:{title}");
-                    infoData.Add($"{nameof(fileName)}:{fileName}");
-                    infoData.Add($"generated_on:{DateTime.UtcNow}");
-                    infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
                 }
             }
 
@@ -585,8 +588,11 @@ namespace PlantUML.Logic
                     diagramData.Add($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}");
                 }
             }
-            diagramData.Add("autonumber");
-            diagramData.AddRange(messages);
+            if (messages.Count > 0)
+            {
+                diagramData.Add("autonumber");
+                diagramData.AddRange(messages);
+            }
             return diagramData;
         }
         #endregion create sequence diagram
