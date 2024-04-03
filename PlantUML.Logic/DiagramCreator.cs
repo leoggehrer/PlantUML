@@ -7,7 +7,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
-using System.Linq.Expressions;
+using CommonTool.Extensions;
 
 namespace PlantUML.Logic
 {
@@ -342,6 +342,10 @@ namespace PlantUML.Logic
             var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
             var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             var syntaxRoot = syntaxTree.GetRoot();
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location);
+            var systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location);
+            var compilation = CSharpCompilation.Create("ClassCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore]);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
 
             if (Path.Exists(path) == false)
@@ -364,7 +368,7 @@ namespace PlantUML.Logic
                     fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
                 }
 
-                AnalyzeDeclarationSyntax(itemNode, diagramData, 0);
+                AnalyzeDeclarationSyntax(semanticModel, itemNode, diagramData, 0);
                 diagramData.Insert(0, $"@startuml {title}");
                 diagramData.Insert(1, $"title {title}");
 
@@ -407,7 +411,15 @@ namespace PlantUML.Logic
                 umlRelations.Add(ExtractUMLRelations(lines));
             }
 
-            result.AddRange(umlItems.SelectMany(e => e));
+            foreach (var item in umlItems)
+            {
+                var isContained = result.IsSubsequence(item);
+
+                if (isContained == false)
+                {
+                    result.AddRange(item);
+                }
+            }
 
             foreach (var item in umlRelations.SelectMany(e => e).Distinct())
             {
@@ -457,7 +469,7 @@ namespace PlantUML.Logic
         /// <param name="source">The source code to generate the sequence diagrams from.</param>
         /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
         /// <param name="force">A flag indicating whether to overwrite existing files in the specified path.</param>
-        public static void CreateSequenceDiagram(string path, string source, string[]defines, bool force)
+        public static void CreateSequenceDiagram(string path, string source, string[] defines, bool force)
         {
             var fileCounter = 0;
             var infoData = new List<string>();
@@ -467,9 +479,9 @@ namespace PlantUML.Logic
             var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
             var mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location);
             var systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location);
-            var compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [ syntaxTree ], references: [ mscorlib, systemCore ]);
+            var compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore]);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            
+
             if (Path.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
@@ -565,7 +577,7 @@ namespace PlantUML.Logic
 
             for (var i = 0; i < participants.Count && i < participantAliasse.Count; i++)
             {
-                var isReferenced = messages.Any(l => l.StartsWith($"{participantAliasse[i]}") 
+                var isReferenced = messages.Any(l => l.StartsWith($"{participantAliasse[i]}")
                                                   || l.Contains($"> {participantAliasse[i]}"));
 
                 if (isReferenced)
@@ -810,12 +822,13 @@ namespace PlantUML.Logic
 
         #region diagram helpers
         /// <summary>
-        /// Analyzes the declaration syntax of a given syntax node and generates diagram data.
+        /// Analyzes the declaration syntax of a given semantic model and syntax node.
         /// </summary>
-        /// <param name="syntaxNode">The syntax node to analyze.</param>
-        /// <param name="diagramData">The list to store the generated diagram data.</param>
-        /// <param name="level">The indentation level for the generated diagram data.</param>
-        public static void AnalyzeDeclarationSyntax(SyntaxNode syntaxNode, List<string> diagramData, int level)
+        /// <param name="semanticModel">The semantic model to analyze.</param>
+        /// <param name="syntaxNode">The syntax node representing the declaration.</param>
+        /// <param name="diagramData">The list to store the diagram data.</param>
+        /// <param name="level">The indentation level for the diagram data.</param>
+        public static void AnalyzeDeclarationSyntax(SemanticModel semanticModel, SyntaxNode syntaxNode, List<string> diagramData, int level)
         {
             static string GetVisibility(SyntaxTokenList modifiers, string defaultValue)
             {
@@ -897,17 +910,17 @@ namespace PlantUML.Logic
                         }
                         if (item.Keyword.Text == "get")
                         {
-                            result.Add($"{accessVisibility}{(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}{declaration.Type} get{declaration.Identifier}()");
+                            result.Add($"{accessVisibility} {(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}{declaration.Type} get{declaration.Identifier}()");
                         }
                         else if (item.Keyword.Text == "set")
                         {
-                            result.Add($"{accessVisibility}{(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}Void set{declaration.Identifier}({declaration.Type} value)");
+                            result.Add($"{accessVisibility} {(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}Void set{declaration.Identifier}({declaration.Type} value)");
                         }
                     }
                 }
                 else
                 {
-                    result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Trim());
+                    result.Add($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Shrink(' '));
                 }
                 return [.. result];
             }
@@ -929,122 +942,137 @@ namespace PlantUML.Logic
                         parameterList += $"{item.Type} {item.Identifier}";
                     }
                 }
-                return $"{visibility} {modifiers} {declaration.ReturnType} {declaration.Identifier}({parameterList})".Trim();
+                return $"{visibility} {modifiers} {declaration.ReturnType} {declaration.Identifier}({parameterList})".Shrink(' ');
             }
 
             if (syntaxNode is EnumDeclarationSyntax enumDeclaration)
             {
-                diagramData.Add($"enum {enumDeclaration.Identifier} {Color.Enum}".SetIndent(level));
+                string declaration = ConvertModifiers(enumDeclaration.Modifiers);
+
+                declaration += $" enum {enumDeclaration.Identifier} {Color.Enum}" + " {";
+                diagramData.Add(declaration);
                 foreach (var member in enumDeclaration.Members)
                 {
-                    diagramData.Add($"{member.Identifier}".SetIndent(level + 1));
+                    diagramData.Add($"{member.Identifier}");
                 }
-                diagramData.Add("}".SetIndent(level));
+                diagramData.Add("}");
             }
             else if (syntaxNode is StructDeclarationSyntax structDeclaration)
             {
-                diagramData.Add($"struct {structDeclaration.Identifier} {Color.Struct}".SetIndent(level));
+                string declaration = ConvertModifiers(structDeclaration.Modifiers);
+
+                declaration += $" struct {structDeclaration.Identifier} {Color.Struct}" + " {";
+                diagramData.Add(declaration);
                 foreach (var member in structDeclaration.Members)
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("}".SetIndent(level));
+                diagramData.Add("}");
             }
             else if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclaration)
             {
                 string declaration = ConvertModifiers(interfaceDeclaration.Modifiers);
 
-                declaration += $"interface {interfaceDeclaration.Identifier} {Color.Interface}";
-                declaration += " {";
-                diagramData.Add(declaration.SetIndent(level));
+                declaration += $" interface {interfaceDeclaration.Identifier} {Color.Interface}" + " {";
+                diagramData.Add(declaration);
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("---".SetIndent(level));
+                diagramData.Add("---");
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("---".SetIndent(level));
+                diagramData.Add("---");
                 foreach (var member in interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("}".SetIndent(level));
+                diagramData.Add("}");
             }
             else if (syntaxNode is ClassDeclarationSyntax classDeclaration)
             {
                 var declaration = ConvertModifiers(classDeclaration.Modifiers);
                 var autoProperties = classDeclaration.Members.OfType<PropertyDeclarationSyntax>()
-                                                     .Where(p => IsAutoProperty(p));
+                                                     .Where(IsAutoProperty);
 
                 declaration += $" class {classDeclaration.Identifier}";
                 declaration += declaration.Contains("abstract") ? $" {Color.AbstractClass}" : $" {Color.Class}";
                 declaration += " {";
-                diagramData.Add(declaration.Trim().SetIndent(level));
+                diagramData.Add(declaration);
 
                 foreach (var autoProperty in autoProperties)
                 {
                     var modifier = ConvertModifiers(autoProperty.Modifiers);
 
-                    diagramData.Add($"-{modifier}{autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}");
+                    diagramData.Add($"- {modifier} {autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}".Shrink(' '));
                 }
 
                 foreach (var member in classDeclaration.Members.Where(m => m is FieldDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("---".SetIndent(level));
+                diagramData.Add("---");
                 foreach (var member in classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("---".SetIndent(level));
+                diagramData.Add("---");
                 foreach (var member in classDeclaration.Members.Where(m => m is MethodDeclarationSyntax))
                 {
-                    AnalyzeDeclarationSyntax(member, diagramData, level + 1);
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
                 }
-                diagramData.Add("}".SetIndent(level));
+                diagramData.Add("}");
+
                 if (classDeclaration.BaseList != null)
                 {
                     foreach (var baseType in classDeclaration.BaseList.Types)
                     {
                         string identifierText;
+                        var typeDeclaration = FindTypeDeclaration(semanticModel, baseType);
+
+                        if (typeDeclaration != default)
+                        {
+                            AnalyzeDeclarationSyntax(semanticModel, typeDeclaration, diagramData, level + 1);
+                        }
 
                         if (baseType.Type is IdentifierNameSyntax identifierName)
                         {
                             identifierText = identifierName.Identifier.Text;
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}".SetIndent(level));
+                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
                         }
                         else if (baseType.Type is GenericNameSyntax genericName)
                         {
                             identifierText = genericName.Identifier.Text;
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}".SetIndent(level));
+                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
                         }
                         else
                         {
                             identifierText = baseType.Type.ToString();
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}".SetIndent(level));
+                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
                         }
 
-                        if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1]))
+                        if (typeDeclaration != default)
                         {
-                            diagramData.Add($"interface {identifierText} {Color.Interface}");
-                        }
-                        else
-                        {
-                            diagramData.Add($"class {identifierText} {Color.Class}");
+                            if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1]))
+                            {
+                                diagramData.Add($"interface {identifierText} {Color.Interface}");
+                            }
+                            else
+                            {
+                                diagramData.Add($"class {identifierText} {Color.Class}");
+                            }
                         }
                     }
                 }
             }
             else if (syntaxNode is FieldDeclarationSyntax fieldDeclaration)
             {
-                diagramData.Add(ConvertFieldDeclaration(fieldDeclaration).SetIndent(level));
+                diagramData.Add(ConvertFieldDeclaration(fieldDeclaration));
             }
             else if (syntaxNode is PropertyDeclarationSyntax propertyDeclaration)
             {
@@ -1666,6 +1694,31 @@ namespace PlantUML.Logic
         #endregion diagram helpers
 
         #region helpers
+        /// <summary>
+        /// Finds the type declaration syntax node that matches the given base type syntax.
+        /// </summary>
+        /// <param name="semanticModel">The semantic model to use for type resolution.</param>
+        /// <param name="baseTypeSyntax">The base type syntax to match.</param>
+        /// <returns>The type declaration syntax node that matches the given base type syntax, or null if no match is found.</returns>
+        private static TypeDeclarationSyntax? FindTypeDeclaration(SemanticModel semanticModel, BaseTypeSyntax baseTypeSyntax)
+        {
+            var result = default(TypeDeclarationSyntax);
+            var typeDeclarations = semanticModel.SyntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>();
+
+            if (baseTypeSyntax.Type is IdentifierNameSyntax identifierName)
+            {
+                string identifierText = identifierName.Identifier.Text;
+
+                result = typeDeclarations.FirstOrDefault(t => t.Identifier.Text == identifierText);
+            }
+            return result;
+        }
+        /// <summary>
+        /// Finds the method declaration syntax node for the given invocation expression.
+        /// </summary>
+        /// <param name="semanticModel">The semantic model.</param>
+        /// <param name="invocation">The invocation expression syntax node.</param>
+        /// <returns>The method declaration syntax node if found, otherwise null.</returns>
         private static MethodDeclarationSyntax? FindMethodDeclaration(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
         {
             var result = default(MethodDeclarationSyntax);
@@ -1710,7 +1763,7 @@ namespace PlantUML.Logic
             var parameters = methodSyntax.ParameterList?.Parameters ?? [];
             var result = $"{identifier}" + (parameters.Any() ? $"_{string.Join("_", parameters.Select((item, index) => $"p{index}"))}" : string.Empty);
 
-            return Shrink(result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b), '_');
+            return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
         }
         /// <summary>
         /// Creates a participant string based on the given invocation expression syntax.
@@ -1735,7 +1788,7 @@ namespace PlantUML.Logic
             var arguments = invocationExpression.ArgumentList?.Arguments ?? [];
             var result = $"{identifier}" + (arguments.Any() ? $"_{string.Join("_", arguments.Select((item, index) => $"a{index}"))}" : string.Empty);
 
-            return Shrink(result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b), '_');
+            return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
         }
         /// <summary>
         /// Creates an argument list based on the provided invocation expression and method results.
@@ -1952,7 +2005,7 @@ namespace PlantUML.Logic
         /// <param name="source">The input string.</param>
         /// <param name="charToRemove">The character to remove.</param>
         /// <returns>A new string with consecutive occurrences of the specified character removed.</returns>
-        public static string Shrink(string source, char charToRemove)
+        public static string _Shrink(string source, char charToRemove)
         {
             var result = new StringBuilder();
             var hasFound = false;
