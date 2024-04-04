@@ -2,7 +2,7 @@
 
 namespace PlantUML.ConApp
 {
-    public partial class PlantUMLApp : CommonTool.ConsoleApplication
+    public partial class PlantUMLApp : ConsoleApplication
     {
         #region Class-Constructors
         /// <summary>
@@ -12,7 +12,7 @@ namespace PlantUML.ConApp
         static PlantUMLApp()
         {
             ClassConstructing();
-            DocumentsPath = SourcePath;
+            TargetPath = ProjectsPath = SourcePath;
             ClassConstructed();
         }
         /// <summary>
@@ -55,9 +55,10 @@ namespace PlantUML.ConApp
         /// </summary>
         public static string DiagramFolder { get; set; } = "diagrams";
         /// <summary>
-        /// Gets or sets the path to the documents.
+        /// Gets or sets the path to the projects.
         /// </summary>
-        public static string DocumentsPath { get; set; }
+        public static string ProjectsPath { get; set; }
+        public static string TargetPath { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether to create a complete diagram.
         /// </summary>
@@ -90,13 +91,28 @@ namespace PlantUML.ConApp
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Path", "Change source path"),
+                    Text = ToLabelText("Path", "Change projects path"),
                     Action = (self) => 
                     {
-                        var savePath = DocumentsPath;
+                        var savePath = ProjectsPath;
                         
-                        DocumentsPath = SelectOrChangeToSubPath(DocumentsPath, MaxSubPathDepth, [ SourcePath ]);
-                        if (savePath != DocumentsPath)
+                        ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth, [ SourcePath ]);
+                        if (savePath != ProjectsPath)
+                        {
+                            PageIndex = 0;
+                        }
+                    },
+                },
+                new()
+                {
+                    Key = $"{++mnuIdx}",
+                    Text = ToLabelText("Path", "Change target path"),
+                    Action = (self) => 
+                    {
+                        var savePath = TargetPath;
+                        
+                        TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth, [ SourcePath ]);
+                        if (savePath != TargetPath)
                         {
                             PageIndex = 0;
                         }
@@ -129,14 +145,14 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var paths = TemplatePath.GetSubPaths(DocumentsPath, MaxSubPathDepth)
+            var paths = TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth)
                                     .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
                                     .OrderBy(p => p)
                                     .ToArray();
 
             menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) =>
             {
-                menuItem.Text = ToLabelText("Path", $"{item.Replace(DocumentsPath, string.Empty)}");
+                menuItem.Text = ToLabelText("Path", $"{item.Replace(ProjectsPath, string.Empty)}");
                 menuItem.Tag = "path";
                 menuItem.Action = (self) => CreateDiagram(self, Force);
                 menuItem.Params = new() { { "path", item } };
@@ -161,10 +177,11 @@ namespace PlantUML.ConApp
             ForegroundColor = saveForeColor;
             PrintLine($"Force flag:       {Force}");
             PrintLine($"Max. path depth:  {MaxSubPathDepth}");
-            PrintLine($"Source path:      {DocumentsPath}");
+            PrintLine($"Projets path:     {ProjectsPath}");
             PrintLine();
-            PrintLine($"Diagram complete: {CreateCompleteDiagram}");
+            PrintLine($"Target path:      {TargetPath}");
             PrintLine($"Diagram folder:   {DiagramFolder}");
+            PrintLine($"Diagram complete: {CreateCompleteDiagram}");
             PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
         }
