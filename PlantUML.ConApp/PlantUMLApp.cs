@@ -47,18 +47,21 @@ namespace PlantUML.ConApp
 
         #region app properties
         /// <summary>
+        /// Gets or sets the path to the projects.
+        /// </summary>
+        public static string ProjectsPath { get; set; }
+        /// <summary>
+        /// Gets or sets the target path.
+        /// </summary>
+        public static string TargetPath { get; set; }
+        /// <summary>
         /// Gets or sets the selected diagram type.
         /// </summary>
-        public static DiagramBuilderType DiagramBuilder { get; set; } = DiagramBuilderType.Activity;
+        public DiagramBuilderType DiagramBuilder { get; set; } = DiagramBuilderType.All;
         /// <summary>
         /// Gets or sets the folder path for diagrams.
         /// </summary>
         public static string DiagramFolder { get; set; } = "diagrams";
-        /// <summary>
-        /// Gets or sets the path to the projects.
-        /// </summary>
-        public static string ProjectsPath { get; set; }
-        public static string TargetPath { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether to create a complete diagram.
         /// </summary>
@@ -91,26 +94,30 @@ namespace PlantUML.ConApp
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Path", "Change projects path"),
-                    Action = (self) => 
+                    Text = ToLabelText("Projects path", "Change projects path"),
+                    Action = (self) =>
                     {
                         var savePath = ProjectsPath;
-                        
+
                         ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth, [ SourcePath ]);
                         if (savePath != ProjectsPath)
                         {
                             PageIndex = 0;
+                        }
+                        if (savePath == TargetPath)
+                        {
+                            TargetPath = ProjectsPath;
                         }
                     },
                 },
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Path", "Change target path"),
-                    Action = (self) => 
+                    Text = ToLabelText("Target path", "Change target path"),
+                    Action = (self) =>
                     {
                         var savePath = TargetPath;
-                        
+
                         TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth, [ SourcePath ]);
                         if (savePath != TargetPath)
                         {
@@ -152,10 +159,13 @@ namespace PlantUML.ConApp
 
             menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) =>
             {
-                menuItem.Text = ToLabelText("Path", $"{item.Replace(ProjectsPath, string.Empty)}");
-                menuItem.Tag = "path";
+                var subPath = item.Replace(ProjectsPath, string.Empty);
+                var targetPath = item.Replace(ProjectsPath, TargetPath);
+
+                menuItem.Text = ToLabelText("Path", $"{subPath}");
+                menuItem.Tag = "paths";
                 menuItem.Action = (self) => CreateDiagram(self, Force);
-                menuItem.Params = new() { { "path", item } };
+                menuItem.Params = new() { { "sourcePath", item }, { "targetPath", targetPath } };
             }));
             return [.. menuItems.Union(CreateExitMenuItems())];
         }
@@ -182,7 +192,7 @@ namespace PlantUML.ConApp
             PrintLine($"Target path:      {TargetPath}");
             PrintLine($"Diagram folder:   {DiagramFolder}");
             PrintLine($"Diagram complete: {CreateCompleteDiagram}");
-            PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
+            PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
         }
         #endregion overrides
@@ -198,13 +208,14 @@ namespace PlantUML.ConApp
         /// <summary>
         /// Changes the diagram builder type based on the current value of DiagramBuilder.
         /// </summary>
-        private static void ChangeDiagramBuilder()
+        private void ChangeDiagramBuilder()
         {
             DiagramBuilder = DiagramBuilder.ToString().ToLower() switch
             {
+                "all" => DiagramBuilderType.Activity,
                 "activity" => DiagramBuilderType.Class,
                 "class" => DiagramBuilderType.Sequence,
-                "sequence" => DiagramBuilderType.Activity,
+                "sequence" => DiagramBuilderType.All,
                 _ => DiagramBuilder,
             };
         }
@@ -214,26 +225,36 @@ namespace PlantUML.ConApp
         /// </summary>
         /// <param name="menuItem">The menu item containing the parameters and tag for the diagram creation.</param>
         /// <param name="force">A flag indicating whether to force the creation of the diagram.</param>
-        private static void CreateDiagram(MenuItem menuItem, bool force)
+        private void CreateDiagram(MenuItem menuItem, bool force)
         {
-            var pathOrFilePath = menuItem.Params[menuItem.Tag]?.ToString() ?? string.Empty;
-
-            StartProgressBar();
-            UMLDiagramBuilder diagram = DiagramBuilder switch
+            var sourcePath = menuItem.Params["sourcePath"]?.ToString() ?? string.Empty;
+            var targetPath = menuItem.Params["targetPath"]?.ToString() ?? string.Empty;
+            Action<UMLDiagramBuilder> execute = (builder) =>
             {
-                DiagramBuilderType.Activity => new ActivityDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
-                DiagramBuilderType.Class => new ClassDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
-                DiagramBuilderType.Sequence => new SequenceDiagramBuilder(pathOrFilePath, DiagramFolder, CreateCompleteDiagram, force),
-                _ => throw new InvalidOperationException("Invalid diagram builder type."),
+                if (menuItem.Tag.ToLower() == "paths")
+                    builder.CreateFromPath();
+                else if (menuItem.Tag.ToLower() == "file")
+                    builder.CreateFromFile();
             };
 
-            if (menuItem.Tag.ToLower() == "path")
+            StartProgressBar();
+            if ((DiagramBuilder & DiagramBuilderType.Activity) > 0)
             {
-                diagram.CreateFromPath();
+                var builder = new ActivityDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+
+                execute(builder);
             }
-            else if (menuItem.Tag.ToLower() == "file")
+            if ((DiagramBuilder & DiagramBuilderType.Class) > 0)
             {
-                diagram.CreateFromFile();
+                var builder = new ClassDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+
+                execute(builder);
+            }
+            if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0)
+            {
+                var builder = new SequenceDiagramBuilder(sourcePath, targetPath, DiagramFolder, force);
+
+                execute(builder);
             }
         }
         #endregion methods for app

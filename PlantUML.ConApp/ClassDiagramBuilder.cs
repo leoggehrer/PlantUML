@@ -1,23 +1,27 @@
-﻿using System.Text;
-using CommonTool;
-
+﻿
 namespace PlantUML.ConApp
 {
-     /// <summary>
+    using System.IO;
+    using System.Text;
+    using CommonTool;
+    using CommonTool.Extensions;
+
+    /// <summary>
     /// Represents a base class for building UML diagrams.
     /// </summary>
-    /// <param name="pathOrFilePath">The path or file path of the input file.</param>
+    /// <param name="sourcePath">The path or file path of the input file.</param>
+    /// <param name="targetPath">The path or for uml-diagrams.</param>
     /// <param name="diagramFolder">The folder where the generated diagrams will be saved.</param>
     /// <param name="createCompleteDiagram">A flag indicating whether to create complete diagrams.</param>
     /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-   public partial class ClassDiagramBuilder(string pathOrFilePath, string diagramFolder, bool createCompleteDiagram, bool force) : UMLDiagramBuilder(pathOrFilePath, diagramFolder, createCompleteDiagram, force)
+   public partial class ClassDiagramBuilder(string sourcePath, string targetPath, string diagramFolder, bool createCompleteDiagram, bool force) : UMLDiagramBuilder(sourcePath, targetPath, diagramFolder, createCompleteDiagram, force)
     {
         public override void CreateFromFile()
         {
-            var fileDirectory = Path.GetDirectoryName(PathOrFilePath!);
-            var diagramsDirectory = Path.Combine(fileDirectory!, DiagramFolder!);
-            var source = File.ReadAllText(PathOrFilePath!);
+            var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty;
             var defines = ReadDefinesFromProjectFiles(fileDirectory!);
+            var diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory;
+            var source = File.ReadAllText(SourcePath!);
 
             Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, defines, Force);
             if (CreateCompleteDiagram)
@@ -29,19 +33,23 @@ namespace PlantUML.ConApp
         {
             StringBuilder builder = new();
             
-            if (Directory.Exists(PathOrFilePath))
+            if (Directory.Exists(SourcePath))
             {
-                var files = Application.GetSourceCodeFiles(PathOrFilePath, [ "*.cs" ]);
+                var defines = ReadDefinesFromProjectFiles(SourcePath!);
+                var sourceFiles = Application.GetSourceCodeFiles(SourcePath, [ "*.cs" ]);
+                var diagramsDirectory = TargetPath;
                 
-                foreach (var file in files)
+                foreach (var file in sourceFiles)
                 {
                     var source = File.ReadAllText(file);
 
                     builder.AppendLine(source);
                 }
 
-                var diagramsDirectory = Path.Combine(PathOrFilePath!, DiagramFolder!);
-                var defines = ReadDefinesFromProjectFiles(PathOrFilePath!);
+                if (DiagramFolder.HasContent())
+                {
+                    diagramsDirectory = Path.Combine(TargetPath, DiagramFolder);
+                }
 
                 Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, builder.ToString(), defines, Force);
                 if (CreateCompleteDiagram)

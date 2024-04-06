@@ -7,14 +7,18 @@
     /// <summary>
     /// Represents an abstract class for building UML diagrams.
     /// </summary>
-    public abstract partial class UMLDiagramBuilder(string pathOrFilePath, string diagramFolder, bool createCompleteDiagram, bool force)
+    public abstract partial class UMLDiagramBuilder(string sourcePath, string targetPath, string diagramFolder, bool createCompleteDiagram, bool force)
     {
         #region properties
 
         /// <summary>
-        /// Gets or sets the path or file path for the UML diagram.
+        /// Gets or sets the source path.
         /// </summary>
-        public string PathOrFilePath { get; private set; } = pathOrFilePath;
+        public string SourcePath { get; private set; } = sourcePath;
+        /// <summary>
+        /// Gets or sets the target path for the UML diagram.
+        /// </summary>
+        public string TargetPath { get; private set; } = targetPath;
         /// <summary>
         /// Gets or sets the folder where the diagrams are stored.
         /// </summary>

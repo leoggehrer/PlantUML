@@ -234,7 +234,7 @@ namespace PlantUML.Logic
                     }
                     else
                     {
-                        diagramData.Add($"{localDeclarationStatement.Declaration}");
+                        diagramData[^1] += $"\\n{localDeclarationStatement.Declaration}";
                     }
                 }
                 else
