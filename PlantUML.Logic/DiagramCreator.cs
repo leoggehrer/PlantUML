@@ -57,9 +57,13 @@ namespace PlantUML.Logic
 
         #region properties
         /// <summary>
+        /// Gets the file filter for info files.
+        /// </summary>
+        public static string InfoFileFilter => "*_info.txt";
+        /// <summary>
         /// Gets or sets the extension for PlantUML files.
         /// </summary>
-        public static string PlantUMLExtension { get; private set; } = ".puml";
+        public static string PlantUMLExtension => ".puml";
         #endregion properties
 
         #region skinparam
@@ -145,6 +149,7 @@ namespace PlantUML.Logic
         /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
         public static void CreateActivityDiagram(string path, string source, string[] defines, bool force)
         {
+            var infoFileName = "ac_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
             var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
@@ -195,6 +200,7 @@ namespace PlantUML.Logic
                     {
                         File.WriteAllLines(filePath, diagramData);
                     }
+
                     infoData.Add($"{nameof(title)}:{title} (AC)");
                     infoData.Add($"{nameof(fileName)}:{fileName}");
                     infoData.Add($"generated_on:{DateTime.UtcNow}");
@@ -202,9 +208,10 @@ namespace PlantUML.Logic
                 }
             }
 
-            if (force || Path.Exists(Path.Combine(path, "ac_info.txt")) == false)
+            if (force || Path.Exists(Path.Combine(path, infoFileName)) == false)
             {
-                File.WriteAllLines(Path.Combine(path, "ac_info.txt"), infoData);
+                File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+                UpdateDiagramPath(path, InfoFileFilter);
             }
         }
         /// <summary>
@@ -258,11 +265,12 @@ namespace PlantUML.Logic
         /// <param name="force">A boolean value indicating whether to force the creation of the diagram even if it already exists.</param>
         public static void CreateCompleteActivityDiagram(string path, bool force)
         {
+            var infoFileName = "ac_info.txt";
             var result = new List<string>();
             var umlFiles = new List<string>();
             var umlItems = new List<UMLItem>();
-            var infoFilePath = Path.Combine(path, "ac_info.txt");
-            var files = Directory.GetFiles(path, "*.puml", SearchOption.AllDirectories)
+            var infoFilePath = Path.Combine(path, infoFileName);
+            var files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories)
                                  .Where(f => Path.GetFileName(f).StartsWith("ac_"));
 
             if (File.Exists(infoFilePath))
@@ -302,6 +310,7 @@ namespace PlantUML.Logic
             var fileName = "CompleteActivityDiagram.puml";
             var filePath = Path.Combine(path, fileName);
             var diagramData = new List<string>();
+            var completeInfoData = new List<string>();
 
             foreach (var item in umlItems)
             {
@@ -319,10 +328,23 @@ namespace PlantUML.Logic
                 diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
                 diagramData.Add("end footer");
                 diagramData.Add("@enduml");
+
                 if (force || Path.Exists(filePath) == false)
                 {
                     File.WriteAllLines(filePath, diagramData);
                 }
+
+                completeInfoData.Add($"title:All acivity diagrams (AC)");
+                completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+                completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+                completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+            }
+
+            var comleteInfoFileName = "CompleteActivityDiagram_info.txt";
+
+            if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false)
+            {
+                File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
             }
         }
         #endregion create activity diagram
@@ -337,6 +359,7 @@ namespace PlantUML.Logic
         /// <param name="force">A flag indicating whether to overwrite existing class diagram files.</param>
         public static void CreateClassDiagram(string path, string source, string[] defines, bool force)
         {
+            var infoFileName = "cd_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
             var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
@@ -383,9 +406,11 @@ namespace PlantUML.Logic
                 infoData.Add($"{nameof(title)}:{title} (CD)");
                 infoData.Add($"{nameof(fileName)}:{fileName}");
             }
-            if (force)
+
+            if (force || Path.Exists(Path.Combine(path, infoFileName)) == false)
             {
-                File.WriteAllLines(Path.Combine(path, "cd_info.txt"), infoData);
+                File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+                UpdateDiagramPath(path, InfoFileFilter);
             }
         }
 
@@ -447,16 +472,30 @@ namespace PlantUML.Logic
             var fileName = "CompleteClassDiagram.puml";
             var filePath = Path.Combine(path, fileName);
             var diagramData = new List<string>(result);
+            var completeInfoData = new List<string>();
 
             if (diagramData.Count > 0)
             {
                 diagramData.Insert(0, "@startuml CompleteClassDiagram");
                 diagramData.Insert(1, "title CompleteClassDiagram");
                 diagramData.Add("@enduml");
+
                 if (force || Path.Exists(filePath) == false)
                 {
                     File.WriteAllLines(filePath, diagramData);
                 }
+
+                completeInfoData.Add($"title:All class diagrams (CD)");
+                completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+                completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+                completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+            }
+
+            var comleteInfoFileName = "CompleteClassDiagram_info.txt";
+
+            if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false)
+            {
+                File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
             }
         }
         #endregion create class diagram
@@ -471,6 +510,7 @@ namespace PlantUML.Logic
         /// <param name="force">A flag indicating whether to overwrite existing files in the specified path.</param>
         public static void CreateSequenceDiagram(string path, string source, string[] defines, bool force)
         {
+            var infoFileName = "sq_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
             var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
@@ -535,9 +575,10 @@ namespace PlantUML.Logic
                 }
             }
 
-            if (force || Path.Exists(Path.Combine(path, "sq_info.txt")) == false)
+            if (force || Path.Exists(Path.Combine(path, infoFileName)) == false)
             {
-                File.WriteAllLines(Path.Combine(path, "sq_info.txt"), infoData);
+                File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+                UpdateDiagramPath(path, InfoFileFilter);
             }
         }
         /// <summary>
@@ -558,19 +599,6 @@ namespace PlantUML.Logic
                                                                                && ie.Expression.ToString().Contains("nameof") == false);
 
             participants.Add(CreateParticipant(methodNode));
-            //foreach (var item in filteredInvocationExpressions)
-            //{
-            //    var methodDeclaration = FindMethodDeclaration(semanticModel, item);
-
-            //    if (methodDeclaration != null)
-            //    {
-            //        participants.Add(CreateParticipant(methodDeclaration));
-            //    }
-            //    else
-            //    {
-            //        participants.Add(CreateParticipant(item));
-            //    }
-            //}
             participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
 
             participantAliasse.Add(CreateParticipantAlias(methodNode!));
@@ -1153,11 +1181,6 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is InvocationExpressionSyntax invocationExpression)
             {
-                //foreach (var item in invocationExpression.ArgumentList.Arguments)
-                //{
-                //    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
-                //}
-
                 var participantFrom = CreateParticipantAlias(methodDeclaration);
                 var participantTo = CreateParticipantAlias(invocationExpression);
 
@@ -1174,32 +1197,34 @@ namespace PlantUML.Logic
                     {
                         messages.Add($"{participantFrom} -> {participantTo}");
                     }
-                    var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression);
 
-                    if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
+                    if (invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression)
                     {
-                        var result = methodSymbol.ReturnType.ToString();
+                        var resultVariable = assignmentExpression.Left.ToString();
 
-                        if (result?.ToLower() != "void")
-                        {
-                            var resultVariable = "result";// $"resultOf{methodSymbol.Name}";
-
-                            //if (methodResults.ContainsKey(participantTo) == false)
-                            //{
-                            //    methodResults.Add(participantTo, resultVariable);
-                            //}
-                            //else
-                            //{
-                            //    methodResults[participantTo] = resultVariable;
-                            //}
-                            messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
-                        }
+                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
                     }
                     else if (invocationExpression.Parent is ReturnStatementSyntax)
                     {
-                        var resultVariable = "result";// $"resultOf{methodDeclaration.Identifier}";
+                        var resultVariable = "result";
 
                         messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
+                    }
+                    else
+                    {
+                        var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression);
+
+                        if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
+                        {
+                            var result = methodSymbol.ReturnType.ToString();
+
+                            if (result?.ToLower() != "void")
+                            {
+                                var resultVariable = "result";
+
+                                messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
+                            }
+                        }
                     }
                 }
                 else
@@ -1226,6 +1251,64 @@ namespace PlantUML.Logic
                 AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level + 1);
                 AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level + 1);
             }
+            else if (syntaxNode is DoStatementSyntax doStatement)
+            {
+                messages.Add($"loop {doStatement.Condition}");
+                foreach (var item in doStatement.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+                messages.Add("end");
+            }
+            else if (syntaxNode is WhileStatementSyntax whileStatement
+                     && HasInvocationExpression(whileStatement))
+            {
+                messages.Add($"loop {whileStatement.Condition}");
+                foreach (var item in whileStatement.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+                messages.Add("end");
+            }
+            else if (syntaxNode is ForStatementSyntax forStatement
+                     && HasInvocationExpression(forStatement))
+            {
+                messages.Add($"loop {forStatement.Condition}");
+                foreach (var item in forStatement.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+                messages.Add("end");
+            }
+            else if (syntaxNode is ForEachStatementSyntax forEachStatement
+                     && HasInvocationExpression(forEachStatement))
+            {
+                messages.Add($"loop {forEachStatement.Expression}");
+                foreach (var item in forEachStatement.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+                messages.Add("end");
+            }
+            else if (syntaxNode is IfStatementSyntax ifStatement
+                     && HasInvocationExpression(ifStatement))
+            {
+                messages.Add($"alt {ifStatement.Condition}");
+                foreach (var item in ifStatement.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+                messages.Add("end");
+            }
+            else if (syntaxNode is ElseClauseSyntax elseClause
+                     && HasInvocationExpression(elseClause))
+            {
+                messages.Add($"else");
+                foreach (var item in elseClause.ChildNodes())
+                {
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                }
+            }
             else
             {
                 foreach (var item in syntaxNode.ChildNodes())
@@ -1233,6 +1316,20 @@ namespace PlantUML.Logic
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
             }
+        }
+
+        private static bool HasInvocationExpression(SyntaxNode syntaxNode)
+        {
+            var result = syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>().Any();
+
+            if (result == false)
+            {
+                foreach (var item in syntaxNode.ChildNodes())
+                {
+                    result = HasInvocationExpression(item);
+                }
+            }
+            return result;
         }
         /// <summary>
         /// Analyzes a syntax node and generates diagram data based on the type of the node.
@@ -1700,6 +1797,33 @@ namespace PlantUML.Logic
         #endregion diagram helpers
 
         #region helpers
+        /// <summary>
+        /// Updates the diagram path by deleting any diagram files that do not have a corresponding entry in the info files.
+        /// </summary>
+        /// <param name="path">The directory path where the diagram files and info files are located.</param>
+        /// <param name="infoFileFilter">The filter pattern for the info files.</param>
+        private static void UpdateDiagramPath(string path, string infoFileFilter)
+        {
+            var infoLines = new List<string>();
+            var infoFiles = Directory.GetFiles(path, infoFileFilter, SearchOption.TopDirectoryOnly);
+
+            foreach (var infoFile in infoFiles)
+            {
+                infoLines.AddRange(File.ReadAllLines(infoFile));
+            }
+
+            var files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories);
+
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+
+                if (infoLines.Any(l => l.StartsWith($"fileName:{fileName}")) == false)
+                {
+                    File.Delete(file);
+                }
+            }
+        }
         /// <summary>
         /// Finds the type declaration syntax node that matches the given base type syntax.
         /// </summary>
