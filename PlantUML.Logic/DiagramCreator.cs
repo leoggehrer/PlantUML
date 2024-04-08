@@ -1204,6 +1204,15 @@ namespace PlantUML.Logic
 
                         messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
                     }
+                    else if (invocationExpression.Parent is EqualsValueClauseSyntax equalsValueClause)
+                    {
+                        if (equalsValueClause.Parent is VariableDeclaratorSyntax equalsVariableDeclarator)
+                        {
+                            var equalsVariable = equalsVariableDeclarator.Identifier.Text;
+
+                            messages.Add($"{participantTo} --> {participantFrom} : {equalsVariable}".SetIndent(level));
+                        }
+                    }
                     else if (invocationExpression.Parent is ReturnStatementSyntax)
                     {
                         var resultVariable = "result";
