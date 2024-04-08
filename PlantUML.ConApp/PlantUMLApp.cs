@@ -1,4 +1,5 @@
 ﻿using CommonTool;
+using CommonTool.Extensions;
 
 namespace PlantUML.ConApp
 {
@@ -152,7 +153,7 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var paths = TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth)
+            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth))
                                     .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
                                     .OrderBy(p => p)
                                     .ToArray();
@@ -162,6 +163,10 @@ namespace PlantUML.ConApp
                 var subPath = item.Replace(ProjectsPath, string.Empty);
                 var targetPath = item.Replace(ProjectsPath, TargetPath);
 
+                if (subPath.IsNullOrEmpty())
+                {
+                    subPath = $"{Path.DirectorySeparatorChar}{ProjectsPath.Split(Path.DirectorySeparatorChar).LastOrDefault()}";
+                }
                 menuItem.Text = ToLabelText("Path", $"{subPath}");
                 menuItem.Tag = "paths";
                 menuItem.Action = (self) => CreateDiagram(self, Force);
