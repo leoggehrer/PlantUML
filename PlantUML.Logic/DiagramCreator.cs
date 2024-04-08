@@ -1155,14 +1155,14 @@ namespace PlantUML.Logic
             {
                 foreach (var variable in localDeclarationStatement.Declaration.Variables)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level);
                 }
             }
             else if (syntaxNode is VariableDeclaratorSyntax variableDeclarator)
             {
                 if (variableDeclarator.Initializer != null)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level);
                 }
 
                 foreach (var item in variableDeclarator.Initializer?.Value?.ChildNodes() ?? [])
@@ -1173,7 +1173,7 @@ namespace PlantUML.Logic
                         {
                             foreach (var argument in varInvocationExpression.ArgumentList.Arguments)
                             {
-                                AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level + 1);
+                                AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level);
                             }
                         }
                     }
@@ -1191,24 +1191,24 @@ namespace PlantUML.Logic
 
                     if (argumentList != "()")
                     {
-                        messages.Add($"{participantFrom} -> {participantTo} : {argumentList}");
+                        messages.Add($"{participantFrom} -> {participantTo} : {argumentList}".SetIndent(level));
                     }
                     else
                     {
-                        messages.Add($"{participantFrom} -> {participantTo}");
+                        messages.Add($"{participantFrom} -> {participantTo}".SetIndent(level));
                     }
 
                     if (invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression)
                     {
                         var resultVariable = assignmentExpression.Left.ToString();
 
-                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
+                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
                     }
                     else if (invocationExpression.Parent is ReturnStatementSyntax)
                     {
                         var resultVariable = "result";
 
-                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
+                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
                     }
                     else
                     {
@@ -1222,7 +1222,7 @@ namespace PlantUML.Logic
                             {
                                 var resultVariable = "result";
 
-                                messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}");
+                                messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
                             }
                         }
                     }
@@ -1231,7 +1231,7 @@ namespace PlantUML.Logic
                 {
                     foreach (var item in invocationExpression.ChildNodes())
                     {
-                        AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                        AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
                     }
                 }
             }
@@ -1243,67 +1243,67 @@ namespace PlantUML.Logic
             {
                 if (assignmentExpression.Right is InvocationExpressionSyntax rightExpression)
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level);
                 }
             }
             else if (syntaxNode is BinaryExpressionSyntax binaryExpression)
             {
-                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level + 1);
-                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level + 1);
+                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level);
+                AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level);
             }
             else if (syntaxNode is DoStatementSyntax doStatement)
             {
-                messages.Add($"loop {doStatement.Condition}");
+                messages.Add($"loop {doStatement.Condition}".SetIndent(level));
                 foreach (var item in doStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
-                messages.Add("end");
+                messages.Add("end".SetIndent(level));
             }
             else if (syntaxNode is WhileStatementSyntax whileStatement
                      && HasInvocationExpression(whileStatement))
             {
-                messages.Add($"loop {whileStatement.Condition}");
+                messages.Add($"loop {whileStatement.Condition}".SetIndent(level));
                 foreach (var item in whileStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
-                messages.Add("end");
+                messages.Add("end".SetIndent(level));
             }
             else if (syntaxNode is ForStatementSyntax forStatement
                      && HasInvocationExpression(forStatement))
             {
-                messages.Add($"loop {forStatement.Condition}");
+                messages.Add($"loop {forStatement.Condition}".SetIndent(level));
                 foreach (var item in forStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
-                messages.Add("end");
+                messages.Add("end".SetIndent(level));
             }
             else if (syntaxNode is ForEachStatementSyntax forEachStatement
                      && HasInvocationExpression(forEachStatement))
             {
-                messages.Add($"loop {forEachStatement.Expression}");
+                messages.Add($"loop {forEachStatement.Expression}".SetIndent(level));
                 foreach (var item in forEachStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
-                messages.Add("end");
+                messages.Add("end".SetIndent(level));
             }
             else if (syntaxNode is IfStatementSyntax ifStatement
                      && HasInvocationExpression(ifStatement))
             {
-                messages.Add($"alt {ifStatement.Condition}");
+                messages.Add($"alt {ifStatement.Condition}".SetIndent(level));
                 foreach (var item in ifStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
                 }
-                messages.Add("end");
+                messages.Add("end".SetIndent(level));
             }
             else if (syntaxNode is ElseClauseSyntax elseClause
                      && HasInvocationExpression(elseClause))
             {
-                messages.Add($"else");
+                messages.Add($"else".SetIndent(level));
                 foreach (var item in elseClause.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1313,7 +1313,7 @@ namespace PlantUML.Logic
             {
                 foreach (var item in syntaxNode.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
                 }
             }
         }
@@ -1880,7 +1880,8 @@ namespace PlantUML.Logic
             var parameters = methodSyntax.ParameterList?.Parameters ?? [];
             var paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
 
-            return $"{methodSyntax?.Identifier}{paramsStatement}";
+            return $"{methodSyntax?.Identifier}{paramsStatement}".Replace($"{Environment.NewLine}", string.Empty)
+                                                                 .Replace(" ", string.Empty);
         }
         /// <summary>
         /// Creates an alias for a participant based on the given method syntax.
@@ -1905,7 +1906,8 @@ namespace PlantUML.Logic
             var arguments = invocationSyntax.ArgumentList?.Arguments ?? [];
             var argsStatement = arguments.Any() ? string.Join(",", arguments.Select((item, index) => $"a{index}")) : string.Empty;
 
-            return $"{invocationSyntax?.Expression}({argsStatement})";
+            return $"{invocationSyntax?.Expression}({argsStatement})".Replace($"{Environment.NewLine}", string.Empty)
+                                                                     .Replace(" ", string.Empty);
         }
         /// <summary>
         /// Creates an alias for a participant based on the given invocation expression.

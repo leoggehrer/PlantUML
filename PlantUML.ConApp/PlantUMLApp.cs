@@ -153,6 +153,7 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
+            var paths1 = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth)).ToArray();
             var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth))
                                     .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
                                     .OrderBy(p => p)
