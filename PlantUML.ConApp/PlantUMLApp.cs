@@ -234,32 +234,33 @@ namespace PlantUML.ConApp
         {
             var sourcePath = menuItem.Params["sourcePath"]?.ToString() ?? string.Empty;
             var targetPath = menuItem.Params["targetPath"]?.ToString() ?? string.Empty;
-            Action<UMLDiagramBuilder> execute = (builder) =>
+
+            static void execute(UMLDiagramBuilder builder, MenuItem menuItem)
             {
-                if (menuItem.Tag.ToLower() == "paths")
+                if (menuItem.Tag.Equals("paths", StringComparison.CurrentCultureIgnoreCase))
                     builder.CreateFromPath();
-                else if (menuItem.Tag.ToLower() == "file")
+                else if (menuItem.Tag.Equals("file", StringComparison.CurrentCultureIgnoreCase))
                     builder.CreateFromFile();
-            };
+            }
 
             StartProgressBar();
             if ((DiagramBuilder & DiagramBuilderType.Activity) > 0)
             {
                 var builder = new ActivityDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
-                execute(builder);
+                execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Class) > 0)
             {
                 var builder = new ClassDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
-                execute(builder);
+                execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0)
             {
                 var builder = new SequenceDiagramBuilder(sourcePath, targetPath, DiagramFolder, force);
 
-                execute(builder);
+                execute(builder, menuItem);
             }
         }
         #endregion methods for app
