@@ -1191,18 +1191,18 @@ namespace PlantUML.Logic
 
                     if (argumentList != "()")
                     {
-                        messages.Add($"{participantFrom} -> {participantTo} : {argumentList}".SetIndent(level));
+                        messages.Add($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level));
                     }
                     else
                     {
-                        messages.Add($"{participantFrom} -> {participantTo}".SetIndent(level));
+                        messages.Add($"{participantFrom} -[#grey]> {participantTo}".SetIndent(level));
                     }
 
                     if (invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression)
                     {
                         var resultVariable = assignmentExpression.Left.ToString();
 
-                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
+                        messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
                     }
                     else if (invocationExpression.Parent is EqualsValueClauseSyntax equalsValueClause)
                     {
@@ -1210,14 +1210,14 @@ namespace PlantUML.Logic
                         {
                             var equalsVariable = equalsVariableDeclarator.Identifier.Text;
 
-                            messages.Add($"{participantTo} --> {participantFrom} : {equalsVariable}".SetIndent(level));
+                            messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {equalsVariable}".SetIndent(level));
                         }
                     }
                     else if (invocationExpression.Parent is ReturnStatementSyntax)
                     {
                         var resultVariable = "result";
 
-                        messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
+                        messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
                     }
                     else
                     {
@@ -1231,7 +1231,7 @@ namespace PlantUML.Logic
                             {
                                 var resultVariable = "result";
 
-                                messages.Add($"{participantTo} --> {participantFrom} : {resultVariable}".SetIndent(level));
+                                messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
                             }
                         }
                     }
@@ -1262,7 +1262,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is DoStatementSyntax doStatement)
             {
-                messages.Add($"loop {doStatement.Condition}".SetIndent(level));
+                messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
                 foreach (var item in doStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1272,7 +1272,7 @@ namespace PlantUML.Logic
             else if (syntaxNode is WhileStatementSyntax whileStatement
                      && HasInvocationExpression(whileStatement))
             {
-                messages.Add($"loop {whileStatement.Condition}".SetIndent(level));
+                messages.Add($"loop#LightCoral {whileStatement.Condition}".SetIndent(level));
                 foreach (var item in whileStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1282,7 +1282,7 @@ namespace PlantUML.Logic
             else if (syntaxNode is ForStatementSyntax forStatement
                      && HasInvocationExpression(forStatement))
             {
-                messages.Add($"loop {forStatement.Condition}".SetIndent(level));
+                messages.Add($"loop#LightCoral {forStatement.Condition}".SetIndent(level));
                 foreach (var item in forStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1292,7 +1292,7 @@ namespace PlantUML.Logic
             else if (syntaxNode is ForEachStatementSyntax forEachStatement
                      && HasInvocationExpression(forEachStatement))
             {
-                messages.Add($"loop {forEachStatement.Expression}".SetIndent(level));
+                messages.Add($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level));
                 foreach (var item in forEachStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1302,7 +1302,7 @@ namespace PlantUML.Logic
             else if (syntaxNode is IfStatementSyntax ifStatement
                      && HasInvocationExpression(ifStatement))
             {
-                messages.Add($"alt {ifStatement.Condition}".SetIndent(level));
+                messages.Add($"alt#LightBlue {ifStatement.Condition}".SetIndent(level));
                 foreach (var item in ifStatement.ChildNodes())
                 {
                     AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
@@ -1423,10 +1423,12 @@ namespace PlantUML.Logic
                 }
                 diagramData.Add("endswitch".SetIndent(level));
             }
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             else if (syntaxNode is BreakStatementSyntax breakStatement)
             {
                 System.Diagnostics.Debug.WriteLine($"{nameof(breakStatement)} is known but not used!");
             }
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             else if (syntaxNode is ContinueStatementSyntax continueStatement)
             {
                 System.Diagnostics.Debug.WriteLine($"{nameof(continueStatement)} is known but not used!");
@@ -1478,6 +1480,7 @@ namespace PlantUML.Logic
             {
                 System.Diagnostics.Debug.WriteLine($"{syntaxNode.GetType().Name} is unknown!");
             }
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
         }
 
         /// Creates the XML documentation for the CreateTypeDefinition method.
@@ -1869,9 +1872,7 @@ namespace PlantUML.Logic
 
                 foreach (var reference in methodReferences)
                 {
-                    var methodDeclaration = reference.GetSyntax() as MethodDeclarationSyntax;
-
-                    if (methodDeclaration != null)
+                    if (reference.GetSyntax() is MethodDeclarationSyntax methodDeclaration)
                     {
                         result = methodDeclaration;
                     }
@@ -2140,36 +2141,7 @@ namespace PlantUML.Logic
                 && accessorList.Accessors.All(accessor => accessor.Body == null
                                               && accessor.ExpressionBody == null);
         }
-        /// <summary>
-        /// Removes consecutive occurrences of a specified character from a string.
-        /// </summary>
-        /// <param name="source">The input string.</param>
-        /// <param name="charToRemove">The character to remove.</param>
-        /// <returns>A new string with consecutive occurrences of the specified character removed.</returns>
-        public static string _Shrink(string source, char charToRemove)
-        {
-            var result = new StringBuilder();
-            var hasFound = false;
-
-            foreach (char c in source)
-            {
-                if (c == charToRemove)
-                {
-                    if (hasFound == false)
-                    {
-                        hasFound = true;
-                        result.Append(c);
-                    }
-                }
-                else
-                {
-                    hasFound = false;
-                    result.Append(c);
-                }
-            }
-            return result.ToString();
-        }
-        #endregion helpers
+       #endregion helpers
     }
 }
 //MdEnd
