@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
 using CommonTool.Extensions;
+using System.Composition.Hosting.Core;
 
 namespace PlantUML.Logic
 {
@@ -116,6 +117,8 @@ namespace PlantUML.Logic
             public static string Enum { get; set; } = "#LightBlue";
             public static string Struct { get; set; } = "#LightYellow";
             public static string Class { get; set; } = "#GhostWhite";
+            public static string RootObject { get; set; } = "#LightBlue";
+            public static string Object { get; set; } = "#LightGoldenRodYellow";
             public static string AbstractClass { get; set; } = "#White";
             public static string Interface { get; set; } = "#LightGrey";
 
@@ -792,15 +795,17 @@ namespace PlantUML.Logic
             var createdObjects = new List<object>();
             void CreateMapStateRec(Object[] objects, List<string> lines, int deep)
             {
-                static void CreateMapObjectState(Object obj, List<string> lines)
+                static void CreateMapObjectState(Object obj, List<string> lines, int deep)
                 {
-                    lines.Add($"map {CreateObjectName(obj)} " + "{");
+                    string color = deep == 0 ? Color.RootObject : Color.Object;
+
+                    lines.Add($"map {CreateObjectName(obj)}{color} " + "{");
                     lines.AddRange(CreateObjectState(obj).SetIndent(1));
                     lines.Add("}");
                 }
                 static void CreateMapCollectionState(IEnumerable collection, List<string> lines)
                 {
-                    lines.Add($"map {CreateCollectionName(collection)} " + "{");
+                    lines.Add($"map {CreateCollectionName(collection)}{Color.Object} " + "{");
                     lines.AddRange(CreateCollectionState(collection).SetIndent(1));
                     lines.Add("}");
                 }
@@ -810,7 +815,7 @@ namespace PlantUML.Logic
                     if (createdObjects.Contains(obj) == false)
                     {
                         createdObjects.Add(obj);
-                        CreateMapObjectState(obj, lines);
+                        CreateMapObjectState(obj, lines, deep);
 
                         if (deep + 1 <= maxDeep)
                         {
