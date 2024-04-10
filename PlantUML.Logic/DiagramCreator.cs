@@ -1030,9 +1030,13 @@ namespace PlantUML.Logic
                 var declaration = ConvertModifiers(classDeclaration.Modifiers);
                 var autoProperties = classDeclaration.Members.OfType<PropertyDeclarationSyntax>()
                                                      .Where(IsAutoProperty);
+                var isStatic = declaration.Contains("{static}");
+                var isAbstract = declaration.Contains("abstract");
 
+                declaration = declaration.Replace("{static}", string.Empty);
                 declaration += $" class {classDeclaration.Identifier}";
-                declaration += declaration.Contains("abstract") ? $" {Color.AbstractClass}" : $" {Color.Class}";
+                declaration += isStatic ? $" << static >> " : " ";
+                declaration += isAbstract ? $"{Color.AbstractClass}" : $"{Color.Class}";
                 declaration += " {";
                 diagramData.Add(declaration);
 
