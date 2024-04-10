@@ -127,6 +127,8 @@ namespace PlantUML.Logic
 
             public static string Participant { get; set; } = "#LightGreen";
             public static string StartParticipant { get; set; } = "#LightYellow";
+
+            public static string Throw { get; set; } = "#Red";
         }
         #endregion skinparam
 
@@ -1479,6 +1481,11 @@ namespace PlantUML.Logic
             else if (syntaxNode is ReturnStatementSyntax returnStatement)
             {
                 diagramData.Add($"{Color.Return}:return {returnStatement.Expression};".SetIndent(level));
+            }
+            else if (syntaxNode is ThrowStatementSyntax throwStatement)
+            {
+                diagramData.Add($"{Color.Throw}:throw {throwStatement.Expression};".SetIndent(level));
+                diagramData.Add("kill".SetIndent(level));
             }
             else
             {
