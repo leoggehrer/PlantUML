@@ -776,20 +776,25 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="obj">The object to create the name for.</param>
         /// <returns>The name of the object.</returns>
-        private static string CreateObjectName(Object obj) => $"{obj.GetType().Name}_{obj.GetHashCode()}";
+        private static string CreateObjectName(object obj)
+        {
+            var result = obj.GetType().Name.Replace("[]", "Array");
+
+            return $"{result}_{obj.GetHashCode()}";
+        }
         /// <summary>
         /// Creates a collection name for the specified object.
         /// </summary>
         /// <param name="obj">The object for which a collection name is to be created.</param>
         /// <returns>A string representing the collection name.</returns>
-        private static string CreateCollectionName(Object obj) => $"Colletion_{obj.GetHashCode()}";
+        private static string CreateCollectionName(object obj) => $"Colletion_{obj.GetHashCode()}";
         /// <summary>
         /// Creates an object diagram for the given objects up to a specified depth.
         /// </summary>
         /// <param name="maxDeep">The maximum depth of the object diagram.</param>
         /// <param name="objects">The objects to include in the object diagram.</param>
         /// <returns>The lines representing the object diagram.</returns>
-        public static IEnumerable<string> CreateObjectDiagram(int maxDeep, params Object[] objects)
+        public static IEnumerable<string> CreateObjectDiagram(int maxDeep, params object[] objects)
         {
             var result = new List<string>();
             var createdObjects = new List<object>();
@@ -1796,6 +1801,18 @@ namespace PlantUML.Logic
             //if (counter > 0)
             //    result.Add("---");
             #endregion fields
+
+            #region object is an array
+            if (obj.GetType().IsArray)
+            {
+                var array = obj as Array;
+
+                for (int i = 0; i < array!.Length; i++)
+                {
+                    result.Add($"{i} => {array.GetValue(i)}");
+                }
+            }
+            #endregion object is an array
 
             return result;
         }
