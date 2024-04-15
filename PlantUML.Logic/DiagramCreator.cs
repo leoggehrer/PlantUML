@@ -544,7 +544,6 @@ namespace PlantUML.Logic
                     var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
                     var fileName = $"sq_{classNode.Identifier.Text}_{methodNode.Identifier.Text}";
                     var diagramData = CreateSequenceDiagram(semanticModel, methodNode);
-                    var filePath = Path.Combine(path, fileName);
 
                     if (diagramData.Count > 0)
                     {
@@ -556,6 +555,8 @@ namespace PlantUML.Logic
                         {
                             fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
                         }
+                        
+                        var filePath = Path.Combine(path, fileName);
 
                         diagramData.Insert(0, $"@startuml {title}");
                         // diagramData.Insert(1, "header");
@@ -570,7 +571,6 @@ namespace PlantUML.Logic
                         //diagramData.Add("stop");
                         diagramData.AddRange(ReadCustomUMLFromFle(filePath));
                         diagramData.Add("@enduml");
-
 
                         if (force || Path.Exists(filePath) == false)
                         {
@@ -617,8 +617,7 @@ namespace PlantUML.Logic
 
             for (var i = 0; i < participants.Count && i < participantAliasse.Count; i++)
             {
-                var isReferenced = messages.Any(l => l.StartsWith($"{participantAliasse[i]}")
-                                                  || l.Contains($"> {participantAliasse[i]}"));
+                var isReferenced = messages.Any(l => l.Contains($"{participantAliasse[i]}"));
 
                 if (isReferenced)
                 {
@@ -1209,7 +1208,8 @@ namespace PlantUML.Logic
                 AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level);
                 AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level);
             }
-            else if (syntaxNode is DoStatementSyntax doStatement)
+            else if (syntaxNode is DoStatementSyntax doStatement
+                     && HasInvocationExpression(doStatement))
             {
                 messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
                 foreach (var item in doStatement.ChildNodes())
@@ -1282,9 +1282,11 @@ namespace PlantUML.Logic
 
             if (result == false)
             {
-                foreach (var item in syntaxNode.ChildNodes())
+                var iterator = syntaxNode.ChildNodes().GetEnumerator();
+
+                while (result == false && iterator.MoveNext())
                 {
-                    result = HasInvocationExpression(item);
+                    result = HasInvocationExpression(iterator.Current);
                 }
             }
             return result;
