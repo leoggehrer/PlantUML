@@ -710,7 +710,12 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="obj">The object to create the name for.</param>
         /// <returns>The name of the object.</returns>
-        private static string CreateObjectName(Object obj) => $"{obj.GetType().Name}_{obj.GetHashCode()}";
+        private static string CreateObjectName(Object obj)
+        {
+            var result = obj.GetType().Name.Replace("[]", "Array");
+
+            return $"{result}_{obj.GetHashCode()}";
+        }
         /// <summary>
         /// Creates a collection name for the specified object.
         /// </summary>
