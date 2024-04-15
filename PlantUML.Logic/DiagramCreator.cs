@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
 using CommonTool.Extensions;
-using System.Composition.Hosting.Core;
 
 namespace PlantUML.Logic
 {
@@ -2180,18 +2179,11 @@ namespace PlantUML.Logic
                                               && accessor.ExpressionBody == null);
         }
 
-        //public static void WriteUMLFile(string path, string fileName, IEnumerable<string> diagramData, bool force)
-        //{
-        //    var filePath = Path.Combine(path, fileName);
-
-        //    if (force || Path.Exists(Path.Combine(path, infoFileName)) == false)
-        //    {
-        //        File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
-        //        UpdateDiagramPath(path, InfoFileFilter);
-        //    }
-
-        //    File.WriteAllLines(filePath, lines);
-        //}
+        /// <summary>
+        /// Reads custom UML lines from a file.
+        /// </summary>
+        /// <param name="filePath">The path of the file to read.</param>
+        /// <returns>An array of custom UML lines read from the file.</returns>
         public static string[] ReadCustomUMLFromFle(string filePath)
         {
             var result = new List<string>();
@@ -2210,6 +2202,11 @@ namespace PlantUML.Logic
             }
             return result.ToArray();
         }
+        /// <summary>
+        /// Reads custom UML lines from the given collection of lines.
+        /// </summary>
+        /// <param name="lines">The collection of lines to read from.</param>
+        /// <returns>A list of custom UML lines.</returns>
         private static List<string> ReadCustomUML(IEnumerable<string> lines)
         {
             var result = new List<string>();
