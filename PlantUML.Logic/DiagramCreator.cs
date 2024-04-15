@@ -710,7 +710,7 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="obj">The object to create the name for.</param>
         /// <returns>The name of the object.</returns>
-        private static string CreateObjectName(object obj) => $"{obj.GetType().Name}_{obj.GetHashCode()}";
+        private static string CreateObjectName(Object obj) => $"{obj.GetType().Name}_{obj.GetHashCode()}";
         /// <summary>
         /// Creates a collection name for the specified object.
         /// </summary>
@@ -1730,6 +1730,18 @@ namespace PlantUML.Logic
             //if (counter > 0)
             //    result.Add("---");
             #endregion fields
+
+            #region object is an array
+            if (obj.GetType().IsArray)
+            {
+                var array = obj as Array;
+
+                for (int i = 0; i < array!.Length; i++)
+                {
+                    result.Add($"{i} => {array.GetValue(i)}");
+                }
+            }
+            #endregion object is an array
 
             return result;
         }
