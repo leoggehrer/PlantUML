@@ -628,7 +628,11 @@ namespace PlantUML.Logic
 
                         if (isNullable)
                         {
-                            relation = $"{currentItemName} *-- {cleanTypeName} : {memberName}";
+                            relation = $"{currentItemName} \"0..1\" *-- \"1\" {cleanTypeName} : {memberName}";
+                        }
+                        else if (IsArray)
+                        {
+                            relation = $"{currentItemName} \"many\" *-- \"1\" {cleanTypeName} : {memberName}";
                         }
                         else
                         {
