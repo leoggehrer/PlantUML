@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
 using CommonTool.Extensions;
+using System.Xml.Xsl;
 
 namespace PlantUML.Logic
 {
@@ -483,6 +484,7 @@ namespace PlantUML.Logic
 
             if (diagramData.Count > 0)
             {
+                diagramData.AddRange(CreateRelations(diagramData));
                 diagramData.AddRange(ReadCustomUMLFromFle(filePath));
                 diagramData.Insert(0, "@startuml CompleteClassDiagram");
                 diagramData.Insert(1, "title CompleteClassDiagram");
@@ -505,6 +507,208 @@ namespace PlantUML.Logic
             {
                 File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
             }
+        }
+        /// <summary>
+        /// Creates relations based on the provided diagram data.
+        /// </summary>
+        /// <param name="diagramData">The collection of diagram data.</param>
+        /// <returns>A list of relations.</returns>
+        private static List<string> CreateRelations(IEnumerable<string> diagramData)
+        {
+            var result = new List<string>();
+            bool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+
+            foreach (var line in diagramData)
+            {
+                if (line.Contains("class") || line.Contains("interface"))
+                {
+                    isTypeDefinition = true;
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = false;
+                }
+                else if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
+                {
+                    isFieldRange = true;
+                }
+                else if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = true;
+                    isMethodRange = false;
+                }
+                else if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = true;
+                }
+                else if (isTypeDefinition && line.Contains("}"))
+                {
+                    isTypeDefinition = false;
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = false;
+                }
+
+                if (isTypeDefinition && isFieldRange)
+                {
+                    CreateItemRelations(line, diagramData, result);
+                }
+            }
+            return result;
+        }
+        /// <summary>
+        /// Creates item relations based on the provided type line, diagram data, and a list of relations.
+        /// </summary>
+        /// <param name="typeLine">The type line to extract the type name from.</param>
+        /// <param name="diagramData">The diagram data containing the lines to process.</param>
+        /// <param name="relations">The list of relations to populate with the created item relations.</param>
+        private static void CreateItemRelations(string typeLine, IEnumerable<string> digramData, List<string> relations)
+        {
+            var extractItemNames = new List<string>();
+            var currentItemName = string.Empty;
+            var typeName = GetTypeNameFrom(typeLine);
+            var cleanTypeName = typeName.Replace("?", string.Empty)
+                                        .Replace("[]", string.Empty);
+            bool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+
+            foreach (var diagramLine in digramData)
+            {
+                if (diagramLine.Contains("class") || diagramLine.Contains("interface"))
+                {
+                    extractItemNames.Add(GetItemNameFrom(diagramLine));
+                }
+            }
+
+            foreach (var diagramLine in digramData)
+            {
+                if (diagramLine.Contains("class") || diagramLine.Contains("interface"))
+                {
+                    isTypeDefinition = true;
+                    currentItemName = GetItemNameFrom(diagramLine);
+                }
+                else if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
+                {
+                    isFieldRange = true;
+                }
+                else if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = true;
+                    isMethodRange = false;
+                }
+                else if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = true;
+                }
+                else if (isTypeDefinition && diagramLine.Contains("}"))
+                {
+                    isTypeDefinition = false;
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = false;
+                    currentItemName = string.Empty;
+                }
+
+                if (isTypeDefinition && isFieldRange)
+                {
+                    var currentTypeName = GetTypeNameFrom(diagramLine);
+                    var cleanCurrentTypeName = currentTypeName.Replace("?", string.Empty)
+                                                              .Replace("[]", string.Empty);
+
+                    if (cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName))
+                    {
+                        var memberName = GetMemberNameFrom(diagramLine);
+                        var isNullable = currentTypeName.EndsWith("?");
+                        var IsArray = currentTypeName.EndsWith("[]");
+                        string? relation;
+
+                        if (isNullable)
+                        {
+                            relation = $"{currentItemName} *-- {cleanTypeName} : {memberName}";
+                        }
+                        else
+                        {
+                            relation = $"{currentItemName} -- {cleanTypeName} : {memberName}";
+                        }
+                        if (relations.Contains(relation) == false)
+                        {
+                            relations.Add(relation);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the type name from the given line of code.
+        /// </summary>
+        /// <param name="line">The line of code to extract the type name from.</param>
+        /// <returns>The type name extracted from the line of code.</returns>
+        private static string GetItemNameFrom(string line)
+        {
+            var result = string.Empty;
+            var parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < parts.Length && result == string.Empty; i++)
+            {
+                if ((parts[i] == "class" || parts[i] == "interface") && i + 1 < parts.Length)
+                {
+                    result = parts[i + 1];
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Extracts the type name from a given line of text.
+        /// </summary>
+        /// <param name="line">The line of text containing the type name.</param>
+        /// <returns>The extracted type name.</returns>
+        private static string GetTypeNameFrom(string line)
+        {
+            var result = string.Empty;
+            var cleanLine = line.Replace("+", string.Empty)
+                                .Replace("-", string.Empty)
+                                .Replace("#", string.Empty)
+                                .Replace("~", string.Empty)
+                                .Replace("{static}", string.Empty)
+                                .Replace("{abstract}", string.Empty)
+                                .Replace("{const}", string.Empty);
+            var parts = cleanLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length > 1)
+            {
+                result = parts[0];
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the member name from a given line.
+        /// </summary>
+        /// <param name="line">The line containing the member name.</param>
+        /// <returns>The extracted member name.</returns>
+        private static string GetMemberNameFrom(string line)
+        {
+            var result = string.Empty;
+            var cleanLine = line.Replace("+", string.Empty)
+                                .Replace("-", string.Empty)
+                                .Replace("#", string.Empty)
+                                .Replace("~", string.Empty)
+                                .Replace("{static}", string.Empty)
+                                .Replace("{abstract}", string.Empty)
+                                .Replace("{const}", string.Empty);
+            var parts = cleanLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length > 1)
+            {
+                result = parts[1];
+            }
+            return result;
         }
         #endregion create class diagram
 
@@ -555,7 +759,7 @@ namespace PlantUML.Logic
                         {
                             fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
                         }
-                        
+
                         var filePath = Path.Combine(path, fileName);
 
                         diagramData.Insert(0, $"@startuml {title}");
@@ -1930,7 +2134,7 @@ namespace PlantUML.Logic
             var paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
 
             return $"{methodSyntax?.Identifier}{paramsStatement}".Replace($"{Environment.NewLine}", string.Empty);
-//                                                                 .Replace(" ", string.Empty);
+            //                                                                 .Replace(" ", string.Empty);
         }
         /// <summary>
         /// Creates an alias for a participant based on the given method syntax.
