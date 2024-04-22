@@ -131,6 +131,7 @@ namespace PlantUML.Logic
             public static string Participant { get; set; } = "#LightGreen";
             public static string StartParticipant { get; set; } = "#LightYellow";
 
+            public static string If { get; set; } = "#LightYellow";
             public static string Throw { get; set; } = "#Red";
         }
         #endregion skinparam
@@ -1418,52 +1419,87 @@ namespace PlantUML.Logic
             else if (syntaxNode is DoStatementSyntax doStatement
                      && HasInvocationExpression(doStatement))
             {
-                messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
+                var innerMessages = new List<string>();
+
                 foreach (var item in doStatement.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
                 }
-                messages.Add("end".SetIndent(level));
+
+                if (innerMessages.Count > 0)
+                {
+                    messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
+                    messages.AddRange(innerMessages);
+                    messages.Add("end".SetIndent(level));
+                }
             }
             else if (syntaxNode is WhileStatementSyntax whileStatement
                      && HasInvocationExpression(whileStatement))
             {
-                messages.Add($"loop#LightCoral {whileStatement.Condition}".SetIndent(level));
+                var innerMessages = new List<string>();
+
                 foreach (var item in whileStatement.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
                 }
-                messages.Add("end".SetIndent(level));
+
+                if (innerMessages.Count > 0)
+                {
+                    messages.Add($"loop#LightCoral {whileStatement.Condition}".SetIndent(level));
+                    messages.AddRange(innerMessages);
+                    messages.Add("end".SetIndent(level));
+                }
             }
             else if (syntaxNode is ForStatementSyntax forStatement
                      && HasInvocationExpression(forStatement))
             {
-                messages.Add($"loop#LightCoral {forStatement.Condition}".SetIndent(level));
+                var innerMessages = new List<string>();
+
                 foreach (var item in forStatement.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
                 }
-                messages.Add("end".SetIndent(level));
+
+                if (innerMessages.Count > 0)
+                {
+                    messages.Add($"loop#LightCoral {forStatement.Condition}".SetIndent(level));
+                    messages.AddRange(innerMessages);
+                    messages.Add("end".SetIndent(level));
+                }
             }
             else if (syntaxNode is ForEachStatementSyntax forEachStatement
                      && HasInvocationExpression(forEachStatement))
             {
-                messages.Add($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level));
+                var innerMessages = new List<string>();
+
                 foreach (var item in forEachStatement.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
                 }
-                messages.Add("end".SetIndent(level));
+
+                if (innerMessages.Count > 0)
+                {
+                    messages.Add($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level));
+                    messages.AddRange(innerMessages);
+                    messages.Add("end".SetIndent(level));
+                }
             }
             else if (syntaxNode is IfStatementSyntax ifStatement
                      && HasInvocationExpression(ifStatement))
             {
-                messages.Add($"alt#LightBlue {ifStatement.Condition}".SetIndent(level));
+                var innerMessages = new List<string>();
+
                 foreach (var item in ifStatement.ChildNodes())
                 {
-                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                    AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
                 }
-                messages.Add("end".SetIndent(level));
+
+                if (innerMessages.Count > 0)
+                {
+                    messages.Add($"alt#LightBlue {ifStatement.Condition}".SetIndent(level));
+                    messages.AddRange(innerMessages);
+                    messages.Add("end".SetIndent(level));
+                }
             }
             else if (syntaxNode is ElseClauseSyntax elseClause
                      && HasInvocationExpression(elseClause))
@@ -1546,7 +1582,7 @@ namespace PlantUML.Logic
                                                                .Replace("\r", " ")
                                                                .Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
-                diagramData.Add($"if ({condition}) then ({yesLabel})".SetIndent(level));
+                diagramData.Add($"{Color.If}:if ({condition}) then ({yesLabel})".SetIndent(level));
                 AnalyzeStatement(ifStatement.Statement, diagramData, level + 1);
                 if (ifStatement.Else != null)
                     AnalyzeStatement(ifStatement.Else, diagramData, level + 1);
