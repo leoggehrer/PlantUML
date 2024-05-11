@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents an abstract class for building UML diagrams.
     /// </summary>
-    public abstract partial class UMLDiagramBuilder(string sourcePath, string targetPath, string diagramFolder, bool createCompleteDiagram, bool force)
+    public abstract partial class UMLDiagramBuilder(string sourcePath, int maxSubPathDeep, string targetPath, string diagramFolder, bool createCompleteDiagram, bool force)
     {
         #region properties
 
@@ -15,6 +15,10 @@
         /// Gets or sets the source path.
         /// </summary>
         public string SourcePath { get; private set; } = sourcePath;
+        /// <summary>
+        /// Gets the maximum depth for the UML diagram.
+        /// </summary>
+        public int MaxSubPathDeep { get; private set; } = maxSubPathDeep;
         /// <summary>
         /// Gets or sets the target path for the UML diagram.
         /// </summary>

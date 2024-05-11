@@ -153,10 +153,10 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth))
-                                    .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
-                                    .OrderBy(p => p)
-                                    .ToArray();
+            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth + 1))
+                                               .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
+                                               .OrderBy(p => p)
+                                               .ToArray();
 
             menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) =>
             {
@@ -246,19 +246,19 @@ namespace PlantUML.ConApp
             StartProgressBar();
             if ((DiagramBuilder & DiagramBuilderType.Activity) > 0)
             {
-                var builder = new ActivityDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+                var builder = new ActivityDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
                 execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Class) > 0)
             {
-                var builder = new ClassDiagramBuilder(sourcePath, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+                var builder = new ClassDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
                 execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0)
             {
-                var builder = new SequenceDiagramBuilder(sourcePath, targetPath, DiagramFolder, force);
+                var builder = new SequenceDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, force);
 
                 execute(builder, menuItem);
             }
