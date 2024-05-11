@@ -226,7 +226,7 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="methodNode">The method declaration syntax to analyze.</param>
         /// <returns>A list of strings representing the activity diagram data.</returns>
-        public static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode)
+        private static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode)
         {
             var diagramData = new List<string>();
             var islocalDeclaration = false;
@@ -261,7 +261,7 @@ namespace PlantUML.Logic
                     AnalyzeStatement(statement, diagramData, 0);
                 }
             }
-            return diagramData;
+            return FormatActivityDiagram(diagramData);
         }
         /// <summary>
         /// Creates a complete activity diagram by processing all the .puml files in the specified directory and its subdirectories.
@@ -353,6 +353,51 @@ namespace PlantUML.Logic
             {
                 File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
             }
+        }
+        private static List<string> FormatActivityDiagram(List<string> diagramData)
+        {
+            static string FormatLine(string line)
+            {
+                var items = line.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+                var text = string.Join(string.Empty, items);
+                var result = new StringBuilder();
+                var start = false;
+                var blank = 0;
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] == ' ' && start == false)
+                    {
+                        result.Append(text[i]);
+                    }
+                    else if (text[i] == ' ' && start)
+                    {
+                        blank++;
+                        if (blank < 2)
+                        {
+                            result.Append(text[i]);
+                        }
+                    }
+                    else
+                    {
+                        start = true;
+                        blank = 0;
+                        result.Append(text[i]);
+                    }
+                }
+
+                return result.ToString();
+            }
+
+            var result = new List<string>();
+
+            foreach (var line in diagramData)
+            {
+                var formatLine = FormatLine(line);
+
+                result.Add(formatLine);
+            }
+            return result;
         }
         #endregion create activity diagram
 
