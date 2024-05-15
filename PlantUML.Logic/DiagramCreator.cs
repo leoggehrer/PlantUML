@@ -963,8 +963,25 @@ namespace PlantUML.Logic
         /// <returns>The name of the object.</returns>
         private static string CreateObjectName(Object obj)
         {
-            var result = obj.GetType().Name.Replace("[]", "Array");
+            var result = string.Empty;
 
+            if (obj.GetType().IsGenericType)
+            {
+                result = obj.GetType().Name.Replace("`1", string.Empty);
+
+                foreach (var arg in obj.GetType().GetGenericArguments())
+                {
+                    result += $"_{arg.Name}";
+                }
+            }
+            else if (obj.GetType().IsArray)
+            {
+                result = obj.GetType().Name.Replace("[]", "Array");
+            }
+            else
+            {
+                result = obj.GetType().Name;
+            }
             return $"{result}_{obj.GetHashCode()}";
         }
         /// <summary>
@@ -983,14 +1000,14 @@ namespace PlantUML.Logic
         {
             var result = new List<string>();
             var createdObjects = new List<object>();
-            void CreateMapStateRec(object[] objects, List<string> lines, int deep)
+            void CreateStateRec(object[] objects, List<string> lines, int deep)
             {
-                static void CreateMapObjectState(object obj, List<string> lines, int deep)
+                static void CreateObjectState(object obj, List<string> lines, int deep)
                 {
                     string color = deep == 0 ? Color.RootObject : Color.Object;
 
-                    lines.Add($"map {CreateObjectName(obj)}{color} " + "{");
-                    lines.AddRange(CreateObjectState(obj).SetIndent(1));
+                    lines.Add($"object {CreateObjectName(obj)}{color} " + "{");
+                    lines.AddRange(DiagramCreator.CreateObjectState(obj).SetIndent(1));
                     lines.Add("}");
                 }
                 static void CreateMapCollectionState(IEnumerable collection, List<string> lines)
@@ -1005,7 +1022,7 @@ namespace PlantUML.Logic
                     if (createdObjects.Contains(obj) == false)
                     {
                         createdObjects.Add(obj);
-                        CreateMapObjectState(obj, lines, deep);
+                        CreateObjectState(obj, lines, deep);
 
                         if (deep + 1 <= maxDeep)
                         {
@@ -1029,8 +1046,11 @@ namespace PlantUML.Logic
                                         {
                                             if (item != null)
                                             {
-                                                CreateMapStateRec([item], lines, deep + 2);
-                                                lines.Add($"{CreateCollectionName(collection)}::{counter} --> {CreateObjectName(item)}");
+                                                if (item.GetType().IsValueType == false)
+                                                {
+                                                    CreateStateRec([item], lines, deep + 2);
+                                                    lines.Add($"{CreateCollectionName(collection)}::{counter} --> {CreateObjectName(item)}");
+                                                }
                                             }
                                             counter++;
                                         }
@@ -1038,7 +1058,7 @@ namespace PlantUML.Logic
                                 }
                                 else if (value != null)
                                 {
-                                    CreateMapStateRec([value], lines, deep + 1);
+                                    CreateStateRec([value], lines, deep + 1);
                                     lines.Add($"{CreateObjectName(obj)}::{GetFieldName(relFieldInfo)} --> {CreateObjectName(value)}");
                                 }
                             }
@@ -1046,7 +1066,7 @@ namespace PlantUML.Logic
                     }
                 }
             }
-            CreateMapStateRec(objects, result, 0);
+            CreateStateRec(objects, result, 0);
             return result;
         }
         #endregion create object and class diagrams with types
