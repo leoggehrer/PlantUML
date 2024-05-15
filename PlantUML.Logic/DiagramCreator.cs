@@ -2469,7 +2469,7 @@ namespace PlantUML.Logic
             }
             else
             {
-                result = $"_{value.GetHashCode()}";
+                result = $"{value.GetHashCode()}";
             }
             return result.Length > maxLength - 3 ? result[..(maxLength - 2)] + "..." : result;
         }
