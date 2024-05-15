@@ -2,7 +2,6 @@
 //MdStart
 using System.Collections.ObjectModel;
 using System.Reflection;
-using CommonTool.Extensions;
 
 namespace PlantUML.Logic.Extensions
 {

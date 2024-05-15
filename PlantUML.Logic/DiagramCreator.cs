@@ -4,7 +4,6 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 using PlantUML.Logic.Extensions;
-using CommonTool.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -588,7 +587,7 @@ namespace PlantUML.Logic
                     isPropertyRange = false;
                     isMethodRange = true;
                 }
-                else if (isTypeDefinition && line.Contains("}"))
+                else if (isTypeDefinition && line.Contains('}'))
                 {
                     isTypeDefinition = false;
                     isFieldRange = false;
@@ -649,7 +648,7 @@ namespace PlantUML.Logic
                     isPropertyRange = false;
                     isMethodRange = true;
                 }
-                else if (isTypeDefinition && diagramLine.Contains("}"))
+                else if (isTypeDefinition && diagramLine.Contains('}'))
                 {
                     isTypeDefinition = false;
                     isFieldRange = false;
@@ -667,7 +666,7 @@ namespace PlantUML.Logic
                     if (cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName))
                     {
                         var memberName = GetMemberNameFrom(diagramLine);
-                        var isNullable = currentTypeName.EndsWith("?");
+                        var isNullable = currentTypeName.EndsWith('?');
                         var IsArray = currentTypeName.EndsWith("[]");
                         string? relation;
 
@@ -963,7 +962,7 @@ namespace PlantUML.Logic
         /// <returns>The name of the object.</returns>
         private static string CreateObjectName(Object obj)
         {
-            var result = string.Empty;
+            string? result;
 
             if (obj.GetType().IsGenericType)
             {
@@ -2503,14 +2502,14 @@ namespace PlantUML.Logic
                 var lines = File.ReadAllLines(filePath);
                 var customUMLLines = ReadCustomUML(lines);
 
-                if (customUMLLines.Any())
+                if (customUMLLines.Count > 0)
                 {
                     customUMLLines.Insert(0, $"' {CustomUMLLabel}");
                     customUMLLines.Add($"' {CustomUMLLabel}");
                 }
                 result.AddRange(customUMLLines);
             }
-            return result.ToArray();
+            return [.. result];
         }
         /// <summary>
         /// Reads custom UML lines from the given collection of lines.
