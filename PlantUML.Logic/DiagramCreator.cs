@@ -1611,7 +1611,7 @@ namespace PlantUML.Logic
 
             if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
-                diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level));
+//                diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level));
             }
             else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
             {
@@ -1705,7 +1705,7 @@ namespace PlantUML.Logic
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
-                diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
+//                diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
                 diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
                 AnalyzeStatement(forStatement.Statement, diagramData, level + 1);
                 if (forStatement.Incrementors.Count > 0)
