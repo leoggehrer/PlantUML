@@ -150,9 +150,31 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="path">The path where the activity diagrams will be saved.</param>
         /// <param name="source">The source code to generate the activity diagrams from.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
+        public static void CreateActivityDiagram(string path, string source, bool force)
+        {
+            CreateActivityDiagram(path, source, [], false, force);
+        }
+        /// <summary>
+        /// Creates activity diagrams for the specified source code and saves them to the given path.
+        /// </summary>
+        /// <param name="path">The path where the activity diagrams will be saved.</param>
+        /// <param name="source">The source code to generate the activity diagrams from.</param>
         /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
         /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-        public static void CreateActivityDiagram(string path, string source, string[] defines, bool force)
+        public static void CreateActivityDiagram(string path, string source, string[] defines,  bool force)
+        {
+            CreateActivityDiagram(path, source, defines, false, force);
+        }
+        /// <summary>
+            /// Creates activity diagrams for the specified source code and saves them to the given path.
+            /// </summary>
+            /// <param name="path">The path where the activity diagrams will be saved.</param>
+            /// <param name="source">The source code to generate the activity diagrams from.</param>
+            /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
+            /// <param name="declarations">A flag indicating whether to generate declarations.</param>
+            /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
+        public static void CreateActivityDiagram(string path, string source, string[] defines, bool declarations, bool force)
         {
             var infoFileName = "ac_info.txt";
             var fileCounter = 0;
@@ -175,7 +197,7 @@ namespace PlantUML.Logic
                 {
                     var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
                     var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}";
-                    var diagramData = CreateActivityDiagram(methodNode);
+                    var diagramData = CreateActivityDiagram(methodNode, declarations);
 
                     if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false)
                     {
@@ -224,8 +246,9 @@ namespace PlantUML.Logic
         /// Creates an activity diagram based on the provided method declaration syntax.
         /// </summary>
         /// <param name="methodNode">The method declaration syntax to analyze.</param>
+        /// <param name="declarations">A flag indicating whether to generate declarations.</param>
         /// <returns>A list of strings representing the activity diagram data.</returns>
-        private static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode)
+        private static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool declarations)
         {
             var diagramData = new List<string>();
             var islocalDeclaration = false;
@@ -257,7 +280,7 @@ namespace PlantUML.Logic
                         islocalDeclaration = false;
                         diagramData[^1] += ";";
                     }
-                    AnalyzeStatement(statement, diagramData, 0);
+                    AnalyzeStatement(statement, diagramData, declarations, 0);
                 }
             }
             return FormatActivityDiagram(diagramData);
@@ -1603,15 +1626,16 @@ namespace PlantUML.Logic
         /// </summary>
         /// <param name="syntaxNode">The syntax node to analyze.</param>
         /// <param name="diagramData">The list to store the generated diagram data.</param>
+        /// <param name="declarations">A flag indicating whether to generate declarations.</param>
         /// <param name="level">The indentation level for the generated diagram data.</param>
-        public static void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, int level)
+        public static void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, bool declarations, int level)
         {
             const string yesLabel = "<color:green>yes";
             const string noLabel = "<color:red>no";
 
-            if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement)
+            if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement && declarations)
             {
-//                diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level));
+                diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level));
             }
             else if (syntaxNode is ExpressionStatementSyntax expressionStatement)
             {
@@ -1635,7 +1659,7 @@ namespace PlantUML.Logic
                 {
                     if (node is StatementSyntax statementSyntax)
                     {
-                        AnalyzeStatement(statementSyntax, diagramData, level + 1);
+                        AnalyzeStatement(statementSyntax, diagramData, declarations, level + 1);
                     }
                 }
             }
@@ -1647,16 +1671,18 @@ namespace PlantUML.Logic
                                                                .Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
                 diagramData.Add($"{Color.If}:if ({condition}) then ({yesLabel})".SetIndent(level));
-                AnalyzeStatement(ifStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(ifStatement.Statement, diagramData, declarations, level + 1);
                 if (ifStatement.Else != null)
-                    AnalyzeStatement(ifStatement.Else, diagramData, level + 1);
+                {
+                    AnalyzeStatement(ifStatement.Else, diagramData, declarations, level + 1);
+                }
 
                 diagramData.Add("endif".SetIndent(level));
             }
             else if (syntaxNode is ElseClauseSyntax elseClause)
             {
                 diagramData.Add($"else ({noLabel})".SetIndent(level));
-                AnalyzeStatement(elseClause.Statement, diagramData, level + 1);
+                AnalyzeStatement(elseClause.Statement, diagramData, declarations, level + 1);
             }
             else if (syntaxNode is SwitchStatementSyntax switchStatement)
             {
@@ -1675,7 +1701,7 @@ namespace PlantUML.Logic
                     {
                         if (node is StatementSyntax statementSyntax)
                         {
-                            AnalyzeStatement(statementSyntax, diagramData, level + 1);
+                            AnalyzeStatement(statementSyntax, diagramData, declarations, level + 1);
                         }
                     }
                 }
@@ -1694,20 +1720,23 @@ namespace PlantUML.Logic
             else if (syntaxNode is DoStatementSyntax doStatement)
             {
                 diagramData.Add("repeat".SetIndent(level));
-                AnalyzeStatement(doStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(doStatement.Statement, diagramData, declarations, level + 1);
                 diagramData.Add($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level));
             }
             else if (syntaxNode is WhileStatementSyntax whileStatement)
             {
                 diagramData.Add($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level));
-                AnalyzeStatement(whileStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(whileStatement.Statement, diagramData, declarations, level + 1);
                 diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
             }
             else if (syntaxNode is ForStatementSyntax forStatement)
             {
-//                diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
+                if (declarations)
+                {
+                    diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
+                }
                 diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
-                AnalyzeStatement(forStatement.Statement, diagramData, level + 1);
+                AnalyzeStatement(forStatement.Statement, diagramData, declarations, level + 1);
                 if (forStatement.Incrementors.Count > 0)
                     diagramData.Add($":{forStatement.Incrementors};".SetIndent(level));
 
@@ -1721,7 +1750,7 @@ namespace PlantUML.Logic
                 diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
                 diagramData.Add($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level));
 
-                AnalyzeStatement(forEachStatement.Statement, statements, level + 1);
+                AnalyzeStatement(forEachStatement.Statement, statements, declarations, level + 1);
 
                 foreach (var statement in statements)
                 {
@@ -2198,31 +2227,6 @@ namespace PlantUML.Logic
                 string identifierText = identifierName.Identifier.Text;
 
                 result = typeDeclarations.FirstOrDefault(t => t.Identifier.Text == identifierText);
-            }
-            return result;
-        }
-        /// <summary>
-        /// Finds the method declaration syntax node for the given invocation expression.
-        /// </summary>
-        /// <param name="semanticModel">The semantic model.</param>
-        /// <param name="invocation">The invocation expression syntax node.</param>
-        /// <returns>The method declaration syntax node if found, otherwise null.</returns>
-        private static MethodDeclarationSyntax? FindMethodDeclaration(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
-        {
-            var result = default(MethodDeclarationSyntax);
-            var symbolInfo = semanticModel.GetSymbolInfo(invocation).Symbol;
-
-            if (symbolInfo != null && symbolInfo is IMethodSymbol methodSymbol)
-            {
-                var methodReferences = methodSymbol.DeclaringSyntaxReferences;
-
-                foreach (var reference in methodReferences)
-                {
-                    if (reference.GetSyntax() is MethodDeclarationSyntax methodDeclaration)
-                    {
-                        result = methodDeclaration;
-                    }
-                }
             }
             return result;
         }

@@ -1,15 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageId>PlantUML.Console</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Gerhard Gehrer</Authors>
+		<Company>HTBLA Leonding</Company>
+		<Description>This console application provides functionality for creating activity, class, and sequence diagrams from C# source code.</Description>
+		<PackageTags>PlantUML;UML Activity Diagram; UML Class Diagram; UML Sequence Diagram</PackageTags>
+		<RepositoryUrl>https://github.com/leoggehrer/PlantUML/tree/master/PlantUML.ConApp</RepositoryUrl>
+		<IncludeSymbols>True</IncludeSymbols>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PlantUML.Logic\PlantUML.Logic.csproj" />
-    <ProjectReference Include="..\..\CommonTool\CommonTool\CommonTool.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\PlantUML.Logic\PlantUML.Logic.csproj" />
+		<ProjectReference Include="..\..\CommonTool\CommonTool\CommonTool.csproj" />
+	</ItemGroup>
 
 </Project>

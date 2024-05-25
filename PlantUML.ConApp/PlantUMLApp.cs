@@ -163,6 +163,7 @@ namespace PlantUML.ConApp
                 var subPath = item.Replace(ProjectsPath, string.Empty);
                 var targetPath = item.Replace(ProjectsPath, TargetPath);
 
+                PrintHeader();
                 if (subPath.IsNullOrEmpty())
                 {
                     subPath = $"{Path.DirectorySeparatorChar}{ProjectsPath.Split(Path.DirectorySeparatorChar).LastOrDefault()}";
@@ -185,7 +186,7 @@ namespace PlantUML.ConApp
             var saveForeColor = ForegroundColor;
 
             ForegroundColor = ConsoleColor.Green;
-
+            Clear();
             count = PrintLine(nameof(PlantUML));
             PrintLine('=', count);
             PrintLine();
@@ -199,6 +200,15 @@ namespace PlantUML.ConApp
             PrintLine($"Diagram complete: {CreateCompleteDiagram}");
             PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
+        }
+
+        /// <summary>
+        /// Runs the console application.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        public override void Run(string[] args)
+        {
+            base.Run(args);
         }
         #endregion overrides
 

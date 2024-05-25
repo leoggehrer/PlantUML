@@ -5,10 +5,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Version>1.0.0</Version>
+		<PackageId>PlantUML.Creator</PackageId>
 		<Authors>Gerhard Gehrer</Authors>
 		<Company>HTBLA Leonding</Company>
-		<Description></Description>
-		<PackageTags>PlantUML;Activity Diagram UML; Class Diagram UML; Sequence Diagram UML</PackageTags>
+		<Description>This class library provides methods for creating activity, class, and sequence diagrams from C# source code.</Description>
+		<PackageTags>PlantUML;UML Activity Diagram; UML Class Diagram; UML Sequence Diagram</PackageTags>
 		<RepositoryUrl>https://github.com/leoggehrer/PlantUML/tree/master/PlantUML.Logic</RepositoryUrl>
 		<IncludeSymbols>True</IncludeSymbols>
 	</PropertyGroup>
