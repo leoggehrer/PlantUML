@@ -36,5 +36,24 @@ endwhile (<color:red>no)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
   #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
 endif
+' CustomUML
+            #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+            #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+              #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+            endif
+            #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (SQ)");
+            #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+            #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
+            #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+          endif
+    endwhile (<color:red>no)
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+stop
+@enduml
+' CustomUML
 stop
 @enduml

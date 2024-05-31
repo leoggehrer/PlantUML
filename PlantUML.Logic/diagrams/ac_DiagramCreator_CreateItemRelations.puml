@@ -10,7 +10,7 @@ while (iterator.MoveNext()) is (<color:green>yes)
       #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
     endif
 endwhile (<color:red>no)
-:iterator = digramData.GetIterator();
+:iterator = digramData.Where(l => l.Equals("---") == false).GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :diagramLine = iterator.Current();
     #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)

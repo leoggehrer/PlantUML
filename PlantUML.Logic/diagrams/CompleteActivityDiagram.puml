@@ -1,6 +1,6 @@
 @startuml CompleteActivityDiagram
 header
-generated on 31.05.2024 21:19:11
+generated on 31.05.2024 22:20:14
 end header
 title CompleteActivityDiagram
 start
@@ -32,6 +32,25 @@ while (iterator.MoveNext()) is (<color:green>yes)
               #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
           endif
           #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+          #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+          #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+          #WhiteSmoke:diagramData.Insert(2, "start");
+          #WhiteSmoke:diagramData.Add("stop");
+          #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+          #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+            #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+          endif
+          #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (AC)");
+          #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+          #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
+          #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+    endwhile (<color:red>no)
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+' CustomUML
           #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
           #WhiteSmoke:diagramData.Insert(1, $"title {title}");
           #WhiteSmoke:diagramData.Insert(2, "start");
@@ -172,6 +191,20 @@ endwhile (<color:red>no)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
   #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
 endif
+' CustomUML
+    #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+    #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+    #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+    #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+      #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+    endif
+    #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (CD)");
+    #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
 stop
 start
 note right:  DiagramCreator.CreateCompleteClassDiagram
@@ -180,8 +213,10 @@ note right:  DiagramCreator.CreateCompleteClassDiagram
 :iterator = files.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :file = iterator.Current();
-    #WhiteSmoke:umlItems.AddRange(ExtractUMLItems(lines));
-    #WhiteSmoke:umlRelations.Add(ExtractUMLRelations(lines));
+    #WhiteSmoke:umlItems.AddRange(items);
+    #LightYellow:if (relations.Count > 0) then (<color:green>yes)
+      #WhiteSmoke:umlRelations.Add(relations);
+    endif
 endwhile (<color:red>no)
 :iterator = umlItems.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
@@ -208,8 +243,24 @@ while (iterator.MoveNext()) is (<color:green>yes)
 endwhile (<color:red>no)
 #LightSkyBlue:var fileName = "CompleteClassDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>(result)\nvar completeInfoData = new List<string>();
 #LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
-  #WhiteSmoke:diagramData.AddRange(CreateRelations(diagramData));
-  #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+  #WhiteSmoke:diagramData.AddRange(relations);
+  #WhiteSmoke:diagramData.AddRange(customUML);
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All class diagrams (CD)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteClassDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+' CustomUML
   #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
   #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
   #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
@@ -279,7 +330,7 @@ while (iterator.MoveNext()) is (<color:green>yes)
       #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
     endif
 endwhile (<color:red>no)
-:iterator = digramData.GetIterator();
+:iterator = digramData.Where(l => l.Equals("---") == false).GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :diagramLine = iterator.Current();
     #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
@@ -380,6 +431,22 @@ while (iterator.MoveNext()) is (<color:green>yes)
             #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
             #WhiteSmoke:diagramData.Insert(1, $"title {title}");
             #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+            #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+            #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+              #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+            endif
+            #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (SQ)");
+            #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+            #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
+            #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+          endif
+    endwhile (<color:red>no)
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+' CustomUML
             #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
             #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
               #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
@@ -1423,6 +1490,10 @@ note right:  DiagramCreator.ReadCustomUMLFromFle
   #WhiteSmoke:result.AddRange(customUMLLines);
 endif
 #Lavender:return [.. result];
+' CustomUML
+  endif
+  endif
+' CustomUML
 stop
 start
 note right:  DiagramCreator.ReadCustomUML
@@ -1431,7 +1502,16 @@ note right:  DiagramCreator.ReadCustomUML
 :iterator = lines.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :line = iterator.Current();
-    #LightYellow:if (line.Contains($"{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+    #LightYellow:if (line.StartsWith($"'{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase) || line.StartsWith($"' {CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      else (<color:red>no)
+        #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)
+          #WhiteSmoke:result.Add(line);
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+' CustomUML
       #WhiteSmoke:counter++;
       else (<color:red>no)
         #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)

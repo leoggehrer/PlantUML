@@ -6,6 +6,7 @@ participant "typeName.Replace("?",string.Empty).Replace(a0,a1)" as typeName_Repl
 participant "diagramLine.Contains(a0)" as diagramLine_Contains_a0 #LightGreen
 participant "extractItemNames.Add(a0)" as extractItemNames_Add_a0 #LightGreen
 participant "GetItemNameFrom(a0)" as GetItemNameFrom_a0 #LightGreen
+participant "digramData.Where(a0)" as digramData_Where_a0 #LightGreen
 participant "diagramLine.StartsWith(a0)" as diagramLine_StartsWith_a0 #LightGreen
 participant "currentTypeName.Replace("?",string.Empty).Replace(a0,a1)" as currentTypeName_Replace_string_Empty_Replace_a0_a1 #LightGreen
 participant "cleanCurrentTypeName.Equals(a0)" as cleanCurrentTypeName_Equals_a0 #LightGreen
@@ -27,7 +28,8 @@ loop#LightCoral digramData
  extractItemNames_Add_a0 -[#grey]> GetItemNameFrom_a0 : (GetItemNameFrom(diagramLine))
  end
 end
-loop#LightCoral digramData
+loop#LightCoral digramData.Where(l => l.Equals("---") == false)
+ CreateItemRelations_p0_p1_p2 -[#grey]> digramData_Where_a0 : (l => l.Equals("---") == false)
  alt#LightBlue diagramLine.Contains("class") || diagramLine.Contains("interface")
  CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("class")
  CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("interface")

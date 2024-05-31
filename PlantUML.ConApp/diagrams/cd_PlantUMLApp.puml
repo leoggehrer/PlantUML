@@ -4,9 +4,9 @@ title PlantUMLApp
 - {static} string _projectspath
 - {static} string _targetpath
 - DiagramBuilderType _diagrambuilder
-- {static} string _diagramfolder
-- {static} bool _createcompletediagram
-- {static} int _maxgenerationdepth
+- string _diagramfolder
+- bool _createcompletediagram
+- int _maxgenerationdepth
 ---
 + {static} string getProjectsPath()
 + {static} Void setProjectsPath(string value)
@@ -14,12 +14,12 @@ title PlantUMLApp
 + {static} Void setTargetPath(string value)
 + DiagramBuilderType getDiagramBuilder()
 + Void setDiagramBuilder(DiagramBuilderType value)
-+ {static} string getDiagramFolder()
-+ {static} Void setDiagramFolder(string value)
-+ {static} bool getCreateCompleteDiagram()
-+ {static} Void setCreateCompleteDiagram(bool value)
-+ {static} int getMaxGenerationDepth()
-+ {static} Void setMaxGenerationDepth(int value)
++ string getDiagramFolder()
++ Void setDiagramFolder(string value)
++ bool getCreateCompleteDiagram()
++ Void setCreateCompleteDiagram(bool value)
++ int getMaxGenerationDepth()
++ Void setMaxGenerationDepth(int value)
 ---
 - {static} void ClassConstructing()
 - {static} void ClassConstructed()
@@ -28,7 +28,7 @@ title PlantUMLApp
 # MenuItem[] CreateMenuItems()
 # void PrintHeader()
 + void Run(string[] args)
-- {static} void ChangeDiagramFolder()
+- void ChangeDiagramFolder()
 + void ChangeMaxGenerationDepth()
 - void ChangeDiagramBuilder()
 - void CreateDiagram(MenuItem menuItem, bool force)

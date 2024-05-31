@@ -76,4 +76,63 @@ alt#LightBlue force || Path.Exists(Path.Combine(path, infoFileName)) == false
  File_WriteAllLines_a0_a1 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, infoFileName), infoData)
  CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> UpdateDiagramPath_a0_a1 : (path, InfoFileFilter)
 end
+' CustomUML
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "File.WriteAllLines(a0,a1)" as File_WriteAllLines_a0_a1 #LightGreen
+participant "infoData.Add(a0)" as infoData_Add_a0 #LightGreen
+participant "UpdateDiagramPath(a0,a1)" as UpdateDiagramPath_a0_a1 #LightGreen
+autonumber
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> CSharpSyntaxTree_ParseText_a0_a1 : (source, options)
+CSharpSyntaxTree_ParseText_a0_a1 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : syntaxTree
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> syntaxTree_GetRoot
+syntaxTree_GetRoot -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : syntaxRoot
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> syntaxRoot_DescendantNodes_OfType_ClassDeclarationSyntax_
+syntaxRoot_DescendantNodes_OfType_ClassDeclarationSyntax_ -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : classNodes
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> MetadataReference_CreateFromFile_a0 : (typeof(object).GetTypeInfo().Assembly.Location)
+MetadataReference_CreateFromFile_a0 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : mscorlib
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> MetadataReference_CreateFromFile_a0 : (typeof(Enumerable).GetTypeInfo().Assembly.Location)
+MetadataReference_CreateFromFile_a0 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : systemCore
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> CSharpCompilation_Create_a0_a1_a2 : ("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])
+CSharpCompilation_Create_a0_a1_a2 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : compilation
+CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> compilation_GetSemanticModel_a0 : (syntaxTree)
+compilation_GetSemanticModel_a0 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : semanticModel
+alt#LightBlue Path.Exists(path) == false
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> Path_Exists_a0 : (path)
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> Directory_CreateDirectory_a0 : (path)
+end
+loop#LightCoral classNodes
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> classNode_DescendantNodes_OfType_MethodDeclarationSyntax_
+ classNode_DescendantNodes_OfType_MethodDeclarationSyntax_ -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : methodNodes
+ loop#LightCoral methodNodes
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> CreateSequenceDiagram_a0_a1 : (semanticModel, methodNode)
+ CreateSequenceDiagram_a0_a1 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : diagramData
+ alt#LightBlue diagramData.Count > 0
+ alt#LightBlue infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> infoData_Contains_a0 : ($"{nameof(fileName)}:{fileName}{PlantUMLExtension}")
+ end
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> Path_Combine_a0_a1 : (path, fileName)
+ Path_Combine_a0_a1 -[#blue]-> CreateSequenceDiagram_p0_p1_p2_p3 : filePath
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> diagramData_Insert_a0_a1 : (0, $"@{StartUmlLabel} {title}")
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> diagramData_Insert_a0_a1 : (1, $"title {title}")
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"@{EndUmlLabel}")
+ alt#LightBlue force || Path.Exists(filePath) == false
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> Path_Exists_a0 : (filePath)
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> File_WriteAllLines_a0_a1 : (filePath, diagramData)
+ end
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> infoData_Add_a0 : ($"{nameof(title)}:{title} (SQ)")
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> infoData_Add_a0 : ($"{nameof(fileName)}:{fileName}")
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> infoData_Add_a0 : ($"generated_on:{DateTime.UtcNow}")
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> infoData_Add_a0 : ($"generated_by:generated with the DiagramCreator by Prof.Gehrer")
+ end
+ end
+end
+alt#LightBlue force || Path.Exists(Path.Combine(path, infoFileName)) == false
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> Path_Exists_a0 : (Path.Combine(path, infoFileName))
+ Path_Exists_a0 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, infoFileName))
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> File_WriteAllLines_a0_a1 : (Path.Combine(path, infoFileName), infoData)
+ File_WriteAllLines_a0_a1 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, infoFileName), infoData)
+ CreateSequenceDiagram_p0_p1_p2_p3 -[#grey]> UpdateDiagramPath_a0_a1 : (path, InfoFileFilter)
+end
+@enduml
+' CustomUML
 @enduml

@@ -3,10 +3,10 @@ title DiagramCreator.CreateCompleteClassDiagram
 participant "CreateCompleteClassDiagram(string path,bool force)" as CreateCompleteClassDiagram_p0_p1 #LightYellow
 participant "Directory.GetFiles(path,$"*{PlantUMLExtension}",SearchOption.AllDirectories).Where(a0)" as Directory_GetFiles_path_PlantUMLExtension_SearchOption_AllDirectories_Where_a0 #LightGreen
 participant "File.ReadAllLines(a0)" as File_ReadAllLines_a0 #LightGreen
-participant "umlItems.AddRange(a0)" as umlItems_AddRange_a0 #LightGreen
 participant "ExtractUMLItems(a0)" as ExtractUMLItems_a0 #LightGreen
-participant "umlRelations.Add(a0)" as umlRelations_Add_a0 #LightGreen
 participant "ExtractUMLRelations(a0)" as ExtractUMLRelations_a0 #LightGreen
+participant "umlItems.AddRange(a0)" as umlItems_AddRange_a0 #LightGreen
+participant "umlRelations.Add(a0)" as umlRelations_Add_a0 #LightGreen
 participant "result.IsSubsequence(a0)" as result_IsSubsequence_a0 #LightGreen
 participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
 participant "umlRelations.SelectMany(e=>e).Distinct()" as umlRelations_SelectMany_e_e_Distinct #LightGreen
@@ -16,9 +16,9 @@ participant "result.Any(a0)" as result_Any_a0 #LightGreen
 participant "char.IsUpper(a0)" as char_IsUpper_a0 #LightGreen
 participant "result.Add(a0)" as result_Add_a0 #LightGreen
 participant "Path.Combine(a0,a1)" as Path_Combine_a0_a1 #LightGreen
-participant "diagramData.AddRange(a0)" as diagramData_AddRange_a0 #LightGreen
 participant "CreateRelations(a0)" as CreateRelations_a0 #LightGreen
 participant "ReadCustomUMLFromFle(a0)" as ReadCustomUMLFromFle_a0 #LightGreen
+participant "diagramData.AddRange(a0)" as diagramData_AddRange_a0 #LightGreen
 participant "diagramData.Insert(a0,a1)" as diagramData_Insert_a0_a1 #LightGreen
 participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
 participant "Path.Exists(a0)" as Path_Exists_a0 #LightGreen
@@ -30,10 +30,14 @@ Directory_GetFiles_path_PlantUMLExtension_SearchOption_AllDirectories_Where_a0 -
 loop#LightCoral files
  CreateCompleteClassDiagram_p0_p1 -[#grey]> File_ReadAllLines_a0 : (file)
  File_ReadAllLines_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : lines
- CreateCompleteClassDiagram_p0_p1 -[#grey]> umlItems_AddRange_a0 : (ExtractUMLItems(lines))
- umlItems_AddRange_a0 -[#grey]> ExtractUMLItems_a0 : (ExtractUMLItems(lines))
- CreateCompleteClassDiagram_p0_p1 -[#grey]> umlRelations_Add_a0 : (ExtractUMLRelations(lines))
- umlRelations_Add_a0 -[#grey]> ExtractUMLRelations_a0 : (ExtractUMLRelations(lines))
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> ExtractUMLItems_a0 : (lines)
+ ExtractUMLItems_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : items
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> ExtractUMLRelations_a0 : (lines)
+ ExtractUMLRelations_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : relations
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> umlItems_AddRange_a0 : (items)
+ alt#LightBlue relations.Count > 0
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> umlRelations_Add_a0 : (relations)
+ end
 end
 loop#LightCoral umlItems
  CreateCompleteClassDiagram_p0_p1 -[#grey]> result_IsSubsequence_a0 : (item)
@@ -62,10 +66,12 @@ end
 CreateCompleteClassDiagram_p0_p1 -[#grey]> Path_Combine_a0_a1 : (path, fileName)
 Path_Combine_a0_a1 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : filePath
 alt#LightBlue diagramData.Count > 0
- CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (CreateRelations(diagramData))
- diagramData_AddRange_a0 -[#grey]> CreateRelations_a0 : (CreateRelations(diagramData))
- CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (ReadCustomUMLFromFle(filePath))
- diagramData_AddRange_a0 -[#grey]> ReadCustomUMLFromFle_a0 : (ReadCustomUMLFromFle(filePath))
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> CreateRelations_a0 : (diagramData)
+ CreateRelations_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : relations
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> ReadCustomUMLFromFle_a0 : (filePath)
+ ReadCustomUMLFromFle_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : customUML
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (relations)
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (customUML)
  CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Insert_a0_a1 : (0, $"@{StartUmlLabel} CompleteClassDiagram")
  CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Insert_a0_a1 : (1, "title CompleteClassDiagram")
  CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"@{EndUmlLabel}")
@@ -84,4 +90,75 @@ alt#LightBlue force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == f
  CreateCompleteClassDiagram_p0_p1 -[#grey]> File_WriteAllLines_a0_a1 : (Path.Combine(path, comleteInfoFileName), completeInfoData)
  File_WriteAllLines_a0_a1 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, comleteInfoFileName), completeInfoData)
 end
+' CustomUML
+participant "diagramData.Insert(a0,a1)" as diagramData_Insert_a0_a1 #LightGreen
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "Path.Exists(a0)" as Path_Exists_a0 #LightGreen
+participant "File.WriteAllLines(a0,a1)" as File_WriteAllLines_a0_a1 #LightGreen
+participant "completeInfoData.Add(a0)" as completeInfoData_Add_a0 #LightGreen
+autonumber
+CreateCompleteClassDiagram_p0_p1 -[#grey]> Directory_GetFiles_path_PlantUMLExtension_SearchOption_AllDirectories_Where_a0 : (f => Path.GetFileName(f).StartsWith("cd_"))
+Directory_GetFiles_path_PlantUMLExtension_SearchOption_AllDirectories_Where_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : files
+loop#LightCoral files
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> File_ReadAllLines_a0 : (file)
+ File_ReadAllLines_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : lines
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> ExtractUMLItems_a0 : (lines)
+ ExtractUMLItems_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : items
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> ExtractUMLRelations_a0 : (lines)
+ ExtractUMLRelations_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : relations
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> umlItems_AddRange_a0 : (items)
+ alt#LightBlue relations.Count > 0
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> umlRelations_Add_a0 : (relations)
+ end
+end
+loop#LightCoral umlItems
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_IsSubsequence_a0 : (item)
+ result_IsSubsequence_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : isContained
+ alt#LightBlue isContained == false
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_AddRange_a0 : (item)
+ end
+end
+loop#LightCoral umlRelations.SelectMany(e => e).Distinct()
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> umlRelations_SelectMany_e_e_Distinct
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> item_Trim_Split_StringSplitOptions_RemoveEmptyEntries_ToArray
+ item_Trim_Split_StringSplitOptions_RemoveEmptyEntries_ToArray -[#blue]-> CreateCompleteClassDiagram_p0_p1 : itemData
+ loop#LightCoral itemData
+ alt#LightBlue result.Any(l => l.Contains(relationPart)) == false
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_Any_a0 : (l => l.Contains(relationPart))
+ alt#LightBlue relationPart.Length > 1 && relationPart[0] == 'I' && char.IsUpper(relationPart[1])
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> char_IsUpper_a0 : (relationPart[1])
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_Add_a0 : ($"interface {relationPart} {Color.Interface}")
+ else
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_Add_a0 : ($"class {relationPart} {Color.Class}")
+ end
+ end
+ end
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> result_Add_a0 : (item)
+end
+CreateCompleteClassDiagram_p0_p1 -[#grey]> Path_Combine_a0_a1 : (path, fileName)
+Path_Combine_a0_a1 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : filePath
+alt#LightBlue diagramData.Count > 0
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> CreateRelations_a0 : (diagramData)
+ CreateRelations_a0 -[#blue]-> CreateCompleteClassDiagram_p0_p1 : relations
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (relations)
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Insert_a0_a1 : (0, $"@{StartUmlLabel} CompleteClassDiagram")
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Insert_a0_a1 : (1, "title CompleteClassDiagram")
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"@{EndUmlLabel}")
+ alt#LightBlue force || Path.Exists(filePath) == false
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> Path_Exists_a0 : (filePath)
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> File_WriteAllLines_a0_a1 : (filePath, diagramData)
+ end
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> completeInfoData_Add_a0 : ($"title:All class diagrams (CD)")
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> completeInfoData_Add_a0 : ($"{nameof(fileName)}:{fileName}")
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> completeInfoData_Add_a0 : ($"generated_on:{DateTime.UtcNow}")
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> completeInfoData_Add_a0 : ($"generated_by:generated with the DiagramCreator by Prof.Gehrer")
+end
+alt#LightBlue force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> Path_Exists_a0 : (Path.Combine(path, comleteInfoFileName))
+ Path_Exists_a0 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, comleteInfoFileName))
+ CreateCompleteClassDiagram_p0_p1 -[#grey]> File_WriteAllLines_a0_a1 : (Path.Combine(path, comleteInfoFileName), completeInfoData)
+ File_WriteAllLines_a0_a1 -[#grey]> Path_Combine_a0_a1 : (Path.Combine(path, comleteInfoFileName), completeInfoData)
+end
+@enduml
+' CustomUML
 @enduml

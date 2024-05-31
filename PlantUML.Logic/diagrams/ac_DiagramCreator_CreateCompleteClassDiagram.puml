@@ -6,8 +6,10 @@ start
 :iterator = files.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :file = iterator.Current();
-    #WhiteSmoke:umlItems.AddRange(ExtractUMLItems(lines));
-    #WhiteSmoke:umlRelations.Add(ExtractUMLRelations(lines));
+    #WhiteSmoke:umlItems.AddRange(items);
+    #LightYellow:if (relations.Count > 0) then (<color:green>yes)
+      #WhiteSmoke:umlRelations.Add(relations);
+    endif
 endwhile (<color:red>no)
 :iterator = umlItems.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
@@ -34,8 +36,8 @@ while (iterator.MoveNext()) is (<color:green>yes)
 endwhile (<color:red>no)
 #LightSkyBlue:var fileName = "CompleteClassDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>(result)\nvar completeInfoData = new List<string>();
 #LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
-  #WhiteSmoke:diagramData.AddRange(CreateRelations(diagramData));
-  #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+  #WhiteSmoke:diagramData.AddRange(relations);
+  #WhiteSmoke:diagramData.AddRange(customUML);
   #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
   #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
   #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
@@ -51,5 +53,24 @@ endif
 #LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
 endif
+' CustomUML
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All class diagrams (CD)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteClassDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+stop
+@enduml
+' CustomUML
 stop
 @enduml

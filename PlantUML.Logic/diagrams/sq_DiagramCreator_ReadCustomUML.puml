@@ -1,16 +1,31 @@
 @startuml DiagramCreator.ReadCustomUML
 title DiagramCreator.ReadCustomUML
 participant "ReadCustomUML(IEnumerable<string> lines)" as ReadCustomUML_p0 #LightYellow
-participant "line.Contains(a0,a1)" as line_Contains_a0_a1 #LightGreen
+participant "line.StartsWith(a0,a1)" as line_StartsWith_a0_a1 #LightGreen
 participant "result.Add(a0)" as result_Add_a0 #LightGreen
 autonumber
 loop#LightCoral lines
- alt#LightBlue line.Contains($"{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
- ReadCustomUML_p0 -[#grey]> line_Contains_a0_a1 : ($"{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
+ alt#LightBlue line.StartsWith($"'{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase) || line.StartsWith($"' {CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
+ ReadCustomUML_p0 -[#grey]> line_StartsWith_a0_a1 : ($"'{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
+ ReadCustomUML_p0 -[#grey]> line_StartsWith_a0_a1 : ($"' {CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
  else
  alt#LightBlue counter > 0 && counter % 2 > 0
  ReadCustomUML_p0 -[#grey]> result_Add_a0 : (line)
  end
  end
 end
+' CustomUML
+participant "line.Contains(a0,a1)" as line_Contains_a0_a1 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral lines
+ else
+ alt#LightBlue counter > 0 && counter % 2 > 0
+participant "line.Contains(a0,a1)" as line_Contains_a0_a1 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral lines
+ else
+ alt#LightBlue counter > 0 && counter % 2 > 0
+' CustomUML
 @enduml

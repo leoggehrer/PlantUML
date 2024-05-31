@@ -20,4 +20,10 @@ alt#LightBlue File.Exists(filePath)
  end
  ReadCustomUMLFromFle_p0 -[#grey]> result_AddRange_a0 : (customUMLLines)
 end
+' CustomUML
+participant "File.Exists(a0)" as File_Exists_a0 #LightGreen
+participant "File.ReadAllLines(a0)" as File_ReadAllLines_a0 #LightGreen
+end
+@enduml
+' CustomUML
 @enduml

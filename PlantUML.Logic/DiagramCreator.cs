@@ -174,18 +174,18 @@ namespace PlantUML.Logic
         /// <param name="source">The source code to generate the activity diagrams from.</param>
         /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
         /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-        public static void CreateActivityDiagram(string path, string source, string[] defines,  bool force)
+        public static void CreateActivityDiagram(string path, string source, string[] defines, bool force)
         {
             CreateActivityDiagram(path, source, defines, false, force);
         }
         /// <summary>
-            /// Creates activity diagrams for the specified source code and saves them to the given path.
-            /// </summary>
-            /// <param name="path">The path where the activity diagrams will be saved.</param>
-            /// <param name="source">The source code to generate the activity diagrams from.</param>
-            /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
-            /// <param name="declarations">A flag indicating whether to generate declarations.</param>
-            /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
+        /// Creates activity diagrams for the specified source code and saves them to the given path.
+        /// </summary>
+        /// <param name="path">The path where the activity diagrams will be saved.</param>
+        /// <param name="source">The source code to generate the activity diagrams from.</param>
+        /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
+        /// <param name="declarations">A flag indicating whether to generate declarations.</param>
+        /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
         public static void CreateActivityDiagram(string path, string source, string[] defines, bool declarations, bool force)
         {
             var infoFileName = "ac_info.txt";
@@ -517,9 +517,14 @@ namespace PlantUML.Logic
             foreach (var file in files)
             {
                 var lines = File.ReadAllLines(file);
+                var items = ExtractUMLItems(lines);
+                var relations = ExtractUMLRelations(lines);
 
-                umlItems.AddRange(ExtractUMLItems(lines));
-                umlRelations.Add(ExtractUMLRelations(lines));
+                umlItems.AddRange(items);
+                if (relations.Count > 0)
+                {
+                    umlRelations.Add(relations);
+                }
             }
 
             foreach (var item in umlItems)
@@ -562,8 +567,11 @@ namespace PlantUML.Logic
 
             if (diagramData.Count > 0)
             {
-                diagramData.AddRange(CreateRelations(diagramData));
-                diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+                //var relations = CreateRelations(diagramData);
+                var customUML = ReadCustomUMLFromFle(filePath);
+
+                //diagramData.AddRange(relations);
+                diagramData.AddRange(customUML);
                 diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
                 diagramData.Insert(1, "title CompleteClassDiagram");
                 diagramData.Add($"@{EndUmlLabel}");
@@ -659,7 +667,7 @@ namespace PlantUML.Logic
                 }
             }
 
-            foreach (var diagramLine in digramData)
+            foreach (var diagramLine in digramData.Where(l => l.Equals("---") == false))
             {
                 if (diagramLine.Contains("class") || diagramLine.Contains("interface"))
                 {
@@ -2574,7 +2582,8 @@ namespace PlantUML.Logic
 
             foreach (var line in lines)
             {
-                if (line.Contains($"{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase))
+                if (line.StartsWith($"'{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)
+                    || line.StartsWith($"' {CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase))
                 {
                     counter++;
                 }
