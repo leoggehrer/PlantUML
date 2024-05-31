@@ -1,0 +1,6 @@
+@startuml PlantUMLApp.ChangeDiagramFolder
+title PlantUMLApp.ChangeDiagramFolder
+start
+#WhiteSmoke:DiagramFolder = ReadLine("Enter the diagram folder name: ").Trim();
+stop
+@enduml

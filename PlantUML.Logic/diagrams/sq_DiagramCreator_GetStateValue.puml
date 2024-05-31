@@ -1,0 +1,8 @@
+@startuml DiagramCreator.GetStateValue
+title DiagramCreator.GetStateValue
+participant "GetStateValue(object obj,FieldInfo fieldInfo)" as GetStateValue_p0_p1 #LightYellow
+participant "GetStateValue(a0,a1,a2)" as GetStateValue_a0_a1_a2 #LightGreen
+autonumber
+GetStateValue_p0_p1 -[#grey]> GetStateValue_a0_a1_a2 : (obj, fieldInfo, 15)
+GetStateValue_a0_a1_a2 -[#blue]-> GetStateValue_p0_p1 : result
+@enduml

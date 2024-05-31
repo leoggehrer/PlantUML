@@ -1,0 +1,14 @@
+@startuml DiagramCreator.CreateParticipant
+title DiagramCreator.CreateParticipant
+participant "CreateParticipant(InvocationExpressionSyntax invocationSyntax)" as CreateParticipant_p0 #LightYellow
+participant "arguments.Any()" as arguments_Any #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "arguments.Select(a0)" as arguments_Select_a0 #LightGreen
+participant "$"{invocationSyntax?.Expression}({argsStatement})".Replace($"{Environment.NewLine}",string.Empty).Replace(a0,a1)" as _invocationSyntax_Expression_argsStatement_Replace_Environment_NewLine_string_Empty_Replace_a0_a1 #LightGreen
+autonumber
+CreateParticipant_p0 -[#grey]> arguments_Any
+CreateParticipant_p0 -[#grey]> string_Join_a0_a1 : (",", arguments.Select((item,  Expression ) => $"a{ Expression }"))
+string_Join_a0_a1 -[#grey]> arguments_Select_a0 : (",", arguments.Select((item,  Expression ) => $"a{ Expression }"))
+CreateParticipant_p0 -[#grey]> _invocationSyntax_Expression_argsStatement_Replace_Environment_NewLine_string_Empty_Replace_a0_a1 : (" ", string.Empty)
+_invocationSyntax_Expression_argsStatement_Replace_Environment_NewLine_string_Empty_Replace_a0_a1 -[#blue]-> CreateParticipant_p0 : result
+@enduml

@@ -1,0 +1,7 @@
+@startuml Program.Main
+title Program.Main
+participant "Main(string[] args)" as Main_p0 #LightYellow
+participant "app.Run(a0)" as app_Run_a0 #LightGreen
+autonumber
+Main_p0 -[#grey]> app_Run_a0 : (args)
+@enduml

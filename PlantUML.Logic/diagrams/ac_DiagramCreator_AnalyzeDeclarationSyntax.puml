@@ -1,0 +1,124 @@
+@startuml DiagramCreator.AnalyzeDeclarationSyntax
+title DiagramCreator.AnalyzeDeclarationSyntax
+start
+#LightGreen:Params(SemanticModel semanticModel,SyntaxNode syntaxNode,List<string> diagramData,int level);
+#LightYellow:if (syntaxNode is EnumDeclarationSyntax enumDeclaration) then (<color:green>yes)
+  #WhiteSmoke:declaration += $" enum {enumDeclaration.Identifier} {Color.Enum}" + " {";
+  #WhiteSmoke:diagramData.Add(declaration);
+  :iterator = enumDeclaration.Members.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :member = iterator.Current();
+        #WhiteSmoke:diagramData.Add($"{member.Identifier}");
+  endwhile (<color:red>no)
+  #WhiteSmoke:diagramData.Add("}");
+  else (<color:red>no)
+    #LightYellow:if (syntaxNode is StructDeclarationSyntax structDeclaration) then (<color:green>yes)
+      #WhiteSmoke:declaration += $" struct {structDeclaration.Identifier} {Color.Struct}" + " {";
+      #WhiteSmoke:diagramData.Add(declaration);
+      :iterator = structDeclaration.Members.GetIterator();
+      while (iterator.MoveNext()) is (<color:green>yes)
+        :member = iterator.Current();
+                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+      endwhile (<color:red>no)
+      #WhiteSmoke:diagramData.Add("}");
+      else (<color:red>no)
+        #LightYellow:if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclaration) then (<color:green>yes)
+          #WhiteSmoke:declaration += $" interface {interfaceDeclaration.Identifier} {Color.Interface}" + " {";
+          #WhiteSmoke:diagramData.Add(declaration);
+          :iterator = interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("---");
+          :iterator = interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("---");
+          :iterator = interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("}");
+          else (<color:red>no)
+            #LightYellow:if (syntaxNode is ClassDeclarationSyntax classDeclaration) then (<color:green>yes)
+              #WhiteSmoke:declaration = declaration.Replace("{static}", string.Empty);
+              #WhiteSmoke:declaration += $" class {classDeclaration.Identifier}";
+              #WhiteSmoke:declaration += isStatic ? $" << static >> " : " ";
+              #WhiteSmoke:declaration += isAbstract ? $"{Color.AbstractClass}" : $"{Color.Class}";
+              #WhiteSmoke:declaration += " {";
+              #WhiteSmoke:diagramData.Add(declaration);
+              :iterator = autoProperties.GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :autoProperty = iterator.Current();
+                                #WhiteSmoke:diagramData.Add($"- {modifier} {autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}".Shrink(' '));
+              endwhile (<color:red>no)
+              :iterator = classDeclaration.Members.Where(m => m is FieldDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("---");
+              :iterator = classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("---");
+              :iterator = classDeclaration.Members.Where(m => m is MethodDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("}");
+              #LightYellow:if (classDeclaration.BaseList != null) then (<color:green>yes)
+                :iterator = classDeclaration.BaseList.Types.GetIterator();
+                while (iterator.MoveNext()) is (<color:green>yes)
+                  :baseType = iterator.Current();
+                                    #LightYellow:if (typeDeclaration != default) then (<color:green>yes)
+                                      #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, typeDeclaration, diagramData, level + 1);
+                                    endif
+                                    #LightYellow:if (baseType.Type is IdentifierNameSyntax identifierName) then (<color:green>yes)
+                                      #WhiteSmoke:identifierText = identifierName.Identifier.Text;
+                                      #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                      else (<color:red>no)
+                                        #LightYellow:if (baseType.Type is GenericNameSyntax genericName) then (<color:green>yes)
+                                          #WhiteSmoke:identifierText = genericName.Identifier.Text;
+                                          #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                          else (<color:red>no)
+                                            #WhiteSmoke:identifierText = baseType.Type.ToString();
+                                            #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                        endif
+                                    endif
+                                    #LightYellow:if (typeDeclaration != default) then (<color:green>yes)
+                                      #LightYellow:if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1])) then (<color:green>yes)
+                                        #WhiteSmoke:diagramData.Add($"interface {identifierText} {Color.Interface}");
+                                        else (<color:red>no)
+                                          #WhiteSmoke:diagramData.Add($"class {identifierText} {Color.Class}");
+                                      endif
+                                    endif
+                endwhile (<color:red>no)
+              endif
+              else (<color:red>no)
+                #LightYellow:if (syntaxNode is FieldDeclarationSyntax fieldDeclaration) then (<color:green>yes)
+                  #WhiteSmoke:diagramData.Add(ConvertFieldDeclaration(fieldDeclaration));
+                  else (<color:red>no)
+                    #LightYellow:if (syntaxNode is PropertyDeclarationSyntax propertyDeclaration) then (<color:green>yes)
+                      #WhiteSmoke:diagramData.AddRange(ConvertPropertyDeclaration(propertyDeclaration));
+                      else (<color:red>no)
+                        #LightYellow:if (syntaxNode is MethodDeclarationSyntax methodDeclaration) then (<color:green>yes)
+                          #WhiteSmoke:diagramData.Add(ConvertMethodDeclaration(methodDeclaration));
+                          else (<color:red>no)
+                            #WhiteSmoke:System.Diagnostics.Debug.WriteLine($"{syntaxNode.GetType().Name} is unknown!");
+                        endif
+                    endif
+                endif
+            endif
+        endif
+    endif
+endif
+stop
+@enduml

@@ -1,0 +1,13 @@
+@startuml DiagramCreator.CreateTypeDefinitions
+title DiagramCreator.CreateTypeDefinitions
+start
+#LightGreen:Params(IEnumerable<Type> types,DiagramCreationFlags diagramCreationFlags);
+#LightSkyBlue:var result = new List<string>();
+:iterator = types.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :type = iterator.Current();
+    #WhiteSmoke:result.AddRange(CreateTypeDefinition(type, diagramCreationFlags));
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

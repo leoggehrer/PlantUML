@@ -1,0 +1,8 @@
+@startuml DiagramCreator.GetItemNameFrom
+title DiagramCreator.GetItemNameFrom
+participant "GetItemNameFrom(string line)" as GetItemNameFrom_p0 #LightYellow
+participant "line.Split(a0,a1)" as line_Split_a0_a1 #LightGreen
+autonumber
+GetItemNameFrom_p0 -[#grey]> line_Split_a0_a1 : (" ", StringSplitOptions.RemoveEmptyEntries)
+line_Split_a0_a1 -[#blue]-> GetItemNameFrom_p0 : parts
+@enduml

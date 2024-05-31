@@ -1,0 +1,8 @@
+@startuml DiagramCreator.IsAutoProperty
+title DiagramCreator.IsAutoProperty
+start
+#LightGreen:Params(PropertyDeclarationSyntax propertydeclaration);
+#LightSkyBlue:var accessorList = propertydeclaration.AccessorList;
+#Lavender:return accessorList != null && accessorList.Accessors.All(accessor => accessor.Body == null && accessor.ExpressionBody == null);
+stop
+@enduml

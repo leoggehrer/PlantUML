@@ -1,0 +1,6 @@
+@startuml DiagramCreator.CreateCollectionName
+title DiagramCreator.CreateCollectionName
+start
+#LightGreen:Params(object obj);
+stop
+@enduml

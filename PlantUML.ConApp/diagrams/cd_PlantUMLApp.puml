@@ -1,0 +1,37 @@
+@startuml PlantUMLApp
+title PlantUMLApp
+ class PlantUMLApp #GhostWhite {
+- {static} string _projectspath
+- {static} string _targetpath
+- DiagramBuilderType _diagrambuilder
+- {static} string _diagramfolder
+- {static} bool _createcompletediagram
+- {static} int _maxgenerationdepth
+---
++ {static} string getProjectsPath()
++ {static} Void setProjectsPath(string value)
++ {static} string getTargetPath()
++ {static} Void setTargetPath(string value)
++ DiagramBuilderType getDiagramBuilder()
++ Void setDiagramBuilder(DiagramBuilderType value)
++ {static} string getDiagramFolder()
++ {static} Void setDiagramFolder(string value)
++ {static} bool getCreateCompleteDiagram()
++ {static} Void setCreateCompleteDiagram(bool value)
++ {static} int getMaxGenerationDepth()
++ {static} Void setMaxGenerationDepth(int value)
+---
+- {static} void ClassConstructing()
+- {static} void ClassConstructed()
+- void Constructing()
+- void Constructed()
+# MenuItem[] CreateMenuItems()
+# void PrintHeader()
++ void Run(string[] args)
+- {static} void ChangeDiagramFolder()
++ void ChangeMaxGenerationDepth()
+- void ChangeDiagramBuilder()
+- void CreateDiagram(MenuItem menuItem, bool force)
+}
+PlantUMLApp <|-- ConsoleApplication
+@enduml

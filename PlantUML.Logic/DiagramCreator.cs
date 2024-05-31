@@ -7,6 +7,7 @@ using PlantUML.Logic.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.RegularExpressions;
 
 namespace PlantUML.Logic
 {
@@ -63,7 +64,18 @@ namespace PlantUML.Logic
         /// Gets or sets the extension for PlantUML files.
         /// </summary>
         public static string PlantUMLExtension => ".puml";
+        /// <summary>
+        /// Gets the label for the CustomUML.
+        /// </summary>
         public static string CustomUMLLabel => "CustomUML";
+        /// <summary>
+        /// Gets the label used to start a PlantUML diagram.
+        /// </summary>
+        public static string StartUmlLabel => "startuml";
+        /// <summary>
+        /// Gets the label used to end a PlantUML diagram.
+        /// </summary>
+        public static string EndUmlLabel => "enduml";
         #endregion properties
 
         #region skinparam
@@ -211,18 +223,12 @@ namespace PlantUML.Logic
                     var filePath = Path.Combine(path, fileName);
 
                     diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-                    diagramData.Insert(0, $"@startuml {title}");
-                    // diagramData.Insert(1, "header");
-                    // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
-                    // diagramData.Insert(3, "end header");
+                    diagramData.Insert(0, $"@{StartUmlLabel} {title}");
                     diagramData.Insert(1, $"title {title}");
                     diagramData.Insert(2, "start");
 
-                    // diagramData.Add("footer");
-                    // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
-                    // diagramData.Add("end footer");
                     diagramData.Add("stop");
-                    diagramData.Add("@enduml");
+                    diagramData.Add($"@{EndUmlLabel}");
 
                     if (force || Path.Exists(filePath) == false)
                     {
@@ -347,7 +353,7 @@ namespace PlantUML.Logic
             }
             if (diagramData.Count > 0)
             {
-                diagramData.Insert(0, "@startuml CompleteActivityDiagram");
+                diagramData.Insert(0, $"@{StartUmlLabel} CompleteActivityDiagram");
                 diagramData.Insert(1, "header");
                 diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
                 diagramData.Insert(3, "end header");
@@ -356,7 +362,7 @@ namespace PlantUML.Logic
                 diagramData.Add("footer");
                 diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
                 diagramData.Add("end footer");
-                diagramData.Add("@enduml");
+                diagramData.Add($"@{EndUmlLabel}");
 
                 if (force || Path.Exists(filePath) == false)
                 {
@@ -376,6 +382,11 @@ namespace PlantUML.Logic
                 File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
             }
         }
+        /// <summary>
+        /// Formats the lines of an activity diagram by removing extra spaces and newlines.
+        /// </summary>
+        /// <param name="diagramData">The list of lines representing the activity diagram.</param>
+        /// <returns>A new list of formatted lines.</returns>
         private static List<string> FormatActivityDiagram(List<string> diagramData)
         {
             static string FormatLine(string line)
@@ -470,9 +481,9 @@ namespace PlantUML.Logic
                 var filePath = Path.Combine(path, fileName);
 
                 diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-                diagramData.Insert(0, $"@startuml {title}");
+                diagramData.Insert(0, $"@{StartUmlLabel} {title}");
                 diagramData.Insert(1, $"title {title}");
-                diagramData.Add("@enduml");
+                diagramData.Add($"@{EndUmlLabel}");
 
                 if (force || Path.Exists(filePath) == false)
                 {
@@ -553,9 +564,9 @@ namespace PlantUML.Logic
             {
                 diagramData.AddRange(CreateRelations(diagramData));
                 diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-                diagramData.Insert(0, "@startuml CompleteClassDiagram");
+                diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
                 diagramData.Insert(1, "title CompleteClassDiagram");
-                diagramData.Add("@enduml");
+                diagramData.Add($"@{EndUmlLabel}");
 
                 if (force || Path.Exists(filePath) == false)
                 {
@@ -833,19 +844,11 @@ namespace PlantUML.Logic
 
                         var filePath = Path.Combine(path, fileName);
 
-                        diagramData.Insert(0, $"@startuml {title}");
-                        // diagramData.Insert(1, "header");
-                        // diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
-                        // diagramData.Insert(3, "end header");
+                        diagramData.Insert(0, $"@{StartUmlLabel} {title}");
                         diagramData.Insert(1, $"title {title}");
-                        //diagramData.Insert(2, "start");
 
-                        // diagramData.Add("footer");
-                        // diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
-                        // diagramData.Add("end footer");
-                        //diagramData.Add("stop");
                         diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-                        diagramData.Add("@enduml");
+                        diagramData.Add($"@{EndUmlLabel}");
 
                         if (force || Path.Exists(filePath) == false)
                         {
@@ -877,10 +880,11 @@ namespace PlantUML.Logic
             var messages = new List<string>();
             var participants = new List<string>();
             var participantAliasse = new List<string>();
-            var invocationExpressions = methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray() ?? [];
+            var invocationExpressions = methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray();
             var filteredInvocationExpressions = invocationExpressions.Where(ie => ie.Expression.ToString().Contains("ToString") == false
                                                                                && ie.Expression.ToString().Contains("ConfigureAwait") == false
-                                                                               && ie.Expression.ToString().Contains("nameof") == false);
+                                                                               && ie.Expression.ToString().Contains("nameof") == false
+                                                                               && ie.Expression.ToString().Contains("new") == false);
 
             participants.Add(CreateParticipant(methodNode));
             participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
@@ -1381,6 +1385,23 @@ namespace PlantUML.Logic
             {
                 AnalyzeCallSequence(semanticModel, methodDeclaration!, statement, participantAliasse, messages, methodResults, level);
             }
+            for (int i = 0; i < messages.Count; i++)
+            {
+                int index;
+                var clearMessage = messages[i].Replace(Environment.NewLine, string.Empty).Shrink(' ');
+
+                index = clearMessage.IndexOf("=>");
+                if (index > -1)
+                {
+                    var between = clearMessage.ExtractBetween('{', '}', index);
+
+                    if (between.HasContent())
+                    {
+                        clearMessage = clearMessage.Replace(between, " Expression ");
+                    }
+                }
+                messages[i] = clearMessage;
+            }
         }
         /// <summary>
         /// Analyzes the call sequence within a method.
@@ -1435,6 +1456,29 @@ namespace PlantUML.Logic
                     if (argumentList != "()")
                     {
                         messages.Add($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level));
+                        foreach (var item in invocationExpression.ArgumentList.Arguments)
+                        {
+                            if (item.Expression is InvocationExpressionSyntax argInvocationExpression)
+                            {
+                                var argfrom = participantTo;
+                                var argTo = CreateParticipantAlias(argInvocationExpression);
+
+                                if (participantAliasse.Contains(argfrom)
+                                    && participantAliasse.Contains(argTo))
+                                {
+                                    var argArgumentList = CreateArgumentList(invocationExpression, methodResults);
+
+                                    if (argArgumentList != "()")
+                                    {
+                                        messages.Add($"{argfrom} -[#grey]> {argTo} : {argArgumentList}".SetIndent(level));
+                                    }
+                                    else
+                                    {
+                                        messages.Add($"{argfrom} -[#grey]> {argTo}".SetIndent(level));
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -1606,6 +1650,11 @@ namespace PlantUML.Logic
             }
         }
 
+        /// <summary>
+        /// Checks if the given syntax node contains an invocation expression.
+        /// </summary>
+        /// <param name="syntaxNode">The syntax node to check.</param>
+        /// <returns>True if the syntax node contains an invocation expression, false otherwise.</returns>
         private static bool HasInvocationExpression(SyntaxNode syntaxNode)
         {
             var result = syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>().Any();
@@ -1659,7 +1708,7 @@ namespace PlantUML.Logic
                 {
                     if (node is StatementSyntax statementSyntax)
                     {
-                        AnalyzeStatement(statementSyntax, diagramData, declarations, level + 1);
+                        AnalyzeStatement(statementSyntax, diagramData, declarations, level);
                     }
                 }
             }
@@ -1748,7 +1797,7 @@ namespace PlantUML.Logic
 
                 diagramData.Add($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level));
                 diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
-                diagramData.Add($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level));
+                diagramData.Add($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level + 1));
 
                 AnalyzeStatement(forEachStatement.Statement, statements, declarations, level + 1);
 
@@ -2069,8 +2118,6 @@ namespace PlantUML.Logic
                 //                result.Add($"{item.FieldType.Name} {GetFieldName(item)} => {GetStateValue(obj, item)}");
                 result.Add($"{GetFieldName(item)} => {GetStateValue(obj, item)}");
             }
-            //if (counter > 0)
-            //    result.Add("---");
             #endregion fields
 
             #region object is an array
@@ -2357,7 +2404,7 @@ namespace PlantUML.Logic
 
                         if (commonSet.All(e => currentSet.Any(c => e == c)) && exceptSet.Any())
                         {
-                            var intersectSet = result[j].Intersect(new[] { commonSet.First() });
+                            var intersectSet = result[j].Intersect([commonSet.First()]);
                             var createSet = exceptSet.Union(intersectSet);
 
                             calculatedHirarchies.Add(createSet);

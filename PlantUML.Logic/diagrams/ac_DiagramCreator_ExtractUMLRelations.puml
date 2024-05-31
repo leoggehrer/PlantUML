@@ -1,0 +1,15 @@
+@startuml DiagramCreator.ExtractUMLRelations
+title DiagramCreator.ExtractUMLRelations
+start
+#LightGreen:Params(IEnumerable<string> lines);
+#LightSkyBlue:var result = new UMLItem();
+:iterator = lines.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("<|--") || line.Contains("--|>")) then (<color:green>yes)
+      #WhiteSmoke:result.Add(line);
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

@@ -1,0 +1,8 @@
+@startuml DiagramCreator.CreateParticipant
+title DiagramCreator.CreateParticipant
+start
+#LightGreen:Params(MethodDeclarationSyntax methodSyntax);
+#LightSkyBlue:var parameters = methodSyntax.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
+#Lavender:return $"{methodSyntax?.Identifier}{paramsStatement}".Replace($"{Environment.NewLine}", string.Empty);
+stop
+@enduml

@@ -1,0 +1,38 @@
+@startuml DiagramCreator.CreateDiagramHirarchies
+title DiagramCreator.CreateDiagramHirarchies
+start
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<IEnumerable<Type>>();
+:iterator = types.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :type = iterator.Current();
+    #LightYellow:if (classHirarchy.Count() > 1) then (<color:green>yes)
+      #WhiteSmoke:result.Add(classHirarchy);
+    endif
+endwhile (<color:red>no)
+#LightSkyBlue:var calculatedHirarchies = new List<IEnumerable<Type>>();
+while (i < result.Count - 1) is (<color:green>yes)
+  while (j < result.Count) is (<color:green>yes)
+    #WhiteSmoke:commonSet = commonSet.Intersect(result[j]);
+  :j++;
+  endwhile (<color:red>no)
+  #LightYellow:if (commonSet.Count() > 1) then (<color:green>yes)
+    while (j < result.Count) is (<color:green>yes)
+      #LightYellow:if (commonSet.All(e => currentSet.Any(c => e == c)) && exceptSet.Any()) then (<color:green>yes)
+        #WhiteSmoke:calculatedHirarchies.Add(createSet);
+        else (<color:red>no)
+          #WhiteSmoke:calculatedHirarchies.Add(result[j]);
+      endif
+    :j++;
+    endwhile (<color:red>no)
+    else (<color:red>no)
+      #WhiteSmoke:calculatedHirarchies.AddRange(result);
+  endif
+  #WhiteSmoke:result.Clear();
+  #WhiteSmoke:result.AddRange(calculatedHirarchies);
+  #WhiteSmoke:calculatedHirarchies.Clear();
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result.Distinct();
+stop
+@enduml

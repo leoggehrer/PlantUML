@@ -1,0 +1,55 @@
+@startuml DiagramCreator.CreateCompleteActivityDiagram
+title DiagramCreator.CreateCompleteActivityDiagram
+start
+#LightGreen:Params(string path,bool force);
+#LightSkyBlue:var infoFileName = "ac_info.txt"\nvar result = new List<string>()\nvar umlFiles = new List<string>()\nvar umlItems = new List<UMLItem>()\nvar infoFilePath = Path.Combine(path, infoFileName)\nvar files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories) .Where(f => Path.GetFileName(f).StartsWith("ac_"));
+#LightYellow:if (File.Exists(infoFilePath)) then (<color:green>yes)
+  :iterator = infoData.Select(l => l.Split(':')) .Where(d => d[0].Equals("fileName", StringComparison.OrdinalIgnoreCase)) .Select(d => d[1]).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :infoItem = iterator.Current();
+        #WhiteSmoke:umlFiles.AddRange(query);
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #WhiteSmoke:umlFiles.AddRange(files);
+endif
+:iterator = umlFiles.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #LightYellow:if (acItems.Length == acTitles.Length) then (<color:green>yes)
+      while (i < acItems.Length) is (<color:green>yes)
+        #WhiteSmoke:acItems[i].Insert(1, $"note right: {acTitles[i].Replace("title", string.Empty)}");
+      :i++;
+      endwhile (<color:red>no)
+    endif
+    #WhiteSmoke:umlItems.AddRange(acItems.Where(e => e.Count > 3));
+endwhile (<color:red>no)
+#LightSkyBlue:var fileName = "CompleteActivityDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>()\nvar completeInfoData = new List<string>();
+:iterator = umlItems.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:diagramData.AddRange(item);
+endwhile (<color:red>no)
+#LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteActivityDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "header");
+  #WhiteSmoke:diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+  #WhiteSmoke:diagramData.Insert(3, "end header");
+  #WhiteSmoke:diagramData.Insert(4, "title CompleteActivityDiagram");
+  #WhiteSmoke:diagramData.Add("footer");
+  #WhiteSmoke:diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+  #WhiteSmoke:diagramData.Add("end footer");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All acivity diagrams (AC)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteActivityDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+stop
+@enduml

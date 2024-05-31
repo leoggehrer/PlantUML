@@ -1,0 +1,14 @@
+@startuml DiagramCreator.ExtractUMLRelations
+title DiagramCreator.ExtractUMLRelations
+participant "ExtractUMLRelations(IEnumerable<string> lines)" as ExtractUMLRelations_p0 #LightYellow
+participant "line.Contains(a0)" as line_Contains_a0 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral lines
+ alt#LightBlue line.Contains("<|--") || line.Contains("--|>")
+ ExtractUMLRelations_p0 -[#grey]> line_Contains_a0 : ("<|--")
+ ExtractUMLRelations_p0 -[#grey]> line_Contains_a0 : ("--|>")
+ ExtractUMLRelations_p0 -[#grey]> result_Add_a0 : (line)
+ end
+end
+@enduml

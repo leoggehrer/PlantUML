@@ -1,0 +1,25 @@
+@startuml ClassDiagramBuilder.CreateFromFile
+title ClassDiagramBuilder.CreateFromFile
+participant "CreateFromFile" as CreateFromFile #LightYellow
+participant "Path.GetDirectoryName(a0)" as Path_GetDirectoryName_a0 #LightGreen
+participant "ReadDefinesFromProjectFiles(a0)" as ReadDefinesFromProjectFiles_a0 #LightGreen
+participant "DiagramFolder.HasContent()" as DiagramFolder_HasContent #LightGreen
+participant "Path.Combine(a0,a1)" as Path_Combine_a0_a1 #LightGreen
+participant "File.ReadAllText(a0)" as File_ReadAllText_a0 #LightGreen
+participant "Logic.DiagramCreator.CreateClassDiagram(a0,a1,a2,a3)" as Logic_DiagramCreator_CreateClassDiagram_a0_a1_a2_a3 #LightGreen
+participant "Logic.DiagramCreator.CreateCompleteClassDiagram(a0,a1)" as Logic_DiagramCreator_CreateCompleteClassDiagram_a0_a1 #LightGreen
+autonumber
+CreateFromFile -[#grey]> Path_GetDirectoryName_a0 : (SourcePath!)
+Path_GetDirectoryName_a0 -[#blue]-> CreateFromFile : result
+CreateFromFile -[#grey]> ReadDefinesFromProjectFiles_a0 : (fileDirectory!)
+ReadDefinesFromProjectFiles_a0 -[#blue]-> CreateFromFile : defines
+CreateFromFile -[#grey]> DiagramFolder_HasContent
+CreateFromFile -[#grey]> Path_Combine_a0_a1 : (fileDirectory, DiagramFolder)
+Path_Combine_a0_a1 -[#blue]-> CreateFromFile : result
+CreateFromFile -[#grey]> File_ReadAllText_a0 : (SourcePath!)
+File_ReadAllText_a0 -[#blue]-> CreateFromFile : source
+CreateFromFile -[#grey]> Logic_DiagramCreator_CreateClassDiagram_a0_a1_a2_a3 : (diagramsDirectory, source, defines, Force)
+alt#LightBlue CreateCompleteDiagram
+ CreateFromFile -[#grey]> Logic_DiagramCreator_CreateCompleteClassDiagram_a0_a1 : (diagramsDirectory, Force)
+end
+@enduml

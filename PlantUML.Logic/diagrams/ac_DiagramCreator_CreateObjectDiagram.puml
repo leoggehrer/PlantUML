@@ -1,0 +1,9 @@
+@startuml DiagramCreator.CreateObjectDiagram
+title DiagramCreator.CreateObjectDiagram
+start
+#LightGreen:Params(int maxDeep,params object[] objects);
+#LightSkyBlue:var result = new List<string>()\nvar createdObjects = new List<object>();
+#WhiteSmoke:CreateStateRec(objects, result, 0);
+#Lavender:return result;
+stop
+@enduml

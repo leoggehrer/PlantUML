@@ -1,0 +1,29 @@
+@startuml DiagramCreator.AnalyzeCallSequence
+title DiagramCreator.AnalyzeCallSequence
+participant "AnalyzeCallSequence(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,List<string> participantAliasse,List<string> messages,int level)" as AnalyzeCallSequence_p0_p1_p2_p3_p4 #LightYellow
+participant "AnalyzeCallSequence(a0,a1,a2,a3,a4,a5,a6)" as AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 #LightGreen
+participant "messages[i].Replace(Environment.NewLine,string.Empty).Shrink(a0)" as messages_i_Replace_Environment_NewLine_string_Empty_Shrink_a0 #LightGreen
+participant "clearMessage.IndexOf(a0)" as clearMessage_IndexOf_a0 #LightGreen
+participant "clearMessage.ExtractBetween(a0,a1,a2)" as clearMessage_ExtractBetween_a0_a1_a2 #LightGreen
+participant "between.HasContent()" as between_HasContent #LightGreen
+participant "clearMessage.Replace(a0,a1)" as clearMessage_Replace_a0_a1 #LightGreen
+autonumber
+loop#LightCoral statements!
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration!, statement, participantAliasse, messages, methodResults, level)
+end
+loop#LightCoral i < messages.Count
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> messages_i_Replace_Environment_NewLine_string_Empty_Shrink_a0 : (' ')
+ messages_i_Replace_Environment_NewLine_string_Empty_Shrink_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4 : clearMessage
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> clearMessage_IndexOf_a0 : ("=>")
+ clearMessage_IndexOf_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4 : index
+ alt#LightBlue index > -1
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> clearMessage_ExtractBetween_a0_a1_a2 : ('{', '}', index)
+ clearMessage_ExtractBetween_a0_a1_a2 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4 : between
+ alt#LightBlue between.HasContent()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> between_HasContent
+ AnalyzeCallSequence_p0_p1_p2_p3_p4 -[#grey]> clearMessage_Replace_a0_a1 : (between, " Expression ")
+ clearMessage_Replace_a0_a1 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4 : clearMessage
+ end
+ end
+end
+@enduml

@@ -1,0 +1,13 @@
+@startuml DiagramCreator.CreateCollectionState
+title DiagramCreator.CreateCollectionState
+participant "CreateCollectionState(IEnumerable collection)" as CreateCollectionState_p0 #LightYellow
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral collection
+ alt#LightBlue item != null
+ CreateCollectionState_p0 -[#grey]> result_Add_a0 : ($"{counter++} => { Expression }_{item.GetHashCode()}")
+ else
+ CreateCollectionState_p0 -[#grey]> result_Add_a0 : ($"{counter++} => null")
+ end
+end
+@enduml

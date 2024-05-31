@@ -1,0 +1,211 @@
+@startuml DiagramCreator.AnalyzeDeclarationSyntax
+title DiagramCreator.AnalyzeDeclarationSyntax
+participant "AnalyzeDeclarationSyntax(SemanticModel semanticModel,SyntaxNode syntaxNode,List<string> diagramData,int level)" as AnalyzeDeclarationSyntax_p0_p1_p2_p3 #LightYellow
+participant "modifiers.Any(a0)" as modifiers_Any_a0 #LightGreen
+participant "GetVisibility(a0,a1)" as GetVisibility_a0_a1 #LightGreen
+participant "declaration.Declaration.Variables.FirstOrDefault()" as declaration_Declaration_Variables_FirstOrDefault #LightGreen
+participant "declaration.Modifiers.Any(a0)" as declaration_Modifiers_Any_a0 #LightGreen
+participant "declaration.Declaration.Variables.First()" as declaration_Declaration_Variables_First #LightGreen
+participant "initValue.HasContent()" as initValue_HasContent #LightGreen
+participant "ConvertModifiers(a0)" as ConvertModifiers_a0 #LightGreen
+participant "item.Modifiers.Any()" as item_Modifiers_Any #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "$"{visibility}{modifier}{declaration.Type}get{declaration.Identifier}()".Shrink(a0)" as _visibility_modifier_declaration_Type_get_declaration_Identifier_Shrink_a0 #LightGreen
+participant "$"{visibility}{modifiers}{declaration.ReturnType}{declaration.Identifier}({parameterList})".Shrink(a0)" as _visibility_modifiers_declaration_ReturnType_declaration_Identifier_parameterList_Shrink_a0 #LightGreen
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "AnalyzeDeclarationSyntax(a0,a1,a2,a3)" as AnalyzeDeclarationSyntax_a0_a1_a2_a3 #LightGreen
+participant "interfaceDeclaration.Members.Where(a0)" as interfaceDeclaration_Members_Where_a0 #LightGreen
+participant "classDeclaration.Members.OfType<PropertyDeclarationSyntax>().Where(a0)" as classDeclaration_Members_OfType_PropertyDeclarationSyntax_Where_a0 #LightGreen
+participant "classDeclaration.Members.OfType<PropertyDeclarationSyntax>()" as classDeclaration_Members_OfType_PropertyDeclarationSyntax_ #LightGreen
+participant "declaration.Contains(a0)" as declaration_Contains_a0 #LightGreen
+participant "declaration.Replace(a0,a1)" as declaration_Replace_a0_a1 #LightGreen
+participant "$"-{modifier}{autoProperty.Type}_{autoProperty.Identifier.Text.ToLower()}".Shrink(a0)" as _modifier_autoProperty_Type_autoProperty_Identifier_Text_ToLower_Shrink_a0 #LightGreen
+participant "autoProperty.Identifier.Text.ToLower()" as autoProperty_Identifier_Text_ToLower #LightGreen
+participant "classDeclaration.Members.Where(a0)" as classDeclaration_Members_Where_a0 #LightGreen
+participant "FindTypeDeclaration(a0,a1)" as FindTypeDeclaration_a0_a1 #LightGreen
+participant "char.IsUpper(a0)" as char_IsUpper_a0 #LightGreen
+participant "ConvertFieldDeclaration(a0)" as ConvertFieldDeclaration_a0 #LightGreen
+participant "diagramData.AddRange(a0)" as diagramData_AddRange_a0 #LightGreen
+participant "ConvertPropertyDeclaration(a0)" as ConvertPropertyDeclaration_a0 #LightGreen
+participant "ConvertMethodDeclaration(a0)" as ConvertMethodDeclaration_a0 #LightGreen
+participant "System.Diagnostics.Debug.WriteLine(a0)" as System_Diagnostics_Debug_WriteLine_a0 #LightGreen
+autonumber
+alt#LightBlue modifiers.Any(SyntaxKind.PublicKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> modifiers_Any_a0 : (SyntaxKind.PublicKeyword)
+ else
+ alt#LightBlue modifiers.Any(SyntaxKind.PrivateKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> modifiers_Any_a0 : (SyntaxKind.PrivateKeyword)
+ else
+ alt#LightBlue modifiers.Any(SyntaxKind.ProtectedKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> modifiers_Any_a0 : (SyntaxKind.ProtectedKeyword)
+ else
+ alt#LightBlue modifiers.Any(SyntaxKind.InternalKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> modifiers_Any_a0 : (SyntaxKind.InternalKeyword)
+ end
+ end
+ end
+end
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> GetVisibility_a0_a1 : (declaration.Modifiers, "-")
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Declaration_Variables_FirstOrDefault
+alt#LightBlue declaration.Modifiers.Any(SyntaxKind.ConstKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Modifiers_Any_a0 : (SyntaxKind.ConstKeyword)
+end
+alt#LightBlue declaration.Modifiers.Any(SyntaxKind.AbstractKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Modifiers_Any_a0 : (SyntaxKind.AbstractKeyword)
+end
+alt#LightBlue declaration.Modifiers.Any(SyntaxKind.StaticKeyword)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Modifiers_Any_a0 : (SyntaxKind.StaticKeyword)
+end
+alt#LightBlue initValue.HasContent()
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> initValue_HasContent
+end
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> GetVisibility_a0_a1 : (declaration.Modifiers, "-")
+GetVisibility_a0_a1 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : visibility
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (declaration.Modifiers)
+ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : modifier
+alt#LightBlue declaration.AccessorList != null
+ loop#LightCoral declaration.AccessorList!.Accessors
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> GetVisibility_a0_a1 : (item.Modifiers, visibility)
+ GetVisibility_a0_a1 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : accessVisibility
+ alt#LightBlue item.Modifiers.Any()
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> item_Modifiers_Any
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (item.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : accessModifier
+ end
+ alt#LightBlue item.Keyword.Text == "get"
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> result_Add_a0 : ($"{accessVisibility} {(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}{declaration.Type} get{declaration.Identifier}()")
+ else
+ alt#LightBlue item.Keyword.Text == "set"
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> result_Add_a0 : ($"{accessVisibility} {(accessModifier.HasContent() ? $"{accessModifier} " : string.Empty)}Void set{declaration.Identifier}({declaration.Type} value)")
+ end
+ end
+ end
+ else
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> result_Add_a0 : ($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Shrink(' '))
+ result_Add_a0 -[#grey]> _visibility_modifier_declaration_Type_get_declaration_Identifier_Shrink_a0 : ($"{visibility} {modifier} {declaration.Type} get{declaration.Identifier}()".Shrink(' '))
+end
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> GetVisibility_a0_a1 : (declaration.Modifiers, "-")
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (declaration.Modifiers)
+ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : modifiers
+AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> _visibility_modifiers_declaration_ReturnType_declaration_Identifier_parameterList_Shrink_a0 : (' ')
+_visibility_modifiers_declaration_ReturnType_declaration_Identifier_parameterList_Shrink_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : result
+alt#LightBlue syntaxNode is EnumDeclarationSyntax enumDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (enumDeclaration.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : declaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (declaration)
+ loop#LightCoral enumDeclaration.Members
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{member.Identifier}")
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("}")
+ else
+ alt#LightBlue syntaxNode is StructDeclarationSyntax structDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (structDeclaration.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : declaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (declaration)
+ loop#LightCoral structDeclaration.Members
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("}")
+ else
+ alt#LightBlue syntaxNode is InterfaceDeclarationSyntax interfaceDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (interfaceDeclaration.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : declaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (declaration)
+ loop#LightCoral interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> interfaceDeclaration_Members_Where_a0 : (m => m is FieldDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("---")
+ loop#LightCoral interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> interfaceDeclaration_Members_Where_a0 : (m => m is PropertyDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("---")
+ loop#LightCoral interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> interfaceDeclaration_Members_Where_a0 : (m => m is MethodDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("}")
+ else
+ alt#LightBlue syntaxNode is ClassDeclarationSyntax classDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (classDeclaration.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : declaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> classDeclaration_Members_OfType_PropertyDeclarationSyntax_Where_a0 : (IsAutoProperty)
+ classDeclaration_Members_OfType_PropertyDeclarationSyntax_Where_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : autoProperties
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Contains_a0 : ("{static}")
+ declaration_Contains_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : isStatic
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Contains_a0 : ("abstract")
+ declaration_Contains_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : isAbstract
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> declaration_Replace_a0_a1 : ("{static}", string.Empty)
+ declaration_Replace_a0_a1 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : declaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (declaration)
+ loop#LightCoral autoProperties
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> ConvertModifiers_a0 : (autoProperty.Modifiers)
+ ConvertModifiers_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : modifier
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"- {modifier} {autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}".Shrink(' '))
+ diagramData_Add_a0 -[#grey]> _modifier_autoProperty_Type_autoProperty_Identifier_Text_ToLower_Shrink_a0 : ($"- {modifier} {autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}".Shrink(' '))
+ end
+ loop#LightCoral classDeclaration.Members.Where(m => m is FieldDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> classDeclaration_Members_Where_a0 : (m => m is FieldDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("---")
+ loop#LightCoral classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> classDeclaration_Members_Where_a0 : (m => m is PropertyDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("---")
+ loop#LightCoral classDeclaration.Members.Where(m => m is MethodDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> classDeclaration_Members_Where_a0 : (m => m is MethodDeclarationSyntax)
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, member, diagramData, level + 1)
+ end
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("}")
+ alt#LightBlue classDeclaration.BaseList != null
+ loop#LightCoral classDeclaration.BaseList.Types
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> FindTypeDeclaration_a0_a1 : (semanticModel, baseType)
+ FindTypeDeclaration_a0_a1 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : typeDeclaration
+ alt#LightBlue typeDeclaration != default
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> AnalyzeDeclarationSyntax_a0_a1_a2_a3 : (semanticModel, typeDeclaration, diagramData, level + 1)
+ end
+ alt#LightBlue baseType.Type is IdentifierNameSyntax identifierName
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{classDeclaration.Identifier} <|-- {identifierText}")
+ else
+ alt#LightBlue baseType.Type is GenericNameSyntax genericName
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{classDeclaration.Identifier} <|-- {identifierText}")
+ else
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{classDeclaration.Identifier} <|-- {identifierText}")
+ end
+ end
+ alt#LightBlue typeDeclaration != default
+ alt#LightBlue identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1])
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> char_IsUpper_a0 : (identifierText[1])
+ char_IsUpper_a0 -[#blue]-> AnalyzeDeclarationSyntax_p0_p1_p2_p3 : result
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"interface {identifierText} {Color.Interface}")
+ else
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"class {identifierText} {Color.Class}")
+ end
+ end
+ end
+ end
+ else
+ alt#LightBlue syntaxNode is FieldDeclarationSyntax fieldDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (ConvertFieldDeclaration(fieldDeclaration))
+ diagramData_Add_a0 -[#grey]> ConvertFieldDeclaration_a0 : (ConvertFieldDeclaration(fieldDeclaration))
+ else
+ alt#LightBlue syntaxNode is PropertyDeclarationSyntax propertyDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_AddRange_a0 : (ConvertPropertyDeclaration(propertyDeclaration))
+ diagramData_AddRange_a0 -[#grey]> ConvertPropertyDeclaration_a0 : (ConvertPropertyDeclaration(propertyDeclaration))
+ else
+ alt#LightBlue syntaxNode is MethodDeclarationSyntax methodDeclaration
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (ConvertMethodDeclaration(methodDeclaration))
+ diagramData_Add_a0 -[#grey]> ConvertMethodDeclaration_a0 : (ConvertMethodDeclaration(methodDeclaration))
+ else
+ AnalyzeDeclarationSyntax_p0_p1_p2_p3 -[#grey]> System_Diagnostics_Debug_WriteLine_a0 : ($"{syntaxNode.GetType().Name} is unknown!")
+ end
+ end
+ end
+ end
+ end
+ end
+end
+@enduml

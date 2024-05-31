@@ -1,0 +1,39 @@
+@startuml DiagramCreator.ExtractUMLItems
+title DiagramCreator.ExtractUMLItems
+start
+#LightGreen:Params(IEnumerable<string> lines);
+#LightSkyBlue:var result = new List<UMLItem>()\nvar isItem = false\nvar umlItem = default(UMLItem);
+:iterator = lines.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (isItem == false && line.Trim().EndsWith('{') && (line.Contains("class") || line.Contains("interface"))) then (<color:green>yes)
+      #WhiteSmoke:isItem = true;
+      #WhiteSmoke:umlItem = new UMLItem { line };
+      else (<color:red>no)
+        #LightYellow:if (isItem == false && line.Trim().StartsWith("start", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+          #WhiteSmoke:isItem = true;
+          #WhiteSmoke:umlItem = new UMLItem { line };
+          else (<color:red>no)
+            #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith('}') == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false) then (<color:green>yes)
+              #WhiteSmoke:umlItem.Add(line);
+              else (<color:red>no)
+                #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith('}')) then (<color:green>yes)
+                  #WhiteSmoke:umlItem.Add(line);
+                  #WhiteSmoke:result.Add(umlItem);
+                  #WhiteSmoke:umlItem = default;
+                  #WhiteSmoke:isItem = false;
+                  else (<color:red>no)
+                    #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+                      #WhiteSmoke:umlItem.Add(line);
+                      #WhiteSmoke:result.Add(umlItem);
+                      #WhiteSmoke:umlItem = default;
+                      #WhiteSmoke:isItem = false;
+                    endif
+                endif
+            endif
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

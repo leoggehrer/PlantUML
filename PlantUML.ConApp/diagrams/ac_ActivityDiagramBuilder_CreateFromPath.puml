@@ -1,0 +1,20 @@
+@startuml ActivityDiagramBuilder.CreateFromPath
+title ActivityDiagramBuilder.CreateFromPath
+start
+#LightSkyBlue:StringBuilder builder = new();
+#LightYellow:if (Directory.Exists(SourcePath)) then (<color:green>yes)
+  :iterator = sourceFiles.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        #WhiteSmoke:builder.AppendLine(source);
+  endwhile (<color:red>no)
+  #LightYellow:if (DiagramFolder.HasContent()) then (<color:green>yes)
+    #WhiteSmoke:diagramsDirectory = Path.Combine(TargetPath, DiagramFolder);
+  endif
+  #WhiteSmoke:Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, builder.ToString(), defines, Force);
+  #LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+    #WhiteSmoke:Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
+  endif
+endif
+stop
+@enduml

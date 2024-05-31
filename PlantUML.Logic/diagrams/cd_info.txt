@@ -1,0 +1,6 @@
+title:DiagramCreator (CD)
+fileName:cd_DiagramCreator.puml
+title:Color (CD)
+fileName:cd_Color.puml
+title:UMLItem (CD)
+fileName:cd_UMLItem.puml

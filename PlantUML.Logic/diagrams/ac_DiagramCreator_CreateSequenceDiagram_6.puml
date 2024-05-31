@@ -1,0 +1,23 @@
+@startuml DiagramCreator.CreateSequenceDiagram
+title DiagramCreator.CreateSequenceDiagram
+start
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodNode);
+#LightSkyBlue:var diagramData = new List<string>()\nvar messages = new List<string>()\nvar participants = new List<string>()\nvar participantAliasse = new List<string>()\nvar invocationExpressions = methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray()\nvar filteredInvocationExpressions = invocationExpressions.Where(ie => ie.Expression.ToString().Contains("ToString") == false && ie.Expression.ToString().Contains("ConfigureAwait") == false && ie.Expression.ToString().Contains("nameof") == false && ie.Expression.ToString().Contains("new") == false);
+#WhiteSmoke:participants.Add(CreateParticipant(methodNode));
+#WhiteSmoke:participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
+#WhiteSmoke:participantAliasse.Add(CreateParticipantAlias(methodNode!));
+#WhiteSmoke:participantAliasse.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipantAlias(ie)).Distinct());
+#WhiteSmoke:AnalyzeCallSequence(semanticModel, methodNode!, participantAliasse, messages, 0);
+while (i < participants.Count && i < participantAliasse.Count) is (<color:green>yes)
+  #LightYellow:if (isReferenced) then (<color:green>yes)
+    #WhiteSmoke:diagramData.Add($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}");
+  endif
+:i++;
+endwhile (<color:red>no)
+#LightYellow:if (messages.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Add("autonumber");
+  #WhiteSmoke:diagramData.AddRange(messages);
+endif
+#Lavender:return diagramData;
+stop
+@enduml

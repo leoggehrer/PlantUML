@@ -1,0 +1,188 @@
+@startuml DiagramCreator.AnalyzeStatement
+title DiagramCreator.AnalyzeStatement
+participant "AnalyzeStatement(SyntaxNode syntaxNode,List<string> diagramData,bool declarations,int level)" as AnalyzeStatement_p0_p1_p2_p3 #LightYellow
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "$"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(a0)" as _Color_Declaration_localDeclarationStatement_Declaration_SetIndent_a0 #LightGreen
+participant "expression.Replace(a0,a1)" as expression_Replace_a0_a1 #LightGreen
+participant "$"{Color.Expression}:{expression}".SetIndent(a0)" as _Color_Expression_expression_SetIndent_a0 #LightGreen
+participant "blockSyntax.ChildNodes()" as blockSyntax_ChildNodes #LightGreen
+participant "AnalyzeStatement(a0,a1,a2,a3)" as AnalyzeStatement_a0_a1_a2_a3 #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "$"{Color.If}:if({condition})then({yesLabel})".SetIndent(a0)" as _Color_If_if_condition_then_yesLabel_SetIndent_a0 #LightGreen
+participant ""endif".SetIndent(a0)" as _endif_SetIndent_a0 #LightGreen
+participant "$"else({noLabel})".SetIndent(a0)" as _else_noLabel_SetIndent_a0 #LightGreen
+participant "$"switch({switchStatement.Expression})".SetIndent(a0)" as _switch_switchStatement_Expression_SetIndent_a0 #LightGreen
+participant "$"{section.Labels}".Replace(a0,a1)" as _section_Labels_Replace_a0_a1 #LightGreen
+participant "labels.Contains(a0)" as labels_Contains_a0 #LightGreen
+participant "labels.Replace(a0,a1)" as labels_Replace_a0_a1 #LightGreen
+participant "$"{labels}".SetIndent(a0)" as _labels_SetIndent_a0 #LightGreen
+participant "section.ChildNodes()" as section_ChildNodes #LightGreen
+participant ""endswitch".SetIndent(a0)" as _endswitch_SetIndent_a0 #LightGreen
+participant "System.Diagnostics.Debug.WriteLine(a0)" as System_Diagnostics_Debug_WriteLine_a0 #LightGreen
+participant ""repeat".SetIndent(a0)" as _repeat_SetIndent_a0 #LightGreen
+participant "$"repeatwhile({doStatement.Condition})is({yesLabel})".SetIndent(a0)" as _repeat_while_doStatement_Condition_is_yesLabel_SetIndent_a0 #LightGreen
+participant "$"while({whileStatement.Condition})is({yesLabel})".SetIndent(a0)" as _while_whileStatement_Condition_is_yesLabel_SetIndent_a0 #LightGreen
+participant "$"endwhile({noLabel})".SetIndent(a0)" as _endwhile_noLabel_SetIndent_a0 #LightGreen
+participant "$"{Color.Declaration}:{forStatement.Declaration};".SetIndent(a0)" as _Color_Declaration_forStatement_Declaration_SetIndent_a0 #LightGreen
+participant "$"while({forStatement.Condition})is({yesLabel})".SetIndent(a0)" as _while_forStatement_Condition_is_yesLabel_SetIndent_a0 #LightGreen
+participant "$":{forStatement.Incrementors};".SetIndent(a0)" as _forStatement_Incrementors_SetIndent_a0 #LightGreen
+participant "$":iterator={forEachStatement.Expression}.GetIterator();".SetIndent(a0)" as _iterator_forEachStatement_Expression_GetIterator_SetIndent_a0 #LightGreen
+participant "$"while(iterator.MoveNext())is({yesLabel})".SetIndent(a0)" as _while_iterator_MoveNext_is_yesLabel_SetIndent_a0 #LightGreen
+participant "$":{forEachStatement.Identifier}=iterator.Current();".SetIndent(a0)" as _forEachStatement_Identifier_iterator_Current_SetIndent_a0 #LightGreen
+participant "statement.SetIndent(a0)" as statement_SetIndent_a0 #LightGreen
+participant "$"{Color.Return}:return{returnStatement.Expression};".SetIndent(a0)" as _Color_Return_return_returnStatement_Expression_SetIndent_a0 #LightGreen
+participant "$"{Color.Throw}:throw{throwStatement.Expression};".SetIndent(a0)" as _Color_Throw_throw_throwStatement_Expression_SetIndent_a0 #LightGreen
+participant ""kill".SetIndent(a0)" as _kill_SetIndent_a0 #LightGreen
+autonumber
+alt#LightBlue syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement && declarations
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_Declaration_localDeclarationStatement_Declaration_SetIndent_a0 : ($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ExpressionStatementSyntax expressionStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("System.Console.WriteLine", "PrintLine")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("Console.WriteLine", "PrintLine")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("System.Console.Write", "Print")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("Console.Write", "Print")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("System.Console.ReadLine", "ReadLine")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("Console.ReadLine", "ReadLine")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("System.Console.Read", "Read")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> expression_Replace_a0_a1 : ("Console.Read", "Read")
+ expression_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : expression
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.Expression}:{expression}".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_Expression_expression_SetIndent_a0 : ($"{Color.Expression}:{expression}".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is BlockSyntax blockSyntax
+ loop#LightCoral blockSyntax.ChildNodes()
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> blockSyntax_ChildNodes
+ alt#LightBlue node is StatementSyntax statementSyntax
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (statementSyntax, diagramData, declarations, level)
+ end
+ end
+ else
+ alt#LightBlue syntaxNode is IfStatementSyntax ifStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> string_Join_a0_a1 : (' ', ifStatement.Condition.ToString() .Replace(Environment.NewLine, " ") .Replace("\r", " ") .Split(' ', StringSplitOptions.RemoveEmptyEntries))
+ string_Join_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : condition
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.If}:if ({condition}) then ({yesLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_If_if_condition_then_yesLabel_SetIndent_a0 : ($"{Color.If}:if ({condition}) then ({yesLabel})".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (ifStatement.Statement, diagramData, declarations, level + 1)
+ alt#LightBlue ifStatement.Else != null
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (ifStatement.Else, diagramData, declarations, level + 1)
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("endif".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _endif_SetIndent_a0 : ("endif".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ElseClauseSyntax elseClause
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"else ({noLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _else_noLabel_SetIndent_a0 : ($"else ({noLabel})".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (elseClause.Statement, diagramData, declarations, level + 1)
+ else
+ alt#LightBlue syntaxNode is SwitchStatementSyntax switchStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"switch ({switchStatement.Expression})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _switch_switchStatement_Expression_SetIndent_a0 : ($"switch ({switchStatement.Expression})".SetIndent(level))
+ loop#LightCoral switchStatement.Sections
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> _section_Labels_Replace_a0_a1 : ("case", "case(")
+ _section_Labels_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : labels
+ alt#LightBlue labels.Contains("default:")
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> labels_Contains_a0 : ("default:")
+ labels_Contains_a0 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : result
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> labels_Replace_a0_a1 : ("default:", "case ( default )")
+ labels_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : labels
+ else
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> labels_Replace_a0_a1 : (":", " )")
+ labels_Replace_a0_a1 -[#blue]-> AnalyzeStatement_p0_p1_p2_p3 : labels
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{labels}".SetIndent(level + 1))
+ diagramData_Add_a0 -[#grey]> _labels_SetIndent_a0 : ($"{labels}".SetIndent(level + 1))
+ loop#LightCoral section.ChildNodes()
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> section_ChildNodes
+ alt#LightBlue node is StatementSyntax statementSyntax
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (statementSyntax, diagramData, declarations, level + 1)
+ end
+ end
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("endswitch".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _endswitch_SetIndent_a0 : ("endswitch".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is BreakStatementSyntax breakStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> System_Diagnostics_Debug_WriteLine_a0 : ($"{nameof(breakStatement)} is known but not used!")
+ else
+ alt#LightBlue syntaxNode is ContinueStatementSyntax continueStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> System_Diagnostics_Debug_WriteLine_a0 : ($"{nameof(continueStatement)} is known but not used!")
+ else
+ alt#LightBlue syntaxNode is DoStatementSyntax doStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("repeat".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _repeat_SetIndent_a0 : ("repeat".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (doStatement.Statement, diagramData, declarations, level + 1)
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _repeat_while_doStatement_Condition_is_yesLabel_SetIndent_a0 : ($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is WhileStatementSyntax whileStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _while_whileStatement_Condition_is_yesLabel_SetIndent_a0 : ($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (whileStatement.Statement, diagramData, declarations, level + 1)
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _endwhile_noLabel_SetIndent_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ForStatementSyntax forStatement
+ alt#LightBlue declarations
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_Declaration_forStatement_Declaration_SetIndent_a0 : ($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level))
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _while_forStatement_Condition_is_yesLabel_SetIndent_a0 : ($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (forStatement.Statement, diagramData, declarations, level + 1)
+ alt#LightBlue forStatement.Incrementors.Count > 0
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($":{forStatement.Incrementors};".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _forStatement_Incrementors_SetIndent_a0 : ($":{forStatement.Incrementors};".SetIndent(level))
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _endwhile_noLabel_SetIndent_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ForEachStatementSyntax forEachStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _iterator_forEachStatement_Expression_GetIterator_SetIndent_a0 : ($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _while_iterator_MoveNext_is_yesLabel_SetIndent_a0 : ($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level + 1))
+ diagramData_Add_a0 -[#grey]> _forEachStatement_Identifier_iterator_Current_SetIndent_a0 : ($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level + 1))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (forEachStatement.Statement, statements, declarations, level + 1)
+ loop#LightCoral statements
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : (statement.SetIndent(level + 1))
+ diagramData_Add_a0 -[#grey]> statement_SetIndent_a0 : (statement.SetIndent(level + 1))
+ end
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _endwhile_noLabel_SetIndent_a0 : ($"endwhile ({noLabel})".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ReturnStatementSyntax returnStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.Return}:return {returnStatement.Expression};".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_Return_return_returnStatement_Expression_SetIndent_a0 : ($"{Color.Return}:return {returnStatement.Expression};".SetIndent(level))
+ else
+ alt#LightBlue syntaxNode is ThrowStatementSyntax throwStatement
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ($"{Color.Throw}:throw {throwStatement.Expression};".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _Color_Throw_throw_throwStatement_Expression_SetIndent_a0 : ($"{Color.Throw}:throw {throwStatement.Expression};".SetIndent(level))
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> diagramData_Add_a0 : ("kill".SetIndent(level))
+ diagramData_Add_a0 -[#grey]> _kill_SetIndent_a0 : ("kill".SetIndent(level))
+ else
+ AnalyzeStatement_p0_p1_p2_p3 -[#grey]> System_Diagnostics_Debug_WriteLine_a0 : ($"{syntaxNode.GetType().Name} is unknown!")
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+end
+@enduml

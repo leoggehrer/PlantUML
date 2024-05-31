@@ -1,0 +1,30 @@
+@startuml DiagramCreator.CreateObjectState
+title DiagramCreator.CreateObjectState
+start
+#LightGreen:Params(object obj);
+#LightSkyBlue:var counter = 0\nvar result = new List<string>()\nBindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = obj.GetType().GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add("{static}" + $"{GetFieldName(item)} => {GetStateValue(obj, item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+:iterator = obj.GetType().GetAllClassFields().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{GetFieldName(item)} => {GetStateValue(obj, item)}");
+endwhile (<color:red>no)
+#LightYellow:if (obj.GetType().IsArray) then (<color:green>yes)
+  while (i < array!.Length) is (<color:green>yes)
+    #WhiteSmoke:result.Add($"{i} => {array.GetValue(i)}");
+  :i++;
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+@enduml

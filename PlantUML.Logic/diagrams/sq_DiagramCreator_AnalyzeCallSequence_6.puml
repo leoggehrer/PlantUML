@@ -1,0 +1,232 @@
+@startuml DiagramCreator.AnalyzeCallSequence
+title DiagramCreator.AnalyzeCallSequence
+participant "AnalyzeCallSequence(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,SyntaxNode syntaxNode,List<string> participantAliasse,List<string> messages,Dictionary<string, string> methodResults,int level)" as AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 #LightYellow
+participant "AnalyzeCallSequence(a0,a1,a2,a3,a4,a5,a6)" as AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 #LightGreen
+participant ".ChildNodes()" as _ChildNodes #LightGreen
+participant "CreateParticipantAlias(a0)" as CreateParticipantAlias_a0 #LightGreen
+participant "participantAliasse.Contains(a0)" as participantAliasse_Contains_a0 #LightGreen
+participant "CreateArgumentList(a0,a1)" as CreateArgumentList_a0_a1 #LightGreen
+participant "messages.Add(a0)" as messages_Add_a0 #LightGreen
+participant "$"{participantFrom}-[#grey]>{participantTo}:{argumentList}".SetIndent(a0)" as _participantFrom_grey_participantTo_argumentList_SetIndent_a0 #LightGreen
+participant "$"{argfrom}-[#grey]>{argTo}:{argArgumentList}".SetIndent(a0)" as _argfrom_grey_argTo_argArgumentList_SetIndent_a0 #LightGreen
+participant "$"{argfrom}-[#grey]>{argTo}".SetIndent(a0)" as _argfrom_grey_argTo_SetIndent_a0 #LightGreen
+participant "$"{participantFrom}-[#grey]>{participantTo}".SetIndent(a0)" as _participantFrom_grey_participantTo_SetIndent_a0 #LightGreen
+participant "$"{participantTo}-[#blue]->{participantFrom}:{resultVariable}".SetIndent(a0)" as _participantTo_blue_participantFrom_resultVariable_SetIndent_a0 #LightGreen
+participant "$"{participantTo}-[#blue]->{participantFrom}:{equalsVariable}".SetIndent(a0)" as _participantTo_blue_participantFrom_equalsVariable_SetIndent_a0 #LightGreen
+participant "semanticModel.GetSymbolInfo(a0)" as semanticModel_GetSymbolInfo_a0 #LightGreen
+participant ".ToLower()" as _ToLower #LightGreen
+participant "invocationExpression.ChildNodes()" as invocationExpression_ChildNodes #LightGreen
+participant "HasInvocationExpression(a0)" as HasInvocationExpression_a0 #LightGreen
+participant "doStatement.ChildNodes()" as doStatement_ChildNodes #LightGreen
+participant "$"loop#LightCoral{doStatement.Condition}".SetIndent(a0)" as _loop_LightCoral_doStatement_Condition_SetIndent_a0 #LightGreen
+participant "messages.AddRange(a0)" as messages_AddRange_a0 #LightGreen
+participant ""end".SetIndent(a0)" as _end_SetIndent_a0 #LightGreen
+participant "whileStatement.ChildNodes()" as whileStatement_ChildNodes #LightGreen
+participant "$"loop#LightCoral{whileStatement.Condition}".SetIndent(a0)" as _loop_LightCoral_whileStatement_Condition_SetIndent_a0 #LightGreen
+participant "forStatement.ChildNodes()" as forStatement_ChildNodes #LightGreen
+participant "$"loop#LightCoral{forStatement.Condition}".SetIndent(a0)" as _loop_LightCoral_forStatement_Condition_SetIndent_a0 #LightGreen
+participant "forEachStatement.ChildNodes()" as forEachStatement_ChildNodes #LightGreen
+participant "$"loop#LightCoral{forEachStatement.Expression}".SetIndent(a0)" as _loop_LightCoral_forEachStatement_Expression_SetIndent_a0 #LightGreen
+participant "ifStatement.ChildNodes()" as ifStatement_ChildNodes #LightGreen
+participant "$"alt#LightBlue{ifStatement.Condition}".SetIndent(a0)" as _alt_LightBlue_ifStatement_Condition_SetIndent_a0 #LightGreen
+participant "$"else".SetIndent(a0)" as _else_SetIndent_a0 #LightGreen
+participant "elseClause.ChildNodes()" as elseClause_ChildNodes #LightGreen
+participant "syntaxNode.ChildNodes()" as syntaxNode_ChildNodes #LightGreen
+autonumber
+alt#LightBlue syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement
+ loop#LightCoral localDeclarationStatement.Declaration.Variables
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level)
+ end
+ else
+ alt#LightBlue syntaxNode is VariableDeclaratorSyntax variableDeclarator
+ alt#LightBlue variableDeclarator.Initializer != null
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level)
+ end
+ loop#LightCoral variableDeclarator.Initializer?.Value?.ChildNodes() ?? []
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> _ChildNodes
+ alt#LightBlue item is InvocationExpressionSyntax varInvocationExpression
+ alt#LightBlue varInvocationExpression.ArgumentList?.Arguments.Count == 0
+ loop#LightCoral varInvocationExpression.ArgumentList.Arguments
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level)
+ end
+ end
+ end
+ end
+ else
+ alt#LightBlue syntaxNode is InvocationExpressionSyntax invocationExpression
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> CreateParticipantAlias_a0 : (methodDeclaration)
+ CreateParticipantAlias_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : participantFrom
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> CreateParticipantAlias_a0 : (invocationExpression)
+ CreateParticipantAlias_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : participantTo
+ alt#LightBlue participantAliasse.Contains(participantFrom) && participantAliasse.Contains(participantTo)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> participantAliasse_Contains_a0 : (participantFrom)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> participantAliasse_Contains_a0 : (participantTo)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> CreateArgumentList_a0_a1 : (invocationExpression, methodResults)
+ CreateArgumentList_a0_a1 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : argumentList
+ alt#LightBlue argumentList != "()"
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantFrom_grey_participantTo_argumentList_SetIndent_a0 : ($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level))
+ loop#LightCoral invocationExpression.ArgumentList.Arguments
+ alt#LightBlue item.Expression is InvocationExpressionSyntax argInvocationExpression
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> CreateParticipantAlias_a0 : (argInvocationExpression)
+ CreateParticipantAlias_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : argTo
+ alt#LightBlue participantAliasse.Contains(argfrom) && participantAliasse.Contains(argTo)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> participantAliasse_Contains_a0 : (argfrom)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> participantAliasse_Contains_a0 : (argTo)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> CreateArgumentList_a0_a1 : (invocationExpression, methodResults)
+ CreateArgumentList_a0_a1 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : argArgumentList
+ alt#LightBlue argArgumentList != "()"
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{argfrom} -[#grey]> {argTo} : {argArgumentList}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _argfrom_grey_argTo_argArgumentList_SetIndent_a0 : ($"{argfrom} -[#grey]> {argTo} : {argArgumentList}".SetIndent(level))
+ else
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{argfrom} -[#grey]> {argTo}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _argfrom_grey_argTo_SetIndent_a0 : ($"{argfrom} -[#grey]> {argTo}".SetIndent(level))
+ end
+ end
+ end
+ end
+ else
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantFrom} -[#grey]> {participantTo}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantFrom_grey_participantTo_SetIndent_a0 : ($"{participantFrom} -[#grey]> {participantTo}".SetIndent(level))
+ end
+ alt#LightBlue invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantTo_blue_participantFrom_resultVariable_SetIndent_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ else
+ alt#LightBlue invocationExpression.Parent is EqualsValueClauseSyntax equalsValueClause
+ alt#LightBlue equalsValueClause.Parent is VariableDeclaratorSyntax equalsVariableDeclarator
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {equalsVariable}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantTo_blue_participantFrom_equalsVariable_SetIndent_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {equalsVariable}".SetIndent(level))
+ end
+ else
+ alt#LightBlue invocationExpression.Parent is ReturnStatementSyntax
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantTo_blue_participantFrom_resultVariable_SetIndent_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ else
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> semanticModel_GetSymbolInfo_a0 : (invocationExpression)
+ semanticModel_GetSymbolInfo_a0 -[#blue]-> AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 : symbolInfo
+ alt#LightBlue symbolInfo.Symbol is IMethodSymbol methodSymbol
+ alt#LightBlue result?.ToLower() != "void"
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> _ToLower
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _participantTo_blue_participantFrom_resultVariable_SetIndent_a0 : ($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level))
+ end
+ end
+ end
+ end
+ end
+ else
+ loop#LightCoral invocationExpression.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> invocationExpression_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level)
+ end
+ end
+ else
+ alt#LightBlue syntaxNode is ExpressionStatementSyntax expressionStatement
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, expressionStatement.Expression, participantAliasse, messages, methodResults, level)
+ else
+ alt#LightBlue syntaxNode is AssignmentExpressionSyntax assignmentExpression
+ alt#LightBlue assignmentExpression.Right is InvocationExpressionSyntax rightExpression
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level)
+ end
+ else
+ alt#LightBlue syntaxNode is BinaryExpressionSyntax binaryExpression
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level)
+ else
+ alt#LightBlue syntaxNode is DoStatementSyntax doStatement && HasInvocationExpression(doStatement)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (doStatement)
+ loop#LightCoral doStatement.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> doStatement_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1)
+ end
+ alt#LightBlue innerMessages.Count > 0
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"loop#LightCoral {doStatement.Condition}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _loop_LightCoral_doStatement_Condition_SetIndent_a0 : ($"loop#LightCoral {doStatement.Condition}".SetIndent(level))
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_AddRange_a0 : (innerMessages)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ("end".SetIndent(level))
+ messages_Add_a0 -[#grey]> _end_SetIndent_a0 : ("end".SetIndent(level))
+ end
+ else
+ alt#LightBlue syntaxNode is WhileStatementSyntax whileStatement && HasInvocationExpression(whileStatement)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (whileStatement)
+ loop#LightCoral whileStatement.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> whileStatement_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1)
+ end
+ alt#LightBlue innerMessages.Count > 0
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"loop#LightCoral {whileStatement.Condition}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _loop_LightCoral_whileStatement_Condition_SetIndent_a0 : ($"loop#LightCoral {whileStatement.Condition}".SetIndent(level))
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_AddRange_a0 : (innerMessages)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ("end".SetIndent(level))
+ messages_Add_a0 -[#grey]> _end_SetIndent_a0 : ("end".SetIndent(level))
+ end
+ else
+ alt#LightBlue syntaxNode is ForStatementSyntax forStatement && HasInvocationExpression(forStatement)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (forStatement)
+ loop#LightCoral forStatement.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> forStatement_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1)
+ end
+ alt#LightBlue innerMessages.Count > 0
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"loop#LightCoral {forStatement.Condition}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _loop_LightCoral_forStatement_Condition_SetIndent_a0 : ($"loop#LightCoral {forStatement.Condition}".SetIndent(level))
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_AddRange_a0 : (innerMessages)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ("end".SetIndent(level))
+ messages_Add_a0 -[#grey]> _end_SetIndent_a0 : ("end".SetIndent(level))
+ end
+ else
+ alt#LightBlue syntaxNode is ForEachStatementSyntax forEachStatement && HasInvocationExpression(forEachStatement)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (forEachStatement)
+ loop#LightCoral forEachStatement.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> forEachStatement_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1)
+ end
+ alt#LightBlue innerMessages.Count > 0
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _loop_LightCoral_forEachStatement_Expression_SetIndent_a0 : ($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level))
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_AddRange_a0 : (innerMessages)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ("end".SetIndent(level))
+ messages_Add_a0 -[#grey]> _end_SetIndent_a0 : ("end".SetIndent(level))
+ end
+ else
+ alt#LightBlue syntaxNode is IfStatementSyntax ifStatement && HasInvocationExpression(ifStatement)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (ifStatement)
+ loop#LightCoral ifStatement.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> ifStatement_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1)
+ end
+ alt#LightBlue innerMessages.Count > 0
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"alt#LightBlue {ifStatement.Condition}".SetIndent(level))
+ messages_Add_a0 -[#grey]> _alt_LightBlue_ifStatement_Condition_SetIndent_a0 : ($"alt#LightBlue {ifStatement.Condition}".SetIndent(level))
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_AddRange_a0 : (innerMessages)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ("end".SetIndent(level))
+ messages_Add_a0 -[#grey]> _end_SetIndent_a0 : ("end".SetIndent(level))
+ end
+ else
+ alt#LightBlue syntaxNode is ElseClauseSyntax elseClause && HasInvocationExpression(elseClause)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> HasInvocationExpression_a0 : (elseClause)
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> messages_Add_a0 : ($"else".SetIndent(level))
+ messages_Add_a0 -[#grey]> _else_SetIndent_a0 : ($"else".SetIndent(level))
+ loop#LightCoral elseClause.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> elseClause_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1)
+ end
+ else
+ loop#LightCoral syntaxNode.ChildNodes()
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> syntaxNode_ChildNodes
+ AnalyzeCallSequence_p0_p1_p2_p3_p4_p5_p6 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4_a5_a6 : (semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level)
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+ end
+end
+@enduml

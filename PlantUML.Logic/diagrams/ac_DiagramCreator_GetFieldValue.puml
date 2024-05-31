@@ -1,0 +1,13 @@
+@startuml DiagramCreator.GetFieldValue
+title DiagramCreator.GetFieldValue
+start
+#LightGreen:Params(object obj,FieldInfo fieldInfo);
+#LightSkyBlue:object? value;
+#LightYellow:if (fieldInfo.IsStatic) then (<color:green>yes)
+  #WhiteSmoke:value = fieldInfo.GetValue(null);
+  else (<color:red>no)
+    #WhiteSmoke:value = fieldInfo.GetValue(obj);
+endif
+#Lavender:return value;
+stop
+@enduml

@@ -1,0 +1,4 @@
+title:All class diagrams (CD)
+fileName:CompleteClassDiagram.puml
+generated_on:31.05.2024 21:19:11
+generated_by:generated with the DiagramCreator by Prof.Gehrer

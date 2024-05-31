@@ -1,0 +1,33 @@
+@startuml PlantUMLApp.CreateDiagram
+title PlantUMLApp.CreateDiagram
+participant "CreateDiagram(MenuItem menuItem,bool force)" as CreateDiagram_p0_p1 #LightYellow
+participant "menuItem.Tag.Equals(a0,a1)" as menuItem_Tag_Equals_a0_a1 #LightGreen
+participant "builder.CreateFromPath()" as builder_CreateFromPath #LightGreen
+participant "builder.CreateFromFile()" as builder_CreateFromFile #LightGreen
+participant "StartProgressBar()" as StartProgressBar #LightGreen
+participant "Math.Max(a0,a1)" as Math_Max_a0_a1 #LightGreen
+participant "execute(a0,a1)" as execute_a0_a1 #LightGreen
+autonumber
+alt#LightBlue menuItem.Tag.Equals("paths", StringComparison.CurrentCultureIgnoreCase)
+ CreateDiagram_p0_p1 -[#grey]> menuItem_Tag_Equals_a0_a1 : ("paths", StringComparison.CurrentCultureIgnoreCase)
+ CreateDiagram_p0_p1 -[#grey]> builder_CreateFromPath
+ else
+ alt#LightBlue menuItem.Tag.Equals("file", StringComparison.CurrentCultureIgnoreCase)
+ CreateDiagram_p0_p1 -[#grey]> menuItem_Tag_Equals_a0_a1 : ("file", StringComparison.CurrentCultureIgnoreCase)
+ CreateDiagram_p0_p1 -[#grey]> builder_CreateFromFile
+ end
+end
+CreateDiagram_p0_p1 -[#grey]> StartProgressBar
+alt#LightBlue (DiagramBuilder & DiagramBuilderType.Activity) > 0
+ CreateDiagram_p0_p1 -[#grey]> Math_Max_a0_a1 : (0, MaxGenerationDepth - 1)
+ CreateDiagram_p0_p1 -[#grey]> execute_a0_a1 : (builder, menuItem)
+end
+alt#LightBlue (DiagramBuilder & DiagramBuilderType.Class) > 0
+ CreateDiagram_p0_p1 -[#grey]> Math_Max_a0_a1 : (0, MaxGenerationDepth - 1)
+ CreateDiagram_p0_p1 -[#grey]> execute_a0_a1 : (builder, menuItem)
+end
+alt#LightBlue (DiagramBuilder & DiagramBuilderType.Sequence) > 0
+ CreateDiagram_p0_p1 -[#grey]> Math_Max_a0_a1 : (0, MaxGenerationDepth - 1)
+ CreateDiagram_p0_p1 -[#grey]> execute_a0_a1 : (builder, menuItem)
+end
+@enduml

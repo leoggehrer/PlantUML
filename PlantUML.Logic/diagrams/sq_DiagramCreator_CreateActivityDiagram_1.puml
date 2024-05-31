@@ -1,0 +1,7 @@
+@startuml DiagramCreator.CreateActivityDiagram
+title DiagramCreator.CreateActivityDiagram
+participant "CreateActivityDiagram(string path,string source,string[] defines,bool force)" as CreateActivityDiagram_p0_p1_p2_p3 #LightYellow
+participant "CreateActivityDiagram(a0,a1,a2,a3,a4)" as CreateActivityDiagram_a0_a1_a2_a3_a4 #LightGreen
+autonumber
+CreateActivityDiagram_p0_p1_p2_p3 -[#grey]> CreateActivityDiagram_a0_a1_a2_a3_a4 : (path, source, defines, false, force)
+@enduml

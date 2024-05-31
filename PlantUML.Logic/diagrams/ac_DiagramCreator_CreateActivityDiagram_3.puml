@@ -1,0 +1,7 @@
+@startuml DiagramCreator.CreateActivityDiagram
+title DiagramCreator.CreateActivityDiagram
+start
+#LightGreen:Params(string path,string source,string[] defines,bool force);
+#WhiteSmoke:CreateActivityDiagram(path, source, defines, false, force);
+stop
+@enduml

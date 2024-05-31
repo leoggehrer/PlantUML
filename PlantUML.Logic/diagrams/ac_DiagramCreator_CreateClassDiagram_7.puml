@@ -1,0 +1,54 @@
+@startuml DiagramCreator.CreateClassDiagram
+title DiagramCreator.CreateClassDiagram
+start
+#LightGreen:Params(DiagramCreationFlags diagramCreationFlags,params Type[] types);
+#LightSkyBlue:var result = new List<string>()\nvar allTypes = new List<Type>(types);
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetDeclaredInterfaces().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().Where(t => t.IsInterface).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#WhiteSmoke:result.AddRange(CreateTypeDefinitions(allTypes, diagramCreationFlags));
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0) then (<color:green>yes)
+  #WhiteSmoke:result.AddRange(CreateTypeHirarchies(allTypes.Where(t => t.IsClass)));
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsInterface).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:extend.Extends.ForEach(e => result.AddRange(CreateTypeHierachy([extend.Type!, e.Type!])));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:result.AddRange(CreateTypeImplements(type));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ClassRelations) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:result.AddRange(CreateTypeRelations(type, 0));
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+@enduml

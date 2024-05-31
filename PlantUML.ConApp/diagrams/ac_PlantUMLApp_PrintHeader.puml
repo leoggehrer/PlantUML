@@ -1,0 +1,22 @@
+@startuml PlantUMLApp.PrintHeader
+title PlantUMLApp.PrintHeader
+start
+#LightSkyBlue:var count = 0\nvar saveForeColor = ForegroundColor;
+#WhiteSmoke:ForegroundColor = ConsoleColor.Green;
+#WhiteSmoke:Clear();
+#WhiteSmoke:count = PrintLine(nameof(PlantUML));
+#WhiteSmoke:PrintLine('=', count);
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:ForegroundColor = saveForeColor;
+#WhiteSmoke:PrintLine($"Force flag: {Force}");
+#WhiteSmoke:PrintLine($"Max. sub path depth: {MaxSubPathDepth}");
+#WhiteSmoke:PrintLine($"Max. generat. depth: {MaxGenerationDepth}");
+#WhiteSmoke:PrintLine($"Projets path: {ProjectsPath}");
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:PrintLine($"Target path: {TargetPath}");
+#WhiteSmoke:PrintLine($"Diagram folder: {DiagramFolder}");
+#WhiteSmoke:PrintLine($"Diagram complete: {CreateCompleteDiagram}");
+#WhiteSmoke:PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
+#WhiteSmoke:PrintLine();
+stop
+@enduml

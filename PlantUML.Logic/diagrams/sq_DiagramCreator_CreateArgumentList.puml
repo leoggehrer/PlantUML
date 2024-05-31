@@ -1,0 +1,16 @@
+@startuml DiagramCreator.CreateArgumentList
+title DiagramCreator.CreateArgumentList
+participant "CreateArgumentList(InvocationExpressionSyntax invocationExpression,Dictionary<string, string> methodResults)" as CreateArgumentList_p0_p1 #LightYellow
+participant "CreateParticipantAlias(a0)" as CreateParticipantAlias_a0 #LightGreen
+participant "methodResults.TryGetValue(a0,a1)" as methodResults_TryGetValue_a0_a1 #LightGreen
+autonumber
+loop#LightCoral arguments
+ alt#LightBlue item.Expression is InvocationExpressionSyntax argumentInvocationExpression
+ CreateArgumentList_p0_p1 -[#grey]> CreateParticipantAlias_a0 : (argumentInvocationExpression)
+ CreateParticipantAlias_a0 -[#blue]-> CreateArgumentList_p0_p1 : participant
+ alt#LightBlue methodResults.TryGetValue(participant, out string? value)
+ CreateArgumentList_p0_p1 -[#grey]> methodResults_TryGetValue_a0_a1 : (participant, out string? value)
+ end
+ end
+end
+@enduml

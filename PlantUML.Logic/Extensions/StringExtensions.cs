@@ -23,7 +23,7 @@ namespace PlantUML.Logic.Extensions
         /// <value>
         /// The string used for indenting.
         /// </value>
-        public static string IndentSpace { get; set; } = "    ";
+        public static string IndentSpace { get; set; } = "  ";
         /// <summary>
         /// Gets or sets the text that represents a null value.
         /// </summary>
@@ -456,7 +456,7 @@ namespace PlantUML.Logic.Extensions
             if (text != null)
             {
                 for (int i = 0; i < count; i++)
-                sb.Append(indentSpace);        // spaces for one indent.
+                    sb.Append(indentSpace);        // spaces for one indent.
             }
             sb.Append(text);
             return sb.ToString();

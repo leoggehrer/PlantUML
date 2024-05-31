@@ -1,0 +1,81 @@
+@startuml DiagramCreator.CreateItemMembers
+title DiagramCreator.CreateItemMembers
+start
+#LightGreen:Params(Type type);
+#LightSkyBlue:var counter = 0\nvar result = new List<string>()\nBindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = type.GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{(item.IsPublic ? "+" : "-")}" + " {static}" + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+:iterator = type.GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix}" + " " + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Static | BindingFlags.Public;
+:iterator = type.GetProperties(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.CanRead) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add(" + {static}" + $"{item.PropertyType.GetSourceTypeName()} get{item.Name}()");
+    endif
+    #LightYellow:if (item.CanWrite) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add(" + {static}" + $"set{item.Name}({item.PropertyType.GetSourceTypeName()} value)");
+    endif
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
+:iterator = type.GetProperties(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.CanRead) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add($" + {item.PropertyType.GetSourceTypeName()} get{item.Name}()");
+    endif
+    #LightYellow:if (item.CanWrite) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add($" + set{item.Name}({item.PropertyType.GetSourceTypeName()} value)");
+    endif
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = type.GetMethods(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix} " + "{static}" + $"{item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+:iterator = type.GetMethods(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix} {item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})");
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

@@ -1,0 +1,25 @@
+@startuml UMLDiagramBuilder.ReadDefinesFromProjectFiles
+title UMLDiagramBuilder.ReadDefinesFromProjectFiles
+start
+#LightGreen:Params(string path);
+#LightSkyBlue:List<string> result = [];
+#LightYellow:if (Directory.Exists(path)) then (<color:green>yes)
+  :iterator = files.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        :iterator = lines.GetIterator();
+        while (iterator.MoveNext()) is (<color:green>yes)
+          :line = iterator.Current();
+                #LightYellow:if (defines.HasContent()) then (<color:green>yes)
+                  :iterator = defines.Split(';', StringSplitOptions.RemoveEmptyEntries).GetIterator();
+                  while (iterator.MoveNext()) is (<color:green>yes)
+                    :define = iterator.Current();
+                              #WhiteSmoke:result.Add(define);
+                  endwhile (<color:red>no)
+                endif
+        endwhile (<color:red>no)
+  endwhile (<color:red>no)
+endif
+#Lavender:return result.Distinct().ToArray();
+stop
+@enduml

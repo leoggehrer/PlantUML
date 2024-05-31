@@ -1,0 +1,11 @@
+@startuml DiagramCreator.FindTypeDeclaration
+title DiagramCreator.FindTypeDeclaration
+start
+#LightGreen:Params(SemanticModel semanticModel,BaseTypeSyntax baseTypeSyntax);
+#LightSkyBlue:var result = default(TypeDeclarationSyntax)\nvar typeDeclarations = semanticModel.SyntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>();
+#LightYellow:if (baseTypeSyntax.Type is IdentifierNameSyntax identifierName) then (<color:green>yes)
+  #WhiteSmoke:result = typeDeclarations.FirstOrDefault(t => t.Identifier.Text == identifierText);
+endif
+#Lavender:return result;
+stop
+@enduml

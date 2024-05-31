@@ -1,0 +1,11 @@
+@startuml DiagramCreator.CreateTypeImplements
+title DiagramCreator.CreateTypeImplements
+participant "CreateTypeImplements(Type type)" as CreateTypeImplements_p0 #LightYellow
+participant "type.GetDeclaredInterfaces()" as type_GetDeclaredInterfaces #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral type.GetDeclaredInterfaces()
+ CreateTypeImplements_p0 -[#grey]> type_GetDeclaredInterfaces
+ CreateTypeImplements_p0 -[#grey]> result_Add_a0 : ($"{typeInfo.Name} {lolypop} {type.Name}")
+end
+@enduml

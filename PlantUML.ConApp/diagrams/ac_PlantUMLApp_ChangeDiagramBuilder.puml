@@ -1,0 +1,6 @@
+@startuml PlantUMLApp.ChangeDiagramBuilder
+title PlantUMLApp.ChangeDiagramBuilder
+start
+#WhiteSmoke:DiagramBuilder = DiagramBuilder.ToString().ToLower() switch { "all" => DiagramBuilderType.Activity, "activity" => DiagramBuilderType.Class, "class" => DiagramBuilderType.Sequence, "sequence" => DiagramBuilderType.All, _ => DiagramBuilder, };
+stop
+@enduml

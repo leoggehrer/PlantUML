@@ -1,0 +1,44 @@
+@startuml DiagramCreator.CreateRelations
+title DiagramCreator.CreateRelations
+start
+#LightGreen:Params(IEnumerable<string> diagramData);
+#LightSkyBlue:var result = new List<string>()\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+:iterator = diagramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = true;
+      #WhiteSmoke:isFieldRange = false;
+      #WhiteSmoke:isPropertyRange = false;
+      #WhiteSmoke:isMethodRange = false;
+      else (<color:red>no)
+        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+          #WhiteSmoke:isFieldRange = true;
+          else (<color:red>no)
+            #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = false;
+              #WhiteSmoke:isPropertyRange = true;
+              #WhiteSmoke:isMethodRange = false;
+              else (<color:red>no)
+                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                  #WhiteSmoke:isFieldRange = false;
+                  #WhiteSmoke:isPropertyRange = false;
+                  #WhiteSmoke:isMethodRange = true;
+                  else (<color:red>no)
+                    #LightYellow:if (isTypeDefinition && line.Contains('}')) then (<color:green>yes)
+                      #WhiteSmoke:isTypeDefinition = false;
+                      #WhiteSmoke:isFieldRange = false;
+                      #WhiteSmoke:isPropertyRange = false;
+                      #WhiteSmoke:isMethodRange = false;
+                    endif
+                endif
+            endif
+        endif
+    endif
+    #LightYellow:if (isTypeDefinition && isFieldRange) then (<color:green>yes)
+      #WhiteSmoke:CreateItemRelations(line, diagramData, result);
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

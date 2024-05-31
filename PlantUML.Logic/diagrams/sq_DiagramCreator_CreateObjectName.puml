@@ -1,0 +1,25 @@
+@startuml DiagramCreator.CreateObjectName
+title DiagramCreator.CreateObjectName
+participant "CreateObjectName(Object obj)" as CreateObjectName_p0 #LightYellow
+participant "obj.GetType()" as obj_GetType #LightGreen
+participant "obj.GetType().Name.Replace(a0,a1)" as obj_GetType_Name_Replace_a0_a1 #LightGreen
+participant "obj.GetType().GetGenericArguments()" as obj_GetType_GetGenericArguments #LightGreen
+participant "obj.GetHashCode()" as obj_GetHashCode #LightGreen
+autonumber
+alt#LightBlue obj.GetType().IsGenericType
+ CreateObjectName_p0 -[#grey]> obj_GetType
+ CreateObjectName_p0 -[#grey]> obj_GetType_Name_Replace_a0_a1 : ("`1", string.Empty)
+ obj_GetType_Name_Replace_a0_a1 -[#blue]-> CreateObjectName_p0 : result
+ loop#LightCoral obj.GetType().GetGenericArguments()
+ CreateObjectName_p0 -[#grey]> obj_GetType_GetGenericArguments
+ end
+ else
+ alt#LightBlue obj.GetType().IsArray
+ CreateObjectName_p0 -[#grey]> obj_GetType
+ CreateObjectName_p0 -[#grey]> obj_GetType_Name_Replace_a0_a1 : ("[]", "Array")
+ obj_GetType_Name_Replace_a0_a1 -[#blue]-> CreateObjectName_p0 : result
+ else
+ end
+end
+CreateObjectName_p0 -[#grey]> obj_GetHashCode
+@enduml

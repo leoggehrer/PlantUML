@@ -1,0 +1,23 @@
+@startuml DiagramCreator.ReadCustomUMLFromFle
+title DiagramCreator.ReadCustomUMLFromFle
+participant "ReadCustomUMLFromFle(string filePath)" as ReadCustomUMLFromFle_p0 #LightYellow
+participant "File.Exists(a0)" as File_Exists_a0 #LightGreen
+participant "File.ReadAllLines(a0)" as File_ReadAllLines_a0 #LightGreen
+participant "ReadCustomUML(a0)" as ReadCustomUML_a0 #LightGreen
+participant "customUMLLines.Insert(a0,a1)" as customUMLLines_Insert_a0_a1 #LightGreen
+participant "customUMLLines.Add(a0)" as customUMLLines_Add_a0 #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+autonumber
+alt#LightBlue File.Exists(filePath)
+ ReadCustomUMLFromFle_p0 -[#grey]> File_Exists_a0 : (filePath)
+ ReadCustomUMLFromFle_p0 -[#grey]> File_ReadAllLines_a0 : (filePath)
+ File_ReadAllLines_a0 -[#blue]-> ReadCustomUMLFromFle_p0 : lines
+ ReadCustomUMLFromFle_p0 -[#grey]> ReadCustomUML_a0 : (lines)
+ ReadCustomUML_a0 -[#blue]-> ReadCustomUMLFromFle_p0 : customUMLLines
+ alt#LightBlue customUMLLines.Count > 0
+ ReadCustomUMLFromFle_p0 -[#grey]> customUMLLines_Insert_a0_a1 : (0, $"' {CustomUMLLabel}")
+ ReadCustomUMLFromFle_p0 -[#grey]> customUMLLines_Add_a0 : ($"' {CustomUMLLabel}")
+ end
+ ReadCustomUMLFromFle_p0 -[#grey]> result_AddRange_a0 : (customUMLLines)
+end
+@enduml

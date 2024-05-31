@@ -1,0 +1,7 @@
+@startuml DiagramCreator.IsAutoProperty
+title DiagramCreator.IsAutoProperty
+participant "IsAutoProperty(PropertyDeclarationSyntax propertydeclaration)" as IsAutoProperty_p0 #LightYellow
+participant "accessorList.Accessors.All(a0)" as accessorList_Accessors_All_a0 #LightGreen
+autonumber
+IsAutoProperty_p0 -[#grey]> accessorList_Accessors_All_a0 : (accessor => accessor.Body == null && accessor.ExpressionBody == null)
+@enduml

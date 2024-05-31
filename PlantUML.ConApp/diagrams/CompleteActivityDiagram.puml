@@ -1,0 +1,176 @@
+@startuml CompleteActivityDiagram
+header
+generated on 31.05.2024 21:19:11
+end header
+title CompleteActivityDiagram
+start
+note right:  ActivityDiagramBuilder.CreateFromFile
+#LightSkyBlue:var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty\nvar defines = ReadDefinesFromProjectFiles(fileDirectory!)\nvar diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory\nvar source = File.ReadAllText(SourcePath!);
+#WhiteSmoke:Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, source, defines, Force);
+#LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+  #WhiteSmoke:Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
+endif
+stop
+start
+note right:  ActivityDiagramBuilder.CreateFromPath
+#LightSkyBlue:StringBuilder builder = new();
+#LightYellow:if (Directory.Exists(SourcePath)) then (<color:green>yes)
+  :iterator = sourceFiles.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        #WhiteSmoke:builder.AppendLine(source);
+  endwhile (<color:red>no)
+  #LightYellow:if (DiagramFolder.HasContent()) then (<color:green>yes)
+    #WhiteSmoke:diagramsDirectory = Path.Combine(TargetPath, DiagramFolder);
+  endif
+  #WhiteSmoke:Logic.DiagramCreator.CreateActivityDiagram(diagramsDirectory, builder.ToString(), defines, Force);
+  #LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+    #WhiteSmoke:Logic.DiagramCreator.CreateCompleteActivityDiagram(diagramsDirectory, Force);
+  endif
+endif
+stop
+start
+note right:  ClassDiagramBuilder.CreateFromFile
+#LightSkyBlue:var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty\nvar defines = ReadDefinesFromProjectFiles(fileDirectory!)\nvar diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory\nvar source = File.ReadAllText(SourcePath!);
+#WhiteSmoke:Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, defines, Force);
+#LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+  #WhiteSmoke:Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
+endif
+stop
+start
+note right:  ClassDiagramBuilder.CreateFromPath
+#LightSkyBlue:StringBuilder builder = new();
+#LightYellow:if (Directory.Exists(SourcePath)) then (<color:green>yes)
+  :iterator = sourceFiles.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        #WhiteSmoke:builder.AppendLine(source);
+  endwhile (<color:red>no)
+  #LightYellow:if (DiagramFolder.HasContent()) then (<color:green>yes)
+    #WhiteSmoke:diagramsDirectory = Path.Combine(TargetPath, DiagramFolder);
+  endif
+  #WhiteSmoke:Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, builder.ToString(), defines, Force);
+  #LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+    #WhiteSmoke:Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
+  endif
+endif
+stop
+start
+note right:  PlantUMLApp.CreateMenuItems
+#LightSkyBlue:var mnuIdx = 0\nvar menuItems = new List<MenuItem> { CreateMenuSeparator(), new() { Key = $"{++mnuIdx}", Text = ToLabelText("Force", "Change force flag"), Action = (self) => ChangeForce(), }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Path-Depth", "Change max sub path depth"), Action = (self) => ChangeMaxSubPathDepth(), }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Generation-Depth", "Change max generation depth"), Action = (self) => ChangeMaxGenerationDepth(), }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Projects path", "Change projects path"), Action = (self) => { var savePath = ProjectsPath; ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth + 1, [ SourcePath ]); if (savePath != ProjectsPath) { PageIndex = 0; } if (savePath == TargetPath) { TargetPath = ProjectsPath; } }, }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Target path", "Change target path"), Action = (self) => { var savePath = TargetPath; TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth + 1, [ SourcePath ]); if (savePath != TargetPath) { PageIndex = 0; } }, }, CreateMenuSeparator(), new() { Key = $"{++mnuIdx}", Text = ToLabelText("Create", "Change create complete diagram"), Action = (self) => CreateCompleteDiagram = !CreateCompleteDiagram, }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Folder", "Change diagram folder"), Action = (self) => ChangeDiagramFolder(), }, new() { Key = $"{++mnuIdx}", Text = ToLabelText("Builder", "Change diagram builder"), Action = (self) => ChangeDiagramBuilder(), }, CreateMenuSeparator(), };
+#LightYellow:if (mnuIdx % 10 != 0) then (<color:green>yes)
+  #WhiteSmoke:mnuIdx += 10 - (mnuIdx % 10);
+endif
+#LightSkyBlue:var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth)) .Where(p => TemplatePath.ContainsFiles(p, "*.cs")) .OrderBy(p => p) .ToArray();
+#WhiteSmoke:menuItems.AddRange(CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) => { var subPath = item.Replace(ProjectsPath, string.Empty); var targetPath = item.Replace(ProjectsPath, TargetPath); PrintHeader(); if (subPath.IsNullOrEmpty()) { subPath = $"{Path.DirectorySeparatorChar}{ProjectsPath.Split(Path.DirectorySeparatorChar).LastOrDefault()}"; } menuItem.Text = ToLabelText("Path", $"{subPath}"); menuItem.Tag = "paths"; menuItem.Action = (self) => CreateDiagram(self, Force); menuItem.Params = new() { { "sourcePath", item }, { "targetPath", targetPath } }; }));
+#Lavender:return [.. menuItems.Union(CreateExitMenuItems())];
+stop
+start
+note right:  PlantUMLApp.PrintHeader
+#LightSkyBlue:var count = 0\nvar saveForeColor = ForegroundColor;
+#WhiteSmoke:ForegroundColor = ConsoleColor.Green;
+#WhiteSmoke:Clear();
+#WhiteSmoke:count = PrintLine(nameof(PlantUML));
+#WhiteSmoke:PrintLine('=', count);
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:ForegroundColor = saveForeColor;
+#WhiteSmoke:PrintLine($"Force flag: {Force}");
+#WhiteSmoke:PrintLine($"Max. sub path depth: {MaxSubPathDepth}");
+#WhiteSmoke:PrintLine($"Max. generat. depth: {MaxGenerationDepth}");
+#WhiteSmoke:PrintLine($"Projets path: {ProjectsPath}");
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:PrintLine($"Target path: {TargetPath}");
+#WhiteSmoke:PrintLine($"Diagram folder: {DiagramFolder}");
+#WhiteSmoke:PrintLine($"Diagram complete: {CreateCompleteDiagram}");
+#WhiteSmoke:PrintLine($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
+#WhiteSmoke:PrintLine();
+stop
+start
+note right:  PlantUMLApp.Run
+#LightGreen:Params(string[] args);
+#WhiteSmoke:base.Run(args);
+stop
+start
+note right:  PlantUMLApp.ChangeDiagramFolder
+#WhiteSmoke:DiagramFolder = ReadLine("Enter the diagram folder name: ").Trim();
+stop
+start
+note right:  PlantUMLApp.ChangeMaxGenerationDepth
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:Print("Enter the maximum generation depth: ");
+#LightYellow:if (int.TryParse(ReadLine(), out var result)) then (<color:green>yes)
+  #WhiteSmoke:MaxGenerationDepth = result;
+endif
+stop
+start
+note right:  PlantUMLApp.ChangeDiagramBuilder
+#WhiteSmoke:DiagramBuilder = DiagramBuilder.ToString().ToLower() switch { "all" => DiagramBuilderType.Activity, "activity" => DiagramBuilderType.Class, "class" => DiagramBuilderType.Sequence, "sequence" => DiagramBuilderType.All, _ => DiagramBuilder, };
+stop
+start
+note right:  PlantUMLApp.CreateDiagram
+#LightGreen:Params(MenuItem menuItem,bool force);
+#LightSkyBlue:var sourcePath = menuItem.Params["sourcePath"]?.ToString() ?? string.Empty\nvar targetPath = menuItem.Params["targetPath"]?.ToString() ?? string.Empty;
+#WhiteSmoke:StartProgressBar();
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Activity) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Class) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+stop
+start
+note right:  Program.Main
+#LightGreen:Params(string[] args);
+#LightSkyBlue:PlantUMLApp app = new();
+#WhiteSmoke:app.Run(args);
+stop
+start
+note right:  SequenceDiagramBuilder.CreateFromFile
+#LightSkyBlue:var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty\nvar defines = ReadDefinesFromProjectFiles(fileDirectory!)\nvar diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory\nvar source = File.ReadAllText(SourcePath!);
+#WhiteSmoke:Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, source, defines, Force);
+stop
+start
+note right:  SequenceDiagramBuilder.CreateFromPath
+#LightSkyBlue:StringBuilder builder = new();
+#LightYellow:if (Directory.Exists(SourcePath)) then (<color:green>yes)
+  :iterator = sourceFiles.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        #WhiteSmoke:builder.AppendLine(source);
+  endwhile (<color:red>no)
+  #LightYellow:if (DiagramFolder.HasContent()) then (<color:green>yes)
+    #WhiteSmoke:diagramsDirectory = Path.Combine(TargetPath, DiagramFolder);
+  endif
+  #WhiteSmoke:Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, builder.ToString(), defines, Force);
+endif
+stop
+start
+note right:  UMLDiagramBuilder.ReadDefinesFromProjectFiles
+#LightGreen:Params(string path);
+#LightSkyBlue:List<string> result = [];
+#LightYellow:if (Directory.Exists(path)) then (<color:green>yes)
+  :iterator = files.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :file = iterator.Current();
+        :iterator = lines.GetIterator();
+        while (iterator.MoveNext()) is (<color:green>yes)
+          :line = iterator.Current();
+                #LightYellow:if (defines.HasContent()) then (<color:green>yes)
+                  :iterator = defines.Split(';', StringSplitOptions.RemoveEmptyEntries).GetIterator();
+                  while (iterator.MoveNext()) is (<color:green>yes)
+                    :define = iterator.Current();
+                              #WhiteSmoke:result.Add(define);
+                  endwhile (<color:red>no)
+                endif
+        endwhile (<color:red>no)
+  endwhile (<color:red>no)
+endif
+#Lavender:return result.Distinct().ToArray();
+stop
+footer
+generated with the DiagramCreator by Prof.Gehrer
+end footer
+@enduml

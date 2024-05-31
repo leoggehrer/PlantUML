@@ -1,0 +1,29 @@
+@startuml DiagramCreator.CreateActivityDiagram
+title DiagramCreator.CreateActivityDiagram
+start
+#LightGreen:Params(MethodDeclarationSyntax methodNode,bool declarations);
+#LightSkyBlue:var diagramData = new List<string>()\nvar islocalDeclaration = false\nvar parameters = methodNode.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
+#LightYellow:if (paramsStatement.HasContent()) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Add($"{Color.Parameters}:Params{paramsStatement};");
+endif
+:iterator = methodNode?.Body?.Statements ?? [].GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :statement = iterator.Current();
+    #LightYellow:if (statement is LocalDeclarationStatementSyntax localDeclarationStatement) then (<color:green>yes)
+      #LightYellow:if (islocalDeclaration == false) then (<color:green>yes)
+        #WhiteSmoke:islocalDeclaration = true;
+        #WhiteSmoke:diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration}");
+        else (<color:red>no)
+          #WhiteSmoke:diagramData[^1] += $"\\n{localDeclarationStatement.Declaration}";
+      endif
+      else (<color:red>no)
+        #LightYellow:if (islocalDeclaration) then (<color:green>yes)
+          #WhiteSmoke:islocalDeclaration = false;
+          #WhiteSmoke:diagramData[^1] += ";";
+        endif
+        #WhiteSmoke:AnalyzeStatement(statement, diagramData, declarations, 0);
+    endif
+endwhile (<color:red>no)
+#Lavender:return FormatActivityDiagram(diagramData);
+stop
+@enduml

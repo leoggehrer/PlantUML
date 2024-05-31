@@ -1,0 +1,17 @@
+@startuml DiagramCreator.CreateTypeHirarchies
+title DiagramCreator.CreateTypeHirarchies
+participant "CreateTypeHirarchies(IEnumerable<Type> types)" as CreateTypeHirarchies_p0 #LightYellow
+participant "CreateDiagramHirarchies(a0)" as CreateDiagramHirarchies_a0 #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "CreateTypeHierachy(a0)" as CreateTypeHierachy_a0 #LightGreen
+participant "result.Distinct()" as result_Distinct #LightGreen
+autonumber
+loop#LightCoral CreateDiagramHirarchies(types)
+ CreateTypeHirarchies_p0 -[#grey]> CreateDiagramHirarchies_a0 : (types)
+ CreateDiagramHirarchies_a0 -[#blue]-> CreateTypeHirarchies_p0 : result
+ CreateTypeHirarchies_p0 -[#grey]> result_AddRange_a0 : (CreateTypeHierachy(item))
+ result_AddRange_a0 -[#grey]> CreateTypeHierachy_a0 : (CreateTypeHierachy(item))
+end
+CreateTypeHirarchies_p0 -[#grey]> result_Distinct
+result_Distinct -[#blue]-> CreateTypeHirarchies_p0 : result
+@enduml

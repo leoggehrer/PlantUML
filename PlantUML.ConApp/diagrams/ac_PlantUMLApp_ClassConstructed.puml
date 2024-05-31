@@ -1,0 +1,5 @@
+@startuml PlantUMLApp.ClassConstructed
+title PlantUMLApp.ClassConstructed
+start
+stop
+@enduml

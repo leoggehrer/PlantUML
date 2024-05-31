@@ -1,0 +1,13 @@
+@startuml DiagramCreator.CreateTypeImplements
+title DiagramCreator.CreateTypeImplements
+start
+#LightGreen:Params(Type type);
+#LightSkyBlue:var result = new List<string>()\nvar lolypop = "()-";
+:iterator = type.GetDeclaredInterfaces().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :typeInfo = iterator.Current();
+    #WhiteSmoke:result.Add($"{typeInfo.Name} {lolypop} {type.Name}");
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

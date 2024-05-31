@@ -1,0 +1,8 @@
+@startuml DiagramCreator.CreateParticipantAlias
+title DiagramCreator.CreateParticipantAlias
+start
+#LightGreen:Params(InvocationExpressionSyntax invocationExpression);
+#LightSkyBlue:var identifier = invocationExpression.Expression.ToString()\nvar arguments = invocationExpression.ArgumentList?.Arguments ?? []\nvar result = $"{identifier}" + (arguments.Any() ? $"_{string.Join("_", arguments.Select((item, index) => $"a{index}"))}" : string.Empty);
+#Lavender:return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
+stop
+@enduml

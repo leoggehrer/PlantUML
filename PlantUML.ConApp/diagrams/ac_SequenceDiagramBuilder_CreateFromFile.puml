@@ -1,0 +1,7 @@
+@startuml SequenceDiagramBuilder.CreateFromFile
+title SequenceDiagramBuilder.CreateFromFile
+start
+#LightSkyBlue:var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty\nvar defines = ReadDefinesFromProjectFiles(fileDirectory!)\nvar diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory\nvar source = File.ReadAllText(SourcePath!);
+#WhiteSmoke:Logic.DiagramCreator.CreateSequenceDiagram(diagramsDirectory, source, defines, Force);
+stop
+@enduml

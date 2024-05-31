@@ -1,0 +1,39 @@
+@startuml DiagramCreator.CreateTypeDefinition
+title DiagramCreator.CreateTypeDefinition
+start
+#LightGreen:Params(Type type,DiagramCreationFlags diagramCreationFlags);
+#LightSkyBlue:var result = new List<string>();
+#LightYellow:if (type.IsEnum) then (<color:green>yes)
+  #WhiteSmoke:result.Add($"enum {type.Name} #light" + $"blue " + "{");
+  #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.EnumMembers) > 0) then (<color:green>yes)
+    :iterator = Enum.GetValues(type).GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :item = iterator.Current();
+            #WhiteSmoke:result.Add($" {item}");
+    endwhile (<color:red>no)
+  endif
+  #WhiteSmoke:result.Add("}");
+  else (<color:red>no)
+    #LightYellow:if (type.IsClass) then (<color:green>yes)
+      #LightYellow:if (type.IsAbstract) then (<color:green>yes)
+        #WhiteSmoke:result.Add($"{prefix}abstract class {type.Name} {Color.Class} " + "{");
+        else (<color:red>no)
+          #WhiteSmoke:result.Add($"{prefix}class {type.Name} {Color.AbstractClass} " + "{");
+      endif
+      #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ClassMembers) > 0) then (<color:green>yes)
+        #WhiteSmoke:result.AddRange(CreateItemMembers(type).SetIndent(1));
+      endif
+      #WhiteSmoke:result.Add("}");
+      else (<color:red>no)
+        #LightYellow:if (type.IsInterface) then (<color:green>yes)
+          #WhiteSmoke:result.Add($"interface {type.Name} {Color.Interface} " + "{");
+          #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceMembers) > 0) then (<color:green>yes)
+            #WhiteSmoke:result.AddRange(CreateItemMembers(type).SetIndent(1));
+          endif
+          #WhiteSmoke:result.Add("}");
+        endif
+    endif
+endif
+#Lavender:return result;
+stop
+@enduml

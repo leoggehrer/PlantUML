@@ -1,0 +1,7 @@
+@startuml PlantUMLApp.Run
+title PlantUMLApp.Run
+start
+#LightGreen:Params(string[] args);
+#WhiteSmoke:base.Run(args);
+stop
+@enduml

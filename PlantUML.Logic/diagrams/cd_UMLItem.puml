@@ -1,0 +1,8 @@
+@startuml UMLItem
+title UMLItem
+ class UMLItem #GhostWhite {
+---
+---
+}
+UMLItem <|-- List
+@enduml

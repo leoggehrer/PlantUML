@@ -1,0 +1,66 @@
+@startuml DiagramCreator.CreateObjectDiagram
+title DiagramCreator.CreateObjectDiagram
+participant "CreateObjectDiagram(int maxDeep,params object[] objects)" as CreateObjectDiagram_p0_p1 #LightYellow
+participant "lines.Add(a0)" as lines_Add_a0 #LightGreen
+participant "lines.AddRange(a0)" as lines_AddRange_a0 #LightGreen
+participant "DiagramCreator.CreateObjectState(obj).SetIndent(a0)" as DiagramCreator_CreateObjectState_obj_SetIndent_a0 #LightGreen
+participant "CreateCollectionState(collection).SetIndent(a0)" as CreateCollectionState_collection_SetIndent_a0 #LightGreen
+participant "createdObjects.Contains(a0)" as createdObjects_Contains_a0 #LightGreen
+participant "createdObjects.Add(a0)" as createdObjects_Add_a0 #LightGreen
+participant "CreateObjectState(a0,a1,a2)" as CreateObjectState_a0_a1_a2 #LightGreen
+participant "obj.GetType().GetRelations()" as obj_GetType_GetRelations #LightGreen
+participant "obj.GetType()" as obj_GetType #LightGreen
+participant "obj.GetType().GetAllClassFields().Where(a0)" as obj_GetType_GetAllClassFields_Where_a0 #LightGreen
+participant "obj.GetType().GetAllClassFields()" as obj_GetType_GetAllClassFields #LightGreen
+participant "GetFieldValue(a0,a1)" as GetFieldValue_a0_a1 #LightGreen
+participant "CreateMapCollectionState(a0,a1)" as CreateMapCollectionState_a0_a1 #LightGreen
+participant "item.GetType()" as item_GetType #LightGreen
+participant "CreateStateRec(a0,a1,a2)" as CreateStateRec_a0_a1_a2 #LightGreen
+autonumber
+CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ($"object {CreateObjectName(obj)}{color} " + "{")
+CreateObjectDiagram_p0_p1 -[#grey]> lines_AddRange_a0 : (DiagramCreator.CreateObjectState(obj).SetIndent(1))
+lines_AddRange_a0 -[#grey]> DiagramCreator_CreateObjectState_obj_SetIndent_a0 : (DiagramCreator.CreateObjectState(obj).SetIndent(1))
+CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ("}")
+CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ($"map {CreateCollectionName(collection)}{Color.Object} " + "{")
+CreateObjectDiagram_p0_p1 -[#grey]> lines_AddRange_a0 : (CreateCollectionState(collection).SetIndent(1))
+lines_AddRange_a0 -[#grey]> CreateCollectionState_collection_SetIndent_a0 : (CreateCollectionState(collection).SetIndent(1))
+CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ("}")
+loop#LightCoral objects
+ alt#LightBlue createdObjects.Contains(obj) == false
+ CreateObjectDiagram_p0_p1 -[#grey]> createdObjects_Contains_a0 : (obj)
+ CreateObjectDiagram_p0_p1 -[#grey]> createdObjects_Add_a0 : (obj)
+ CreateObjectDiagram_p0_p1 -[#grey]> CreateObjectState_a0_a1_a2 : (obj, lines, deep)
+ alt#LightBlue deep + 1 <= maxDeep
+ CreateObjectDiagram_p0_p1 -[#grey]> obj_GetType_GetRelations
+ obj_GetType_GetRelations -[#blue]-> CreateObjectDiagram_p0_p1 : relations
+ CreateObjectDiagram_p0_p1 -[#grey]> obj_GetType_GetAllClassFields_Where_a0 : (fi => relations.Any(r => r == fi.FieldType))
+ obj_GetType_GetAllClassFields_Where_a0 -[#blue]-> CreateObjectDiagram_p0_p1 : relationFieldInfos
+ loop#LightCoral relationFieldInfos
+ CreateObjectDiagram_p0_p1 -[#grey]> GetFieldValue_a0_a1 : (obj, relFieldInfo)
+ GetFieldValue_a0_a1 -[#blue]-> CreateObjectDiagram_p0_p1 : value
+ alt#LightBlue value is IEnumerable collection
+ CreateObjectDiagram_p0_p1 -[#grey]> CreateMapCollectionState_a0_a1 : (collection, lines)
+ CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ($"{CreateObjectName(obj)}::{GetFieldName(relFieldInfo)} --> {CreateCollectionName(value)}")
+ alt#LightBlue deep + 2 <= maxDeep
+ loop#LightCoral collection
+ alt#LightBlue item != null
+ alt#LightBlue item.GetType().IsValueType == false
+ CreateObjectDiagram_p0_p1 -[#grey]> item_GetType
+ CreateObjectDiagram_p0_p1 -[#grey]> CreateStateRec_a0_a1_a2 : ([item], lines, deep + 2)
+ CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ($"{CreateCollectionName(collection)}::{counter} --> {CreateObjectName(item)}")
+ end
+ end
+ end
+ end
+ else
+ alt#LightBlue value != null
+ CreateObjectDiagram_p0_p1 -[#grey]> CreateStateRec_a0_a1_a2 : ([value], lines, deep + 1)
+ CreateObjectDiagram_p0_p1 -[#grey]> lines_Add_a0 : ($"{CreateObjectName(obj)}::{GetFieldName(relFieldInfo)} --> {CreateObjectName(value)}")
+ end
+ end
+ end
+ end
+ end
+end
+CreateObjectDiagram_p0_p1 -[#grey]> CreateStateRec_a0_a1_a2 : (objects, result, 0)
+@enduml

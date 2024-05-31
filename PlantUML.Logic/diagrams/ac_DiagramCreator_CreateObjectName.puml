@@ -1,0 +1,22 @@
+@startuml DiagramCreator.CreateObjectName
+title DiagramCreator.CreateObjectName
+start
+#LightGreen:Params(Object obj);
+#LightSkyBlue:string? result;
+#LightYellow:if (obj.GetType().IsGenericType) then (<color:green>yes)
+  #WhiteSmoke:result = obj.GetType().Name.Replace("`1", string.Empty);
+  :iterator = obj.GetType().GetGenericArguments().GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :arg = iterator.Current();
+        #WhiteSmoke:result += $"_{arg.Name}";
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #LightYellow:if (obj.GetType().IsArray) then (<color:green>yes)
+      #WhiteSmoke:result = obj.GetType().Name.Replace("[]", "Array");
+      else (<color:red>no)
+        #WhiteSmoke:result = obj.GetType().Name;
+    endif
+endif
+#Lavender:return $"{result}_{obj.GetHashCode()}";
+stop
+@enduml

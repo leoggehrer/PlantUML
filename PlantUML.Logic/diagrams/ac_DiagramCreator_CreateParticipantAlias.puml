@@ -1,0 +1,8 @@
+@startuml DiagramCreator.CreateParticipantAlias
+title DiagramCreator.CreateParticipantAlias
+start
+#LightGreen:Params(MethodDeclarationSyntax methodSyntax);
+#LightSkyBlue:var identifier = methodSyntax.Identifier\nvar parameters = methodSyntax.ParameterList?.Parameters ?? []\nvar result = $"{identifier}" + (parameters.Any() ? $"_{string.Join("_", parameters.Select((item, index) => $"p{index}"))}" : string.Empty);
+#Lavender:return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
+stop
+@enduml

@@ -1,0 +1,45 @@
+@startuml DiagramCreator.CreateSequenceDiagram
+title DiagramCreator.CreateSequenceDiagram
+participant "CreateSequenceDiagram(SemanticModel semanticModel,MethodDeclarationSyntax methodNode)" as CreateSequenceDiagram_p0_p1 #LightYellow
+participant "methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray()" as methodNode_DescendantNodes_OfType_InvocationExpressionSyntax_ToArray #LightGreen
+participant "methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>()" as methodNode_DescendantNodes_OfType_InvocationExpressionSyntax_ #LightGreen
+participant "methodNode.DescendantNodes()" as methodNode_DescendantNodes #LightGreen
+participant "invocationExpressions.Where(a0)" as invocationExpressions_Where_a0 #LightGreen
+participant "participants.Add(a0)" as participants_Add_a0 #LightGreen
+participant "CreateParticipant(a0)" as CreateParticipant_a0 #LightGreen
+participant "participants.AddRange(a0)" as participants_AddRange_a0 #LightGreen
+participant "filteredInvocationExpressions.Select(ie=>CreateParticipant(ie)).Distinct()" as filteredInvocationExpressions_Select_ie_CreateParticipant_ie_Distinct #LightGreen
+participant "participantAliasse.Add(a0)" as participantAliasse_Add_a0 #LightGreen
+participant "CreateParticipantAlias(a0)" as CreateParticipantAlias_a0 #LightGreen
+participant "participantAliasse.AddRange(a0)" as participantAliasse_AddRange_a0 #LightGreen
+participant "filteredInvocationExpressions.Select(ie=>CreateParticipantAlias(ie)).Distinct()" as filteredInvocationExpressions_Select_ie_CreateParticipantAlias_ie_Distinct #LightGreen
+participant "AnalyzeCallSequence(a0,a1,a2,a3,a4)" as AnalyzeCallSequence_a0_a1_a2_a3_a4 #LightGreen
+participant "messages.Any(a0)" as messages_Any_a0 #LightGreen
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "diagramData.AddRange(a0)" as diagramData_AddRange_a0 #LightGreen
+autonumber
+CreateSequenceDiagram_p0_p1 -[#grey]> methodNode_DescendantNodes_OfType_InvocationExpressionSyntax_ToArray
+methodNode_DescendantNodes_OfType_InvocationExpressionSyntax_ToArray -[#blue]-> CreateSequenceDiagram_p0_p1 : invocationExpressions
+CreateSequenceDiagram_p0_p1 -[#grey]> invocationExpressions_Where_a0 : (ie => ie.Expression.ToString().Contains("ToString") == false && ie.Expression.ToString().Contains("ConfigureAwait") == false && ie.Expression.ToString().Contains("nameof") == false && ie.Expression.ToString().Contains("new") == false)
+invocationExpressions_Where_a0 -[#blue]-> CreateSequenceDiagram_p0_p1 : filteredInvocationExpressions
+CreateSequenceDiagram_p0_p1 -[#grey]> participants_Add_a0 : (CreateParticipant(methodNode))
+participants_Add_a0 -[#grey]> CreateParticipant_a0 : (CreateParticipant(methodNode))
+CreateSequenceDiagram_p0_p1 -[#grey]> participants_AddRange_a0 : (filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct())
+participants_AddRange_a0 -[#grey]> filteredInvocationExpressions_Select_ie_CreateParticipant_ie_Distinct : (filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct())
+CreateSequenceDiagram_p0_p1 -[#grey]> participantAliasse_Add_a0 : (CreateParticipantAlias(methodNode!))
+participantAliasse_Add_a0 -[#grey]> CreateParticipantAlias_a0 : (CreateParticipantAlias(methodNode!))
+CreateSequenceDiagram_p0_p1 -[#grey]> participantAliasse_AddRange_a0 : (filteredInvocationExpressions.Select(ie => CreateParticipantAlias(ie)).Distinct())
+participantAliasse_AddRange_a0 -[#grey]> filteredInvocationExpressions_Select_ie_CreateParticipantAlias_ie_Distinct : (filteredInvocationExpressions.Select(ie => CreateParticipantAlias(ie)).Distinct())
+CreateSequenceDiagram_p0_p1 -[#grey]> AnalyzeCallSequence_a0_a1_a2_a3_a4 : (semanticModel, methodNode!, participantAliasse, messages, 0)
+loop#LightCoral i < participants.Count && i < participantAliasse.Count
+ CreateSequenceDiagram_p0_p1 -[#grey]> messages_Any_a0 : (l => l.Contains($"{ Expression }"))
+ messages_Any_a0 -[#blue]-> CreateSequenceDiagram_p0_p1 : isReferenced
+ alt#LightBlue isReferenced
+ CreateSequenceDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}")
+ end
+end
+alt#LightBlue messages.Count > 0
+ CreateSequenceDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ("autonumber")
+ CreateSequenceDiagram_p0_p1 -[#grey]> diagramData_AddRange_a0 : (messages)
+end
+@enduml

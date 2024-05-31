@@ -1,0 +1,39 @@
+@startuml DiagramCreator.CreateTypeRelations
+title DiagramCreator.CreateTypeRelations
+participant "CreateTypeRelations(Type type,int deep)" as CreateTypeRelations_p0_p1 #LightYellow
+participant "type.GetRelations(a0)" as type_GetRelations_a0 #LightGreen
+participant "item.IsNullableType()" as item_IsNullableType #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "item.IsGenericCollectionType()" as item_IsGenericCollectionType #LightGreen
+participant "item.GetGenericArguments()" as item_GetGenericArguments #LightGreen
+autonumber
+loop#LightCoral type.GetRelations(deep)
+ CreateTypeRelations_p0_p1 -[#grey]> type_GetRelations_a0 : (deep)
+ alt#LightBlue item.IsArray
+ alt#LightBlue item.IsNullableType()
+ CreateTypeRelations_p0_p1 -[#grey]> item_IsNullableType
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} --> \"0..1\" {elemType.Name}")
+ else
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} --> \"1\" {elemType.Name}")
+ end
+ else
+ alt#LightBlue item.IsGenericCollectionType()
+ CreateTypeRelations_p0_p1 -[#grey]> item_IsGenericCollectionType
+ CreateTypeRelations_p0_p1 -[#grey]> item_GetGenericArguments
+ alt#LightBlue item.IsNullableType()
+ CreateTypeRelations_p0_p1 -[#grey]> item_IsNullableType
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} \"*\" o-- \"0..1\" {elemType.Name}")
+ else
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} \"*\" *-- \"1\" {elemType.Name}")
+ end
+ else
+ alt#LightBlue item.IsNullableType()
+ CreateTypeRelations_p0_p1 -[#grey]> item_IsNullableType
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} --> \"0..1\" {item.Name}")
+ else
+ CreateTypeRelations_p0_p1 -[#grey]> result_Add_a0 : ($"{type.Name} --> \"1\" {item.Name}")
+ end
+ end
+ end
+end
+@enduml

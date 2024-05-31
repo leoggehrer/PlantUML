@@ -1,0 +1,32 @@
+@startuml DiagramCreator.FormatActivityDiagram
+title DiagramCreator.FormatActivityDiagram
+participant "FormatActivityDiagram(List<string> diagramData)" as FormatActivityDiagram_p0 #LightYellow
+participant "line.Split(a0,a1)" as line_Split_a0_a1 #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "result.Append(a0)" as result_Append_a0 #LightGreen
+participant "FormatLine(a0)" as FormatLine_a0 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+FormatActivityDiagram_p0 -[#grey]> line_Split_a0_a1 : (Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+line_Split_a0_a1 -[#blue]-> FormatActivityDiagram_p0 : items
+FormatActivityDiagram_p0 -[#grey]> string_Join_a0_a1 : (string.Empty, items)
+string_Join_a0_a1 -[#blue]-> FormatActivityDiagram_p0 : text
+loop#LightCoral i < text.Length
+ alt#LightBlue text[i] == ' ' && start == false
+ FormatActivityDiagram_p0 -[#grey]> result_Append_a0 : (text[i])
+ else
+ alt#LightBlue text[i] == ' ' && start
+ alt#LightBlue blank < 2
+ FormatActivityDiagram_p0 -[#grey]> result_Append_a0 : (text[i])
+ end
+ else
+ FormatActivityDiagram_p0 -[#grey]> result_Append_a0 : (text[i])
+ end
+ end
+end
+loop#LightCoral diagramData
+ FormatActivityDiagram_p0 -[#grey]> FormatLine_a0 : (line)
+ FormatLine_a0 -[#blue]-> FormatActivityDiagram_p0 : formatLine
+ FormatActivityDiagram_p0 -[#grey]> result_Add_a0 : (formatLine)
+end
+@enduml

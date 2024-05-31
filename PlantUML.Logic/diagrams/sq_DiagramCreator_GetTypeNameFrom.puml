@@ -1,0 +1,11 @@
+@startuml DiagramCreator.GetTypeNameFrom
+title DiagramCreator.GetTypeNameFrom
+participant "GetTypeNameFrom(string line)" as GetTypeNameFrom_p0 #LightYellow
+participant "line.Replace("+",string.Empty).Replace("-",string.Empty).Replace("#",string.Empty).Replace("~",string.Empty).Replace("{static}",string.Empty).Replace("{abstract}",string.Empty).Replace(a0,a1)" as line_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_static_string_Empty_Replace_abstract_string_Empty_Replace_a0_a1 #LightGreen
+participant "cleanLine.Split(a0,a1)" as cleanLine_Split_a0_a1 #LightGreen
+autonumber
+GetTypeNameFrom_p0 -[#grey]> line_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_static_string_Empty_Replace_abstract_string_Empty_Replace_a0_a1 : ("{const}", string.Empty)
+line_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_string_Empty_Replace_static_string_Empty_Replace_abstract_string_Empty_Replace_a0_a1 -[#blue]-> GetTypeNameFrom_p0 : cleanLine
+GetTypeNameFrom_p0 -[#grey]> cleanLine_Split_a0_a1 : (" ", StringSplitOptions.RemoveEmptyEntries)
+cleanLine_Split_a0_a1 -[#blue]-> GetTypeNameFrom_p0 : parts
+@enduml

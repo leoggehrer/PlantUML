@@ -1,0 +1,28 @@
+@startuml DiagramCreator.CreateActivityDiagram
+title DiagramCreator.CreateActivityDiagram
+participant "CreateActivityDiagram(MethodDeclarationSyntax methodNode,bool declarations)" as CreateActivityDiagram_p0_p1 #LightYellow
+participant "parameters.Any()" as parameters_Any #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "paramsStatement.HasContent()" as paramsStatement_HasContent #LightGreen
+participant "diagramData.Add(a0)" as diagramData_Add_a0 #LightGreen
+participant "AnalyzeStatement(a0,a1,a2,a3)" as AnalyzeStatement_a0_a1_a2_a3 #LightGreen
+participant "FormatActivityDiagram(a0)" as FormatActivityDiagram_a0 #LightGreen
+autonumber
+CreateActivityDiagram_p0_p1 -[#grey]> parameters_Any
+CreateActivityDiagram_p0_p1 -[#grey]> string_Join_a0_a1 : (",", parameters)
+alt#LightBlue paramsStatement.HasContent()
+ CreateActivityDiagram_p0_p1 -[#grey]> paramsStatement_HasContent
+ CreateActivityDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"{Color.Parameters}:Params{paramsStatement};")
+end
+loop#LightCoral methodNode?.Body?.Statements ?? []
+ alt#LightBlue statement is LocalDeclarationStatementSyntax localDeclarationStatement
+ alt#LightBlue islocalDeclaration == false
+ CreateActivityDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"{Color.Declaration}:{localDeclarationStatement.Declaration}")
+ end
+ else
+ CreateActivityDiagram_p0_p1 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (statement, diagramData, declarations, 0)
+ end
+end
+CreateActivityDiagram_p0_p1 -[#grey]> FormatActivityDiagram_a0 : (diagramData)
+FormatActivityDiagram_a0 -[#blue]-> CreateActivityDiagram_p0_p1 : result
+@enduml

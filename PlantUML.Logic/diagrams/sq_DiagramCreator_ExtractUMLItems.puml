@@ -1,0 +1,41 @@
+@startuml DiagramCreator.ExtractUMLItems
+title DiagramCreator.ExtractUMLItems
+participant "ExtractUMLItems(IEnumerable<string> lines)" as ExtractUMLItems_p0 #LightYellow
+participant "line.Trim().EndsWith(a0)" as line_Trim_EndsWith_a0 #LightGreen
+participant "line.Trim()" as line_Trim #LightGreen
+participant "line.Contains(a0)" as line_Contains_a0 #LightGreen
+participant "line.Trim().StartsWith(a0,a1)" as line_Trim_StartsWith_a0_a1 #LightGreen
+participant "line.Trim().StartsWith(a0)" as line_Trim_StartsWith_a0 #LightGreen
+participant "umlItem.Add(a0)" as umlItem_Add_a0 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+loop#LightCoral lines
+ alt#LightBlue isItem == false && line.Trim().EndsWith('{') && (line.Contains("class") || line.Contains("interface"))
+ ExtractUMLItems_p0 -[#grey]> line_Trim_EndsWith_a0 : ('{')
+ ExtractUMLItems_p0 -[#grey]> line_Contains_a0 : ("class")
+ ExtractUMLItems_p0 -[#grey]> line_Contains_a0 : ("interface")
+ else
+ alt#LightBlue isItem == false && line.Trim().StartsWith("start", StringComparison.CurrentCultureIgnoreCase)
+ ExtractUMLItems_p0 -[#grey]> line_Trim_StartsWith_a0_a1 : ("start", StringComparison.CurrentCultureIgnoreCase)
+ else
+ alt#LightBlue isItem && umlItem != default && line.Trim().StartsWith('}') == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false
+ ExtractUMLItems_p0 -[#grey]> line_Trim_StartsWith_a0 : ('}')
+ ExtractUMLItems_p0 -[#grey]> line_Trim_StartsWith_a0_a1 : ("stop", StringComparison.CurrentCultureIgnoreCase)
+ ExtractUMLItems_p0 -[#grey]> umlItem_Add_a0 : (line)
+ else
+ alt#LightBlue isItem && umlItem != default && line.Trim().StartsWith('}')
+ ExtractUMLItems_p0 -[#grey]> line_Trim_StartsWith_a0 : ('}')
+ ExtractUMLItems_p0 -[#grey]> umlItem_Add_a0 : (line)
+ ExtractUMLItems_p0 -[#grey]> result_Add_a0 : (umlItem)
+ else
+ alt#LightBlue isItem && umlItem != default && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase)
+ ExtractUMLItems_p0 -[#grey]> line_Trim_StartsWith_a0_a1 : ("stop", StringComparison.CurrentCultureIgnoreCase)
+ ExtractUMLItems_p0 -[#grey]> umlItem_Add_a0 : (line)
+ ExtractUMLItems_p0 -[#grey]> result_Add_a0 : (umlItem)
+ end
+ end
+ end
+ end
+ end
+end
+@enduml

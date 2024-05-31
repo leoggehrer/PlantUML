@@ -1,0 +1,15 @@
+@startuml DiagramCreator.ReadCustomUMLFromFle
+title DiagramCreator.ReadCustomUMLFromFle
+start
+#LightGreen:Params(string filePath);
+#LightSkyBlue:var result = new List<string>();
+#LightYellow:if (File.Exists(filePath)) then (<color:green>yes)
+  #LightYellow:if (customUMLLines.Count > 0) then (<color:green>yes)
+    #WhiteSmoke:customUMLLines.Insert(0, $"' {CustomUMLLabel}");
+    #WhiteSmoke:customUMLLines.Add($"' {CustomUMLLabel}");
+  endif
+  #WhiteSmoke:result.AddRange(customUMLLines);
+endif
+#Lavender:return [.. result];
+stop
+@enduml

@@ -1,0 +1,27 @@
+@startuml DiagramCreator.CreateObjectState
+title DiagramCreator.CreateObjectState
+participant "CreateObjectState(object obj)" as CreateObjectState_p0 #LightYellow
+participant "obj.GetType().GetFields(a0)" as obj_GetType_GetFields_a0 #LightGreen
+participant "obj.GetType()" as obj_GetType #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "obj.GetType().GetAllClassFields()" as obj_GetType_GetAllClassFields #LightGreen
+autonumber
+loop#LightCoral obj.GetType().GetFields(bindingFlags)
+ CreateObjectState_p0 -[#grey]> obj_GetType_GetFields_a0 : (bindingFlags)
+ CreateObjectState_p0 -[#grey]> result_Add_a0 : ("{static}" + $"{GetFieldName(item)} => { Expression }")
+end
+alt#LightBlue counter > 0
+ CreateObjectState_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral obj.GetType().GetAllClassFields()
+ CreateObjectState_p0 -[#grey]> obj_GetType_GetAllClassFields
+ CreateObjectState_p0 -[#grey]> result_Add_a0 : ($"{GetFieldName(item)} => { Expression }")
+end
+alt#LightBlue obj.GetType().IsArray
+ CreateObjectState_p0 -[#grey]> obj_GetType
+ obj_GetType -[#blue]-> CreateObjectState_p0 : result
+ loop#LightCoral i < array!.Length
+ CreateObjectState_p0 -[#grey]> result_Add_a0 : ($"{i} => { Expression }")
+ end
+end
+@enduml

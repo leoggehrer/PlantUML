@@ -1,0 +1,13 @@
+@startuml DiagramCreator.FormatActivityDiagram
+title DiagramCreator.FormatActivityDiagram
+start
+#LightGreen:Params(List<string> diagramData);
+#LightSkyBlue:var result = new List<string>();
+:iterator = diagramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #WhiteSmoke:result.Add(formatLine);
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

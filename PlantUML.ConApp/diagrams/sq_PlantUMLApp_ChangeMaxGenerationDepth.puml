@@ -1,0 +1,15 @@
+@startuml PlantUMLApp.ChangeMaxGenerationDepth
+title PlantUMLApp.ChangeMaxGenerationDepth
+participant "ChangeMaxGenerationDepth" as ChangeMaxGenerationDepth #LightYellow
+participant "PrintLine()" as PrintLine #LightGreen
+participant "Print(a0)" as Print_a0 #LightGreen
+participant "int.TryParse(a0,a1)" as int_TryParse_a0_a1 #LightGreen
+participant "ReadLine()" as ReadLine #LightGreen
+autonumber
+ChangeMaxGenerationDepth -[#grey]> PrintLine
+ChangeMaxGenerationDepth -[#grey]> Print_a0 : ("Enter the maximum generation depth: ")
+alt#LightBlue int.TryParse(ReadLine(), out var result)
+ ChangeMaxGenerationDepth -[#grey]> int_TryParse_a0_a1 : (ReadLine(), out var result)
+ int_TryParse_a0_a1 -[#grey]> ReadLine : (ReadLine(), out var result)
+end
+@enduml

@@ -1,0 +1,5 @@
+@startuml DiagramCreator.ClassConstructing
+title DiagramCreator.ClassConstructing
+start
+stop
+@enduml

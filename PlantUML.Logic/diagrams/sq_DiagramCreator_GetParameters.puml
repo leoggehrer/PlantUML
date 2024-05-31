@@ -1,0 +1,14 @@
+@startuml DiagramCreator.GetParameters
+title DiagramCreator.GetParameters
+participant "GetParameters(MethodInfo methodInfo)" as GetParameters_p0 #LightYellow
+participant "methodInfo.GetParameters()" as methodInfo_GetParameters #LightGreen
+participant "result.Append(a0)" as result_Append_a0 #LightGreen
+autonumber
+loop#LightCoral methodInfo.GetParameters()
+ GetParameters_p0 -[#grey]> methodInfo_GetParameters
+ alt#LightBlue counter++ > 0
+ GetParameters_p0 -[#grey]> result_Append_a0 : (", ")
+ end
+ GetParameters_p0 -[#grey]> result_Append_a0 : ($"{item.ParameterType.Name} {item.Name}")
+end
+@enduml

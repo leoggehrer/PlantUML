@@ -1,0 +1,127 @@
+@startuml CompleteClassDiagram
+title CompleteClassDiagram
+ class Color << static >> #GhostWhite {
+- {static} string _enum
+- {static} string _struct
+- {static} string _class
+- {static} string _rootobject
+- {static} string _object
+- {static} string _abstractclass
+- {static} string _interface
+- {static} string _parameters
+- {static} string _declaration
+- {static} string _expression
+- {static} string _return
+- {static} string _participant
+- {static} string _startparticipant
+- {static} string _if
+- {static} string _throw
+---
++ {static} string getEnum()
++ {static} Void setEnum(string value)
++ {static} string getStruct()
++ {static} Void setStruct(string value)
++ {static} string getClass()
++ {static} Void setClass(string value)
++ {static} string getRootObject()
++ {static} Void setRootObject(string value)
++ {static} string getObject()
++ {static} Void setObject(string value)
++ {static} string getAbstractClass()
++ {static} Void setAbstractClass(string value)
++ {static} string getInterface()
++ {static} Void setInterface(string value)
++ {static} string getParameters()
++ {static} Void setParameters(string value)
++ {static} string getDeclaration()
++ {static} Void setDeclaration(string value)
++ {static} string getExpression()
++ {static} Void setExpression(string value)
++ {static} string getReturn()
++ {static} Void setReturn(string value)
++ {static} string getParticipant()
++ {static} Void setParticipant(string value)
++ {static} string getStartParticipant()
++ {static} Void setStartParticipant(string value)
++ {static} string getIf()
++ {static} Void setIf(string value)
++ {static} string getThrow()
++ {static} Void setThrow(string value)
+---
+- {static} void ClassConstructing()
+- {static} void ClassConstructed()
+}
+ class DiagramCreator #GhostWhite {
+---
++ {static} string getInfoFileFilter()
++ {static} string getPlantUMLExtension()
++ {static} string getCustomUMLLabel()
++ {static} string getStartUmlLabel()
++ {static} string getEndUmlLabel()
++ {static} IEnumerable<string> getDefaultClassSkinparam()
++ {static} IEnumerable<string> getDefaultObjectSkinparam()
+---
+- {static} void ClassConstructing()
+- {static} void ClassConstructed()
+- void Constructing()
+- void Constructed()
++ {static} void CreateActivityDiagram(string path, string source, bool force)
++ {static} void CreateActivityDiagram(string path, string source, string[] defines, bool force)
++ {static} void CreateActivityDiagram(string path, string source, string[] defines, bool declarations, bool force)
+- {static} List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool declarations)
++ {static} void CreateCompleteActivityDiagram(string path, bool force)
+- {static} List<string> FormatActivityDiagram(List<string> diagramData)
++ {static} void CreateClassDiagram(string path, string source, string[] defines, bool force)
++ {static} void CreateCompleteClassDiagram(string path, bool force)
+- {static} List<string> CreateRelations(IEnumerable<string> diagramData)
+- {static} void CreateItemRelations(string typeLine, IEnumerable<string> digramData, List<string> relations)
+- {static} string GetItemNameFrom(string line)
+- {static} string GetTypeNameFrom(string line)
+- {static} string GetMemberNameFrom(string line)
++ {static} void CreateSequenceDiagram(string path, string source, string[] defines, bool force)
++ {static} List<string> CreateSequenceDiagram(SemanticModel semanticModel, MethodDeclarationSyntax methodNode)
++ {static} IEnumerable<string> CreateClassDiagram(DiagramCreationFlags diagramCreationFlags, Type[] types)
+- {static} string CreateObjectName(Object obj)
+- {static} string CreateCollectionName(object obj)
++ {static} IEnumerable<string> CreateObjectDiagram(int maxDeep, object[] objects)
++ {static} void AnalyzeDeclarationSyntax(SemanticModel semanticModel, SyntaxNode syntaxNode, List<string> diagramData, int level)
++ {static} void AnalyzeCallSequence(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, List<string> participantAliasse, List<string> messages, int level)
++ {static} void AnalyzeCallSequence(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, SyntaxNode syntaxNode, List<string> participantAliasse, List<string> messages, Dictionary<string, string> methodResults, int level)
+- {static} bool HasInvocationExpression(SyntaxNode syntaxNode)
++ {static} void AnalyzeStatement(SyntaxNode syntaxNode, List<string> diagramData, bool declarations, int level)
++ {static} IEnumerable<string> CreateTypeDefinition(Type type, DiagramCreationFlags diagramCreationFlags)
++ {static} IEnumerable<string> CreateTypeHirarchies(IEnumerable<Type> types)
++ {static} IEnumerable<string> CreateTypeHierachy(IEnumerable<Type> types)
++ {static} IEnumerable<string> CreateTypeRelations(Type type, int deep)
++ {static} IEnumerable<string> CreateTypeImplements(Type type)
++ {static} IEnumerable<string> CreateTypeDefinitions(IEnumerable<Type> types, DiagramCreationFlags diagramCreationFlags)
++ {static} IEnumerable<string> CreateItemMembers(Type type)
++ {static} IEnumerable<string> CreateObjectState(object obj)
++ {static} IEnumerable<string> CreateCollectionState(IEnumerable collection)
+- {static} List<UMLItem> ExtractUMLItems(IEnumerable<string> lines)
+- {static} UMLItem ExtractUMLRelations(IEnumerable<string> lines)
+- {static} void UpdateDiagramPath(string path, string infoFileFilter)
+- {static} TypeDeclarationSyntax? FindTypeDeclaration(SemanticModel semanticModel, BaseTypeSyntax baseTypeSyntax)
+- {static} string CreateParticipant(MethodDeclarationSyntax methodSyntax)
+- {static} string CreateParticipantAlias(MethodDeclarationSyntax methodSyntax)
+- {static} string CreateParticipant(InvocationExpressionSyntax invocationSyntax)
+- {static} string CreateParticipantAlias(InvocationExpressionSyntax invocationExpression)
+- {static} string CreateArgumentList(InvocationExpressionSyntax invocationExpression, Dictionary<string, string> methodResults)
++ {static} IEnumerable<IEnumerable<Type>> CreateDiagramHirarchies(IEnumerable<Type> types)
++ {static} string GetFieldName(FieldInfo fieldInfo)
++ {static} string GetParameters(MethodInfo methodInfo)
++ {static} object? GetFieldValue(object obj, FieldInfo fieldInfo)
++ {static} string GetStateValue(object obj, FieldInfo fieldInfo)
++ {static} string GetStateValue(object obj, FieldInfo fieldInfo, int maxLength)
+- {static} bool IsAutoProperty(PropertyDeclarationSyntax propertydeclaration)
++ {static} string[] ReadCustomUMLFromFle(string filePath)
+- {static} List<string> ReadCustomUML(IEnumerable<string> lines)
+}
+ class UMLItem #GhostWhite {
+---
+---
+}
+UMLItem <|-- List
+DiagramCreator --  : 
+UMLItem --  : 
+@enduml

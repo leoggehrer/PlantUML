@@ -1,0 +1,1447 @@
+@startuml CompleteActivityDiagram
+header
+generated on 31.05.2024 21:19:11
+end header
+title CompleteActivityDiagram
+start
+note right:  DiagramCreator.CreateActivityDiagram
+#LightGreen:Params(string path,string source,bool force);
+#WhiteSmoke:CreateActivityDiagram(path, source, [], false, force);
+stop
+start
+note right:  DiagramCreator.CreateActivityDiagram
+#LightGreen:Params(string path,string source,string[] defines,bool force);
+#WhiteSmoke:CreateActivityDiagram(path, source, defines, false, force);
+stop
+start
+note right:  DiagramCreator.CreateActivityDiagram
+#LightGreen:Params(string path,string source,string[] defines,bool declarations,bool force);
+#LightSkyBlue:var infoFileName = "ac_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+#LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
+  #WhiteSmoke:Directory.CreateDirectory(path);
+endif
+:iterator = classNodes.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :classNode = iterator.Current();
+    :iterator = methodNodes.GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :methodNode = iterator.Current();
+          #LightYellow:if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false) then (<color:green>yes)
+            #WhiteSmoke:fileName = $"{fileName}{PlantUMLExtension}";
+            else (<color:red>no)
+              #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
+          endif
+          #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+          #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+          #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+          #WhiteSmoke:diagramData.Insert(2, "start");
+          #WhiteSmoke:diagramData.Add("stop");
+          #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+          #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+            #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+          endif
+          #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (AC)");
+          #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+          #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
+          #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+    endwhile (<color:red>no)
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+stop
+start
+note right:  DiagramCreator.CreateActivityDiagram
+#LightGreen:Params(MethodDeclarationSyntax methodNode,bool declarations);
+#LightSkyBlue:var diagramData = new List<string>()\nvar islocalDeclaration = false\nvar parameters = methodNode.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
+#LightYellow:if (paramsStatement.HasContent()) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Add($"{Color.Parameters}:Params{paramsStatement};");
+endif
+:iterator = methodNode?.Body?.Statements ?? [].GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :statement = iterator.Current();
+    #LightYellow:if (statement is LocalDeclarationStatementSyntax localDeclarationStatement) then (<color:green>yes)
+      #LightYellow:if (islocalDeclaration == false) then (<color:green>yes)
+        #WhiteSmoke:islocalDeclaration = true;
+        #WhiteSmoke:diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration}");
+        else (<color:red>no)
+          #WhiteSmoke:diagramData[^1] += $"\\n{localDeclarationStatement.Declaration}";
+      endif
+      else (<color:red>no)
+        #LightYellow:if (islocalDeclaration) then (<color:green>yes)
+          #WhiteSmoke:islocalDeclaration = false;
+          #WhiteSmoke:diagramData[^1] += ";";
+        endif
+        #WhiteSmoke:AnalyzeStatement(statement, diagramData, declarations, 0);
+    endif
+endwhile (<color:red>no)
+#Lavender:return FormatActivityDiagram(diagramData);
+stop
+start
+note right:  DiagramCreator.CreateCompleteActivityDiagram
+#LightGreen:Params(string path,bool force);
+#LightSkyBlue:var infoFileName = "ac_info.txt"\nvar result = new List<string>()\nvar umlFiles = new List<string>()\nvar umlItems = new List<UMLItem>()\nvar infoFilePath = Path.Combine(path, infoFileName)\nvar files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories) .Where(f => Path.GetFileName(f).StartsWith("ac_"));
+#LightYellow:if (File.Exists(infoFilePath)) then (<color:green>yes)
+  :iterator = infoData.Select(l => l.Split(':')) .Where(d => d[0].Equals("fileName", StringComparison.OrdinalIgnoreCase)) .Select(d => d[1]).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :infoItem = iterator.Current();
+        #WhiteSmoke:umlFiles.AddRange(query);
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #WhiteSmoke:umlFiles.AddRange(files);
+endif
+:iterator = umlFiles.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #LightYellow:if (acItems.Length == acTitles.Length) then (<color:green>yes)
+      while (i < acItems.Length) is (<color:green>yes)
+        #WhiteSmoke:acItems[i].Insert(1, $"note right: {acTitles[i].Replace("title", string.Empty)}");
+      :i++;
+      endwhile (<color:red>no)
+    endif
+    #WhiteSmoke:umlItems.AddRange(acItems.Where(e => e.Count > 3));
+endwhile (<color:red>no)
+#LightSkyBlue:var fileName = "CompleteActivityDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>()\nvar completeInfoData = new List<string>();
+:iterator = umlItems.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:diagramData.AddRange(item);
+endwhile (<color:red>no)
+#LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteActivityDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "header");
+  #WhiteSmoke:diagramData.Insert(2, $"generated on {DateTime.UtcNow}");
+  #WhiteSmoke:diagramData.Insert(3, "end header");
+  #WhiteSmoke:diagramData.Insert(4, "title CompleteActivityDiagram");
+  #WhiteSmoke:diagramData.Add("footer");
+  #WhiteSmoke:diagramData.Add("generated with the DiagramCreator by Prof.Gehrer");
+  #WhiteSmoke:diagramData.Add("end footer");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All acivity diagrams (AC)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteActivityDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+stop
+start
+note right:  DiagramCreator.FormatActivityDiagram
+#LightGreen:Params(List<string> diagramData);
+#LightSkyBlue:var result = new List<string>();
+:iterator = diagramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #WhiteSmoke:result.Add(formatLine);
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateClassDiagram
+#LightGreen:Params(string path,string source,string[] defines,bool force);
+#LightSkyBlue:var infoFileName = "cd_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("ClassCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree)\nvar typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
+#LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
+  #WhiteSmoke:Directory.CreateDirectory(path);
+endif
+:iterator = typeDeclarations.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :itemNode = iterator.Current();
+    #LightYellow:if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false) then (<color:green>yes)
+      #WhiteSmoke:fileName = $"{fileName}{PlantUMLExtension}";
+      else (<color:red>no)
+        #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
+    endif
+    #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, itemNode, diagramData, 0);
+    #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+    #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+    #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+    #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+    #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+      #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+    endif
+    #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (CD)");
+    #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+stop
+start
+note right:  DiagramCreator.CreateCompleteClassDiagram
+#LightGreen:Params(string path,bool force);
+#LightSkyBlue:var result = new List<string>()\nvar umlItems = new List<UMLItem>()\nvar umlRelations = new List<UMLItem>()\nvar files = Directory.GetFiles(path, $"*{PlantUMLExtension}", SearchOption.AllDirectories) .Where(f => Path.GetFileName(f).StartsWith("cd_"));
+:iterator = files.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #WhiteSmoke:umlItems.AddRange(ExtractUMLItems(lines));
+    #WhiteSmoke:umlRelations.Add(ExtractUMLRelations(lines));
+endwhile (<color:red>no)
+:iterator = umlItems.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (isContained == false) then (<color:green>yes)
+      #WhiteSmoke:result.AddRange(item);
+    endif
+endwhile (<color:red>no)
+:iterator = umlRelations.SelectMany(e => e).Distinct().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    :iterator = itemData.GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :relationPart = iterator.Current();
+          #LightYellow:if (result.Any(l => l.Contains(relationPart)) == false) then (<color:green>yes)
+            #LightYellow:if (relationPart.Length > 1 && relationPart[0] == 'I' && char.IsUpper(relationPart[1])) then (<color:green>yes)
+              #WhiteSmoke:result.Add($"interface {relationPart} {Color.Interface}");
+              else (<color:red>no)
+                #WhiteSmoke:result.Add($"class {relationPart} {Color.Class}");
+            endif
+          endif
+    endwhile (<color:red>no)
+    #WhiteSmoke:result.Add(item);
+endwhile (<color:red>no)
+#LightSkyBlue:var fileName = "CompleteClassDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>(result)\nvar completeInfoData = new List<string>();
+#LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.AddRange(CreateRelations(diagramData));
+  #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All class diagrams (CD)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteClassDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+stop
+start
+note right:  DiagramCreator.CreateRelations
+#LightGreen:Params(IEnumerable<string> diagramData);
+#LightSkyBlue:var result = new List<string>()\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+:iterator = diagramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = true;
+      #WhiteSmoke:isFieldRange = false;
+      #WhiteSmoke:isPropertyRange = false;
+      #WhiteSmoke:isMethodRange = false;
+      else (<color:red>no)
+        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+          #WhiteSmoke:isFieldRange = true;
+          else (<color:red>no)
+            #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = false;
+              #WhiteSmoke:isPropertyRange = true;
+              #WhiteSmoke:isMethodRange = false;
+              else (<color:red>no)
+                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                  #WhiteSmoke:isFieldRange = false;
+                  #WhiteSmoke:isPropertyRange = false;
+                  #WhiteSmoke:isMethodRange = true;
+                  else (<color:red>no)
+                    #LightYellow:if (isTypeDefinition && line.Contains('}')) then (<color:green>yes)
+                      #WhiteSmoke:isTypeDefinition = false;
+                      #WhiteSmoke:isFieldRange = false;
+                      #WhiteSmoke:isPropertyRange = false;
+                      #WhiteSmoke:isMethodRange = false;
+                    endif
+                endif
+            endif
+        endif
+    endif
+    #LightYellow:if (isTypeDefinition && isFieldRange) then (<color:green>yes)
+      #WhiteSmoke:CreateItemRelations(line, diagramData, result);
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateItemRelations
+#LightGreen:Params(string typeLine,IEnumerable<string> digramData,List<string> relations);
+#LightSkyBlue:var extractItemNames = new List<string>()\nvar currentItemName = string.Empty\nvar typeName = GetTypeNameFrom(typeLine)\nvar cleanTypeName = typeName.Replace("?", string.Empty) .Replace("[]", string.Empty)\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+:iterator = digramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :diagramLine = iterator.Current();
+    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
+    endif
+endwhile (<color:red>no)
+:iterator = digramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :diagramLine = iterator.Current();
+    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = true;
+      #WhiteSmoke:currentItemName = GetItemNameFrom(diagramLine);
+      else (<color:red>no)
+        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+          #WhiteSmoke:isFieldRange = true;
+          else (<color:red>no)
+            #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = false;
+              #WhiteSmoke:isPropertyRange = true;
+              #WhiteSmoke:isMethodRange = false;
+              else (<color:red>no)
+                #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                  #WhiteSmoke:isFieldRange = false;
+                  #WhiteSmoke:isPropertyRange = false;
+                  #WhiteSmoke:isMethodRange = true;
+                  else (<color:red>no)
+                    #LightYellow:if (isTypeDefinition && diagramLine.Contains('}')) then (<color:green>yes)
+                      #WhiteSmoke:isTypeDefinition = false;
+                      #WhiteSmoke:isFieldRange = false;
+                      #WhiteSmoke:isPropertyRange = false;
+                      #WhiteSmoke:isMethodRange = false;
+                      #WhiteSmoke:currentItemName = string.Empty;
+                    endif
+                endif
+            endif
+        endif
+    endif
+    #LightYellow:if (isTypeDefinition && isFieldRange) then (<color:green>yes)
+      #LightYellow:if (cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName)) then (<color:green>yes)
+        #LightYellow:if (isNullable) then (<color:green>yes)
+          #WhiteSmoke:relation = $"{currentItemName} \"0..1\" *-- \"1\" {cleanTypeName} : {memberName}";
+          else (<color:red>no)
+            #LightYellow:if (IsArray) then (<color:green>yes)
+              #WhiteSmoke:relation = $"{currentItemName} \"many\" *-- \"1\" {cleanTypeName} : {memberName}";
+              else (<color:red>no)
+                #WhiteSmoke:relation = $"{currentItemName} -- {cleanTypeName} : {memberName}";
+            endif
+        endif
+        #LightYellow:if (relations.Contains(relation) == false) then (<color:green>yes)
+          #WhiteSmoke:relations.Add(relation);
+        endif
+      endif
+    endif
+endwhile (<color:red>no)
+stop
+start
+note right:  DiagramCreator.GetItemNameFrom
+#LightGreen:Params(string line);
+#LightSkyBlue:var result = string.Empty\nvar parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+while (i < parts.Length && result == string.Empty) is (<color:green>yes)
+  #LightYellow:if ((parts[i] == "class" || parts[i] == "interface") && i + 1 < parts.Length) then (<color:green>yes)
+    #WhiteSmoke:result = parts[i + 1];
+  endif
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.GetTypeNameFrom
+#LightGreen:Params(string line);
+#LightSkyBlue:var result = string.Empty\nvar cleanLine = line.Replace("+", string.Empty) .Replace("-", string.Empty) .Replace("#", string.Empty) .Replace("~", string.Empty) .Replace("{static}", string.Empty) .Replace("{abstract}", string.Empty) .Replace("{const}", string.Empty)\nvar parts = cleanLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+#LightYellow:if (parts.Length > 1) then (<color:green>yes)
+  #WhiteSmoke:result = parts[0];
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.GetMemberNameFrom
+#LightGreen:Params(string line);
+#LightSkyBlue:var result = string.Empty\nvar cleanLine = line.Replace("+", string.Empty) .Replace("-", string.Empty) .Replace("#", string.Empty) .Replace("~", string.Empty) .Replace("{static}", string.Empty) .Replace("{abstract}", string.Empty) .Replace("{const}", string.Empty)\nvar parts = cleanLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+#LightYellow:if (parts.Length > 1) then (<color:green>yes)
+  #WhiteSmoke:result = parts[1];
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateSequenceDiagram
+#LightGreen:Params(string path,string source,string[] defines,bool force);
+#LightSkyBlue:var infoFileName = "sq_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree);
+#LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
+  #WhiteSmoke:Directory.CreateDirectory(path);
+endif
+:iterator = classNodes.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :classNode = iterator.Current();
+    :iterator = methodNodes.GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :methodNode = iterator.Current();
+          #LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
+            #LightYellow:if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false) then (<color:green>yes)
+              #WhiteSmoke:fileName = $"{fileName}{PlantUMLExtension}";
+              else (<color:red>no)
+                #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
+            endif
+            #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+            #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+            #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+            #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+            #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+              #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+            endif
+            #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (SQ)");
+            #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+            #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
+            #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+          endif
+    endwhile (<color:red>no)
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+stop
+start
+note right:  DiagramCreator.CreateSequenceDiagram
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodNode);
+#LightSkyBlue:var diagramData = new List<string>()\nvar messages = new List<string>()\nvar participants = new List<string>()\nvar participantAliasse = new List<string>()\nvar invocationExpressions = methodNode.DescendantNodes().OfType<InvocationExpressionSyntax>().ToArray()\nvar filteredInvocationExpressions = invocationExpressions.Where(ie => ie.Expression.ToString().Contains("ToString") == false && ie.Expression.ToString().Contains("ConfigureAwait") == false && ie.Expression.ToString().Contains("nameof") == false && ie.Expression.ToString().Contains("new") == false);
+#WhiteSmoke:participants.Add(CreateParticipant(methodNode));
+#WhiteSmoke:participants.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipant(ie)).Distinct());
+#WhiteSmoke:participantAliasse.Add(CreateParticipantAlias(methodNode!));
+#WhiteSmoke:participantAliasse.AddRange(filteredInvocationExpressions.Select(ie => CreateParticipantAlias(ie)).Distinct());
+#WhiteSmoke:AnalyzeCallSequence(semanticModel, methodNode!, participantAliasse, messages, 0);
+while (i < participants.Count && i < participantAliasse.Count) is (<color:green>yes)
+  #LightYellow:if (isReferenced) then (<color:green>yes)
+    #WhiteSmoke:diagramData.Add($"participant \"{participants[i]}\" as {participantAliasse[i]} {(i == 0 ? Color.StartParticipant : Color.Participant)}");
+  endif
+:i++;
+endwhile (<color:red>no)
+#LightYellow:if (messages.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Add("autonumber");
+  #WhiteSmoke:diagramData.AddRange(messages);
+endif
+#Lavender:return diagramData;
+stop
+start
+note right:  DiagramCreator.CreateClassDiagram
+#LightGreen:Params(DiagramCreationFlags diagramCreationFlags,params Type[] types);
+#LightSkyBlue:var result = new List<string>()\nvar allTypes = new List<Type>(types);
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetDeclaredInterfaces().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Clone().Where(t => t.IsInterface).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:allTypes.AddRange(type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false));
+  endwhile (<color:red>no)
+endif
+#WhiteSmoke:result.AddRange(CreateTypeDefinitions(allTypes, diagramCreationFlags));
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0) then (<color:green>yes)
+  #WhiteSmoke:result.AddRange(CreateTypeHirarchies(allTypes.Where(t => t.IsClass)));
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsInterface).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:extend.Extends.ForEach(e => result.AddRange(CreateTypeHierachy([extend.Type!, e.Type!])));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:result.AddRange(CreateTypeImplements(type));
+  endwhile (<color:red>no)
+endif
+#LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ClassRelations) > 0) then (<color:green>yes)
+  :iterator = allTypes.Where(t => t.IsClass).GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :type = iterator.Current();
+        #WhiteSmoke:result.AddRange(CreateTypeRelations(type, 0));
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateObjectName
+#LightGreen:Params(Object obj);
+#LightSkyBlue:string? result;
+#LightYellow:if (obj.GetType().IsGenericType) then (<color:green>yes)
+  #WhiteSmoke:result = obj.GetType().Name.Replace("`1", string.Empty);
+  :iterator = obj.GetType().GetGenericArguments().GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :arg = iterator.Current();
+        #WhiteSmoke:result += $"_{arg.Name}";
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #LightYellow:if (obj.GetType().IsArray) then (<color:green>yes)
+      #WhiteSmoke:result = obj.GetType().Name.Replace("[]", "Array");
+      else (<color:red>no)
+        #WhiteSmoke:result = obj.GetType().Name;
+    endif
+endif
+#Lavender:return $"{result}_{obj.GetHashCode()}";
+stop
+start
+note right:  DiagramCreator.CreateCollectionName
+#LightGreen:Params(object obj);
+stop
+start
+note right:  DiagramCreator.CreateObjectDiagram
+#LightGreen:Params(int maxDeep,params object[] objects);
+#LightSkyBlue:var result = new List<string>()\nvar createdObjects = new List<object>();
+#WhiteSmoke:CreateStateRec(objects, result, 0);
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.AnalyzeDeclarationSyntax
+#LightGreen:Params(SemanticModel semanticModel,SyntaxNode syntaxNode,List<string> diagramData,int level);
+#LightYellow:if (syntaxNode is EnumDeclarationSyntax enumDeclaration) then (<color:green>yes)
+  #WhiteSmoke:declaration += $" enum {enumDeclaration.Identifier} {Color.Enum}" + " {";
+  #WhiteSmoke:diagramData.Add(declaration);
+  :iterator = enumDeclaration.Members.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :member = iterator.Current();
+        #WhiteSmoke:diagramData.Add($"{member.Identifier}");
+  endwhile (<color:red>no)
+  #WhiteSmoke:diagramData.Add("}");
+  else (<color:red>no)
+    #LightYellow:if (syntaxNode is StructDeclarationSyntax structDeclaration) then (<color:green>yes)
+      #WhiteSmoke:declaration += $" struct {structDeclaration.Identifier} {Color.Struct}" + " {";
+      #WhiteSmoke:diagramData.Add(declaration);
+      :iterator = structDeclaration.Members.GetIterator();
+      while (iterator.MoveNext()) is (<color:green>yes)
+        :member = iterator.Current();
+                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+      endwhile (<color:red>no)
+      #WhiteSmoke:diagramData.Add("}");
+      else (<color:red>no)
+        #LightYellow:if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclaration) then (<color:green>yes)
+          #WhiteSmoke:declaration += $" interface {interfaceDeclaration.Identifier} {Color.Interface}" + " {";
+          #WhiteSmoke:diagramData.Add(declaration);
+          :iterator = interfaceDeclaration.Members.Where(m => m is FieldDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("---");
+          :iterator = interfaceDeclaration.Members.Where(m => m is PropertyDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("---");
+          :iterator = interfaceDeclaration.Members.Where(m => m is MethodDeclarationSyntax).GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :member = iterator.Current();
+                        #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+          endwhile (<color:red>no)
+          #WhiteSmoke:diagramData.Add("}");
+          else (<color:red>no)
+            #LightYellow:if (syntaxNode is ClassDeclarationSyntax classDeclaration) then (<color:green>yes)
+              #WhiteSmoke:declaration = declaration.Replace("{static}", string.Empty);
+              #WhiteSmoke:declaration += $" class {classDeclaration.Identifier}";
+              #WhiteSmoke:declaration += isStatic ? $" << static >> " : " ";
+              #WhiteSmoke:declaration += isAbstract ? $"{Color.AbstractClass}" : $"{Color.Class}";
+              #WhiteSmoke:declaration += " {";
+              #WhiteSmoke:diagramData.Add(declaration);
+              :iterator = autoProperties.GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :autoProperty = iterator.Current();
+                                #WhiteSmoke:diagramData.Add($"- {modifier} {autoProperty.Type} _{autoProperty.Identifier.Text.ToLower()}".Shrink(' '));
+              endwhile (<color:red>no)
+              :iterator = classDeclaration.Members.Where(m => m is FieldDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("---");
+              :iterator = classDeclaration.Members.Where(m => m is PropertyDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("---");
+              :iterator = classDeclaration.Members.Where(m => m is MethodDeclarationSyntax).GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :member = iterator.Current();
+                                #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, level + 1);
+              endwhile (<color:red>no)
+              #WhiteSmoke:diagramData.Add("}");
+              #LightYellow:if (classDeclaration.BaseList != null) then (<color:green>yes)
+                :iterator = classDeclaration.BaseList.Types.GetIterator();
+                while (iterator.MoveNext()) is (<color:green>yes)
+                  :baseType = iterator.Current();
+                                    #LightYellow:if (typeDeclaration != default) then (<color:green>yes)
+                                      #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, typeDeclaration, diagramData, level + 1);
+                                    endif
+                                    #LightYellow:if (baseType.Type is IdentifierNameSyntax identifierName) then (<color:green>yes)
+                                      #WhiteSmoke:identifierText = identifierName.Identifier.Text;
+                                      #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                      else (<color:red>no)
+                                        #LightYellow:if (baseType.Type is GenericNameSyntax genericName) then (<color:green>yes)
+                                          #WhiteSmoke:identifierText = genericName.Identifier.Text;
+                                          #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                          else (<color:red>no)
+                                            #WhiteSmoke:identifierText = baseType.Type.ToString();
+                                            #WhiteSmoke:diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                                        endif
+                                    endif
+                                    #LightYellow:if (typeDeclaration != default) then (<color:green>yes)
+                                      #LightYellow:if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1])) then (<color:green>yes)
+                                        #WhiteSmoke:diagramData.Add($"interface {identifierText} {Color.Interface}");
+                                        else (<color:red>no)
+                                          #WhiteSmoke:diagramData.Add($"class {identifierText} {Color.Class}");
+                                      endif
+                                    endif
+                endwhile (<color:red>no)
+              endif
+              else (<color:red>no)
+                #LightYellow:if (syntaxNode is FieldDeclarationSyntax fieldDeclaration) then (<color:green>yes)
+                  #WhiteSmoke:diagramData.Add(ConvertFieldDeclaration(fieldDeclaration));
+                  else (<color:red>no)
+                    #LightYellow:if (syntaxNode is PropertyDeclarationSyntax propertyDeclaration) then (<color:green>yes)
+                      #WhiteSmoke:diagramData.AddRange(ConvertPropertyDeclaration(propertyDeclaration));
+                      else (<color:red>no)
+                        #LightYellow:if (syntaxNode is MethodDeclarationSyntax methodDeclaration) then (<color:green>yes)
+                          #WhiteSmoke:diagramData.Add(ConvertMethodDeclaration(methodDeclaration));
+                          else (<color:red>no)
+                            #WhiteSmoke:System.Diagnostics.Debug.WriteLine($"{syntaxNode.GetType().Name} is unknown!");
+                        endif
+                    endif
+                endif
+            endif
+        endif
+    endif
+endif
+stop
+start
+note right:  DiagramCreator.AnalyzeCallSequence
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,List<string> participantAliasse,List<string> messages,int level);
+#LightSkyBlue:var methodResults = new Dictionary<string, string>()\nvar statements = methodDeclaration?.Body?.Statements ?? [];
+:iterator = statements!.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :statement = iterator.Current();
+    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration!, statement, participantAliasse, messages, methodResults, level);
+endwhile (<color:red>no)
+while (i < messages.Count) is (<color:green>yes)
+  #WhiteSmoke:index = clearMessage.IndexOf("=>");
+  #LightYellow:if (index > -1) then (<color:green>yes)
+    #LightYellow:if (between.HasContent()) then (<color:green>yes)
+      #WhiteSmoke:clearMessage = clearMessage.Replace(between, " Expression ");
+    endif
+  endif
+  #WhiteSmoke:messages[i] = clearMessage;
+:i++;
+endwhile (<color:red>no)
+stop
+start
+note right:  DiagramCreator.AnalyzeCallSequence
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,SyntaxNode syntaxNode,List<string> participantAliasse,List<string> messages,Dictionary<string, string> methodResults,int level);
+#LightYellow:if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement) then (<color:green>yes)
+  :iterator = localDeclarationStatement.Declaration.Variables.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :variable = iterator.Current();
+        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level);
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #LightYellow:if (syntaxNode is VariableDeclaratorSyntax variableDeclarator) then (<color:green>yes)
+      #LightYellow:if (variableDeclarator.Initializer != null) then (<color:green>yes)
+        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level);
+      endif
+      :iterator = variableDeclarator.Initializer?.Value?.ChildNodes() ?? [].GetIterator();
+      while (iterator.MoveNext()) is (<color:green>yes)
+        :item = iterator.Current();
+                #LightYellow:if (item is InvocationExpressionSyntax varInvocationExpression) then (<color:green>yes)
+                  #LightYellow:if (varInvocationExpression.ArgumentList?.Arguments.Count == 0) then (<color:green>yes)
+                    :iterator = varInvocationExpression.ArgumentList.Arguments.GetIterator();
+                    while (iterator.MoveNext()) is (<color:green>yes)
+                      :argument = iterator.Current();
+                                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level);
+                    endwhile (<color:red>no)
+                  endif
+                endif
+      endwhile (<color:red>no)
+      else (<color:red>no)
+        #LightYellow:if (syntaxNode is InvocationExpressionSyntax invocationExpression) then (<color:green>yes)
+          #LightYellow:if (participantAliasse.Contains(participantFrom) && participantAliasse.Contains(participantTo)) then (<color:green>yes)
+            #LightYellow:if (argumentList != "()") then (<color:green>yes)
+              #WhiteSmoke:messages.Add($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level));
+              :iterator = invocationExpression.ArgumentList.Arguments.GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :item = iterator.Current();
+                                #LightYellow:if (item.Expression is InvocationExpressionSyntax argInvocationExpression) then (<color:green>yes)
+                                  #LightYellow:if (participantAliasse.Contains(argfrom) && participantAliasse.Contains(argTo)) then (<color:green>yes)
+                                    #LightYellow:if (argArgumentList != "()") then (<color:green>yes)
+                                      #WhiteSmoke:messages.Add($"{argfrom} -[#grey]> {argTo} : {argArgumentList}".SetIndent(level));
+                                      else (<color:red>no)
+                                        #WhiteSmoke:messages.Add($"{argfrom} -[#grey]> {argTo}".SetIndent(level));
+                                    endif
+                                  endif
+                                endif
+              endwhile (<color:red>no)
+              else (<color:red>no)
+                #WhiteSmoke:messages.Add($"{participantFrom} -[#grey]> {participantTo}".SetIndent(level));
+            endif
+            #LightYellow:if (invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression) then (<color:green>yes)
+              #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+              else (<color:red>no)
+                #LightYellow:if (invocationExpression.Parent is EqualsValueClauseSyntax equalsValueClause) then (<color:green>yes)
+                  #LightYellow:if (equalsValueClause.Parent is VariableDeclaratorSyntax equalsVariableDeclarator) then (<color:green>yes)
+                    #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {equalsVariable}".SetIndent(level));
+                  endif
+                  else (<color:red>no)
+                    #LightYellow:if (invocationExpression.Parent is ReturnStatementSyntax) then (<color:green>yes)
+                      #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+                      else (<color:red>no)
+                        #LightYellow:if (symbolInfo.Symbol is IMethodSymbol methodSymbol) then (<color:green>yes)
+                          #LightYellow:if (result?.ToLower() != "void") then (<color:green>yes)
+                            #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+                          endif
+                        endif
+                    endif
+                endif
+            endif
+            else (<color:red>no)
+              :iterator = invocationExpression.ChildNodes().GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :item = iterator.Current();
+                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
+              endwhile (<color:red>no)
+          endif
+          else (<color:red>no)
+            #LightYellow:if (syntaxNode is ExpressionStatementSyntax expressionStatement) then (<color:green>yes)
+              #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, expressionStatement.Expression, participantAliasse, messages, methodResults, level);
+              else (<color:red>no)
+                #LightYellow:if (syntaxNode is AssignmentExpressionSyntax assignmentExpression) then (<color:green>yes)
+                  #LightYellow:if (assignmentExpression.Right is InvocationExpressionSyntax rightExpression) then (<color:green>yes)
+                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level);
+                  endif
+                  else (<color:red>no)
+                    #LightYellow:if (syntaxNode is BinaryExpressionSyntax binaryExpression) then (<color:green>yes)
+                      #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level);
+                      #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level);
+                      else (<color:red>no)
+                        #LightYellow:if (syntaxNode is DoStatementSyntax doStatement && HasInvocationExpression(doStatement)) then (<color:green>yes)
+                          :iterator = doStatement.ChildNodes().GetIterator();
+                          while (iterator.MoveNext()) is (<color:green>yes)
+                            :item = iterator.Current();
+                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                          endwhile (<color:red>no)
+                          #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                            #WhiteSmoke:messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
+                            #WhiteSmoke:messages.AddRange(innerMessages);
+                            #WhiteSmoke:messages.Add("end".SetIndent(level));
+                          endif
+                          else (<color:red>no)
+                            #LightYellow:if (syntaxNode is WhileStatementSyntax whileStatement && HasInvocationExpression(whileStatement)) then (<color:green>yes)
+                              :iterator = whileStatement.ChildNodes().GetIterator();
+                              while (iterator.MoveNext()) is (<color:green>yes)
+                                :item = iterator.Current();
+                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                              endwhile (<color:red>no)
+                              #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                #WhiteSmoke:messages.Add($"loop#LightCoral {whileStatement.Condition}".SetIndent(level));
+                                #WhiteSmoke:messages.AddRange(innerMessages);
+                                #WhiteSmoke:messages.Add("end".SetIndent(level));
+                              endif
+                              else (<color:red>no)
+                                #LightYellow:if (syntaxNode is ForStatementSyntax forStatement && HasInvocationExpression(forStatement)) then (<color:green>yes)
+                                  :iterator = forStatement.ChildNodes().GetIterator();
+                                  while (iterator.MoveNext()) is (<color:green>yes)
+                                    :item = iterator.Current();
+                                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                  endwhile (<color:red>no)
+                                  #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                    #WhiteSmoke:messages.Add($"loop#LightCoral {forStatement.Condition}".SetIndent(level));
+                                    #WhiteSmoke:messages.AddRange(innerMessages);
+                                    #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                  endif
+                                  else (<color:red>no)
+                                    #LightYellow:if (syntaxNode is ForEachStatementSyntax forEachStatement && HasInvocationExpression(forEachStatement)) then (<color:green>yes)
+                                      :iterator = forEachStatement.ChildNodes().GetIterator();
+                                      while (iterator.MoveNext()) is (<color:green>yes)
+                                        :item = iterator.Current();
+                                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                      endwhile (<color:red>no)
+                                      #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                        #WhiteSmoke:messages.Add($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level));
+                                        #WhiteSmoke:messages.AddRange(innerMessages);
+                                        #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                      endif
+                                      else (<color:red>no)
+                                        #LightYellow:if (syntaxNode is IfStatementSyntax ifStatement && HasInvocationExpression(ifStatement)) then (<color:green>yes)
+                                          :iterator = ifStatement.ChildNodes().GetIterator();
+                                          while (iterator.MoveNext()) is (<color:green>yes)
+                                            :item = iterator.Current();
+                                                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                          endwhile (<color:red>no)
+                                          #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                            #WhiteSmoke:messages.Add($"alt#LightBlue {ifStatement.Condition}".SetIndent(level));
+                                            #WhiteSmoke:messages.AddRange(innerMessages);
+                                            #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                          endif
+                                          else (<color:red>no)
+                                            #LightYellow:if (syntaxNode is ElseClauseSyntax elseClause && HasInvocationExpression(elseClause)) then (<color:green>yes)
+                                              #WhiteSmoke:messages.Add($"else".SetIndent(level));
+                                              :iterator = elseClause.ChildNodes().GetIterator();
+                                              while (iterator.MoveNext()) is (<color:green>yes)
+                                                :item = iterator.Current();
+                                                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                                              endwhile (<color:red>no)
+                                              else (<color:red>no)
+                                                :iterator = syntaxNode.ChildNodes().GetIterator();
+                                                while (iterator.MoveNext()) is (<color:green>yes)
+                                                  :item = iterator.Current();
+                                                                                                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
+                                                endwhile (<color:red>no)
+                                            endif
+                                        endif
+                                    endif
+                                endif
+                            endif
+                        endif
+                    endif
+                endif
+            endif
+        endif
+    endif
+endif
+stop
+start
+note right:  DiagramCreator.HasInvocationExpression
+#LightGreen:Params(SyntaxNode syntaxNode);
+#LightSkyBlue:var result = syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>().Any();
+#LightYellow:if (result == false) then (<color:green>yes)
+  while (result == false && iterator.MoveNext()) is (<color:green>yes)
+    #WhiteSmoke:result = HasInvocationExpression(iterator.Current);
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.AnalyzeStatement
+#LightGreen:Params(SyntaxNode syntaxNode,List<string> diagramData,bool declarations,int level);
+#LightSkyBlue:string yesLabel = "<color:green>yes"\nstring noLabel = "<color:red>no";
+#LightYellow:if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement && declarations) then (<color:green>yes)
+  #WhiteSmoke:diagramData.Add($"{Color.Declaration}:{localDeclarationStatement.Declaration};".SetIndent(level));
+  else (<color:red>no)
+    #LightYellow:if (syntaxNode is ExpressionStatementSyntax expressionStatement) then (<color:green>yes)
+      #WhiteSmoke:expression = expression.Replace("PrintLine", "PrintLine");
+      #WhiteSmoke:expression = expression.Replace("PrintLine", "PrintLine");
+      #WhiteSmoke:expression = expression.Replace("Print", "Print");
+      #WhiteSmoke:expression = expression.Replace("Print", "Print");
+      #WhiteSmoke:expression = expression.Replace("ReadLine", "ReadLine");
+      #WhiteSmoke:expression = expression.Replace("ReadLine", "ReadLine");
+      #WhiteSmoke:expression = expression.Replace("Read", "Read");
+      #WhiteSmoke:expression = expression.Replace("Read", "Read");
+      #WhiteSmoke:diagramData.Add($"{Color.Expression}:{expression}".SetIndent(level));
+      else (<color:red>no)
+        #LightYellow:if (syntaxNode is BlockSyntax blockSyntax) then (<color:green>yes)
+          :iterator = blockSyntax.ChildNodes().GetIterator();
+          while (iterator.MoveNext()) is (<color:green>yes)
+            :node = iterator.Current();
+                        #LightYellow:if (node is StatementSyntax statementSyntax) then (<color:green>yes)
+                          #WhiteSmoke:AnalyzeStatement(statementSyntax, diagramData, declarations, level);
+                        endif
+          endwhile (<color:red>no)
+          else (<color:red>no)
+            #LightYellow:if (syntaxNode is IfStatementSyntax ifStatement) then (<color:green>yes)
+              #WhiteSmoke:diagramData.Add($"{Color.If}:if ({condition}) then ({yesLabel})".SetIndent(level));
+              #WhiteSmoke:AnalyzeStatement(ifStatement.Statement, diagramData, declarations, level + 1);
+              #LightYellow:if (ifStatement.Else != null) then (<color:green>yes)
+                #WhiteSmoke:AnalyzeStatement(ifStatement.Else, diagramData, declarations, level + 1);
+              endif
+              #WhiteSmoke:diagramData.Add("endif".SetIndent(level));
+              else (<color:red>no)
+                #LightYellow:if (syntaxNode is ElseClauseSyntax elseClause) then (<color:green>yes)
+                  #WhiteSmoke:diagramData.Add($"else ({noLabel})".SetIndent(level));
+                  #WhiteSmoke:AnalyzeStatement(elseClause.Statement, diagramData, declarations, level + 1);
+                  else (<color:red>no)
+                    #LightYellow:if (syntaxNode is SwitchStatementSyntax switchStatement) then (<color:green>yes)
+                      #WhiteSmoke:diagramData.Add($"switch ({switchStatement.Expression})".SetIndent(level));
+                      :iterator = switchStatement.Sections.GetIterator();
+                      while (iterator.MoveNext()) is (<color:green>yes)
+                        :section = iterator.Current();
+                                                #LightYellow:if (labels.Contains("default:")) then (<color:green>yes)
+                                                  #WhiteSmoke:labels = labels.Replace("default:", "case ( default )");
+                                                  else (<color:red>no)
+                                                    #WhiteSmoke:labels = labels.Replace(":", " )");
+                                                endif
+                                                #WhiteSmoke:diagramData.Add($"{labels}".SetIndent(level + 1));
+                                                :iterator = section.ChildNodes().GetIterator();
+                                                while (iterator.MoveNext()) is (<color:green>yes)
+                                                  :node = iterator.Current();
+                                                                            #LightYellow:if (node is StatementSyntax statementSyntax) then (<color:green>yes)
+                                                                              #WhiteSmoke:AnalyzeStatement(statementSyntax, diagramData, declarations, level + 1);
+                                                                            endif
+                                                endwhile (<color:red>no)
+                      endwhile (<color:red>no)
+                      #WhiteSmoke:diagramData.Add("endswitch".SetIndent(level));
+                      else (<color:red>no)
+                        #LightYellow:if (syntaxNode is BreakStatementSyntax breakStatement) then (<color:green>yes)
+                          #WhiteSmoke:System.Diagnostics.Debug.WriteLine($"{nameof(breakStatement)} is known but not used!");
+                          else (<color:red>no)
+                            #LightYellow:if (syntaxNode is ContinueStatementSyntax continueStatement) then (<color:green>yes)
+                              #WhiteSmoke:System.Diagnostics.Debug.WriteLine($"{nameof(continueStatement)} is known but not used!");
+                              else (<color:red>no)
+                                #LightYellow:if (syntaxNode is DoStatementSyntax doStatement) then (<color:green>yes)
+                                  #WhiteSmoke:diagramData.Add("repeat".SetIndent(level));
+                                  #WhiteSmoke:AnalyzeStatement(doStatement.Statement, diagramData, declarations, level + 1);
+                                  #WhiteSmoke:diagramData.Add($"repeat while ({doStatement.Condition}) is ({yesLabel})".SetIndent(level));
+                                  else (<color:red>no)
+                                    #LightYellow:if (syntaxNode is WhileStatementSyntax whileStatement) then (<color:green>yes)
+                                      #WhiteSmoke:diagramData.Add($"while ({whileStatement.Condition}) is ({yesLabel})".SetIndent(level));
+                                      #WhiteSmoke:AnalyzeStatement(whileStatement.Statement, diagramData, declarations, level + 1);
+                                      #WhiteSmoke:diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
+                                      else (<color:red>no)
+                                        #LightYellow:if (syntaxNode is ForStatementSyntax forStatement) then (<color:green>yes)
+                                          #LightYellow:if (declarations) then (<color:green>yes)
+                                            #WhiteSmoke:diagramData.Add($"{Color.Declaration}:{forStatement.Declaration};".SetIndent(level));
+                                          endif
+                                          #WhiteSmoke:diagramData.Add($"while ({forStatement.Condition}) is ({yesLabel})".SetIndent(level));
+                                          #WhiteSmoke:AnalyzeStatement(forStatement.Statement, diagramData, declarations, level + 1);
+                                          #LightYellow:if (forStatement.Incrementors.Count > 0) then (<color:green>yes)
+                                            #WhiteSmoke:diagramData.Add($":{forStatement.Incrementors};".SetIndent(level));
+                                          endif
+                                          #WhiteSmoke:diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
+                                          else (<color:red>no)
+                                            #LightYellow:if (syntaxNode is ForEachStatementSyntax forEachStatement) then (<color:green>yes)
+                                              #WhiteSmoke:diagramData.Add($":iterator = {forEachStatement.Expression}.GetIterator();".SetIndent(level));
+                                              #WhiteSmoke:diagramData.Add($"while (iterator.MoveNext()) is ({yesLabel})".SetIndent(level));
+                                              #WhiteSmoke:diagramData.Add($":{forEachStatement.Identifier} = iterator.Current();".SetIndent(level + 1));
+                                              #WhiteSmoke:AnalyzeStatement(forEachStatement.Statement, statements, declarations, level + 1);
+                                              :iterator = statements.GetIterator();
+                                              while (iterator.MoveNext()) is (<color:green>yes)
+                                                :statement = iterator.Current();
+                                                                                                #WhiteSmoke:diagramData.Add(statement.SetIndent(level + 1));
+                                              endwhile (<color:red>no)
+                                              #WhiteSmoke:diagramData.Add($"endwhile ({noLabel})".SetIndent(level));
+                                              else (<color:red>no)
+                                                #LightYellow:if (syntaxNode is ReturnStatementSyntax returnStatement) then (<color:green>yes)
+                                                  #WhiteSmoke:diagramData.Add($"{Color.Return}:return {returnStatement.Expression};".SetIndent(level));
+                                                  else (<color:red>no)
+                                                    #LightYellow:if (syntaxNode is ThrowStatementSyntax throwStatement) then (<color:green>yes)
+                                                      #WhiteSmoke:diagramData.Add($"{Color.Throw}:throw {throwStatement.Expression};".SetIndent(level));
+                                                      #WhiteSmoke:diagramData.Add("kill".SetIndent(level));
+                                                      else (<color:red>no)
+                                                        #WhiteSmoke:System.Diagnostics.Debug.WriteLine($"{syntaxNode.GetType().Name} is unknown!");
+                                                    endif
+                                                endif
+                                            endif
+                                        endif
+                                    endif
+                                endif
+                            endif
+                        endif
+                    endif
+                endif
+            endif
+        endif
+    endif
+endif
+stop
+start
+note right:  DiagramCreator.CreateTypeDefinition
+#LightGreen:Params(Type type,DiagramCreationFlags diagramCreationFlags);
+#LightSkyBlue:var result = new List<string>();
+#LightYellow:if (type.IsEnum) then (<color:green>yes)
+  #WhiteSmoke:result.Add($"enum {type.Name} #light" + $"blue " + "{");
+  #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.EnumMembers) > 0) then (<color:green>yes)
+    :iterator = Enum.GetValues(type).GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :item = iterator.Current();
+            #WhiteSmoke:result.Add($" {item}");
+    endwhile (<color:red>no)
+  endif
+  #WhiteSmoke:result.Add("}");
+  else (<color:red>no)
+    #LightYellow:if (type.IsClass) then (<color:green>yes)
+      #LightYellow:if (type.IsAbstract) then (<color:green>yes)
+        #WhiteSmoke:result.Add($"{prefix}abstract class {type.Name} {Color.Class} " + "{");
+        else (<color:red>no)
+          #WhiteSmoke:result.Add($"{prefix}class {type.Name} {Color.AbstractClass} " + "{");
+      endif
+      #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.ClassMembers) > 0) then (<color:green>yes)
+        #WhiteSmoke:result.AddRange(CreateItemMembers(type).SetIndent(1));
+      endif
+      #WhiteSmoke:result.Add("}");
+      else (<color:red>no)
+        #LightYellow:if (type.IsInterface) then (<color:green>yes)
+          #WhiteSmoke:result.Add($"interface {type.Name} {Color.Interface} " + "{");
+          #LightYellow:if ((diagramCreationFlags & DiagramCreationFlags.InterfaceMembers) > 0) then (<color:green>yes)
+            #WhiteSmoke:result.AddRange(CreateItemMembers(type).SetIndent(1));
+          endif
+          #WhiteSmoke:result.Add("}");
+        endif
+    endif
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateTypeHirarchies
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<string>();
+:iterator = CreateDiagramHirarchies(types).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:result.AddRange(CreateTypeHierachy(item));
+endwhile (<color:red>no)
+#Lavender:return result.Distinct();
+stop
+start
+note right:  DiagramCreator.CreateTypeHierachy
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<string>()\nvar typeArray = types.ToArray();
+while (i < typeArray.Length - 1) is (<color:green>yes)
+  #LightYellow:if (typeArray[i + 1].IsInterface || typeArray[i].IsInterface) then (<color:green>yes)
+    #WhiteSmoke:result.Add($"{typeArray[i + 1].Name} <|.. {typeArray[i].Name}");
+    else (<color:red>no)
+      #WhiteSmoke:result.Add($"{typeArray[i + 1].Name} <|-- {typeArray[i].Name}");
+  endif
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateTypeRelations
+#LightGreen:Params(Type type,int deep);
+#LightSkyBlue:var result = new List<string>();
+:iterator = type.GetRelations(deep).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.IsArray) then (<color:green>yes)
+      #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+        #WhiteSmoke:result.Add($"{type.Name} --> \"0..1\" {elemType.Name}");
+        else (<color:red>no)
+          #WhiteSmoke:result.Add($"{type.Name} --> \"1\" {elemType.Name}");
+      endif
+      else (<color:red>no)
+        #LightYellow:if (item.IsGenericCollectionType()) then (<color:green>yes)
+          #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+            #WhiteSmoke:result.Add($"{type.Name} \"*\" o-- \"0..1\" {elemType.Name}");
+            else (<color:red>no)
+              #WhiteSmoke:result.Add($"{type.Name} \"*\" *-- \"1\" {elemType.Name}");
+          endif
+          else (<color:red>no)
+            #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+              #WhiteSmoke:result.Add($"{type.Name} --> \"0..1\" {item.Name}");
+              else (<color:red>no)
+                #WhiteSmoke:result.Add($"{type.Name} --> \"1\" {item.Name}");
+            endif
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateTypeImplements
+#LightGreen:Params(Type type);
+#LightSkyBlue:var result = new List<string>()\nvar lolypop = "()-";
+:iterator = type.GetDeclaredInterfaces().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :typeInfo = iterator.Current();
+    #WhiteSmoke:result.Add($"{typeInfo.Name} {lolypop} {type.Name}");
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateTypeDefinitions
+#LightGreen:Params(IEnumerable<Type> types,DiagramCreationFlags diagramCreationFlags);
+#LightSkyBlue:var result = new List<string>();
+:iterator = types.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :type = iterator.Current();
+    #WhiteSmoke:result.AddRange(CreateTypeDefinition(type, diagramCreationFlags));
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateItemMembers
+#LightGreen:Params(Type type);
+#LightSkyBlue:var counter = 0\nvar result = new List<string>()\nBindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = type.GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{(item.IsPublic ? "+" : "-")}" + " {static}" + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+:iterator = type.GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix}" + " " + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Static | BindingFlags.Public;
+:iterator = type.GetProperties(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.CanRead) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add(" + {static}" + $"{item.PropertyType.GetSourceTypeName()} get{item.Name}()");
+    endif
+    #LightYellow:if (item.CanWrite) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add(" + {static}" + $"set{item.Name}({item.PropertyType.GetSourceTypeName()} value)");
+    endif
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
+:iterator = type.GetProperties(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.CanRead) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add($" + {item.PropertyType.GetSourceTypeName()} get{item.Name}()");
+    endif
+    #LightYellow:if (item.CanWrite) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      #WhiteSmoke:result.Add($" + set{item.Name}({item.PropertyType.GetSourceTypeName()} value)");
+    endif
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = type.GetMethods(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix} " + "{static}" + $"{item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+#WhiteSmoke:bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+:iterator = type.GetMethods(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{prefix} {item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})");
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateObjectState
+#LightGreen:Params(object obj);
+#LightSkyBlue:var counter = 0\nvar result = new List<string>()\nBindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+:iterator = obj.GetType().GetFields(bindingFlags).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add("{static}" + $"{GetFieldName(item)} => {GetStateValue(obj, item)}");
+endwhile (<color:red>no)
+#LightYellow:if (counter > 0) then (<color:green>yes)
+  #WhiteSmoke:result.Add("---");
+endif
+#WhiteSmoke:counter = 0;
+:iterator = obj.GetType().GetAllClassFields().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:counter++;
+    #WhiteSmoke:result.Add($"{GetFieldName(item)} => {GetStateValue(obj, item)}");
+endwhile (<color:red>no)
+#LightYellow:if (obj.GetType().IsArray) then (<color:green>yes)
+  while (i < array!.Length) is (<color:green>yes)
+    #WhiteSmoke:result.Add($"{i} => {array.GetValue(i)}");
+  :i++;
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateCollectionState
+#LightGreen:Params(IEnumerable collection);
+#LightSkyBlue:var counter = 0\nvar result = new List<string>();
+:iterator = collection.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item != null) then (<color:green>yes)
+      #WhiteSmoke:result.Add($"{counter++} => {item.GetType().Name}_{item.GetHashCode()}");
+      else (<color:red>no)
+        #WhiteSmoke:result.Add($"{counter++} => null");
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.ExtractUMLItems
+#LightGreen:Params(IEnumerable<string> lines);
+#LightSkyBlue:var result = new List<UMLItem>()\nvar isItem = false\nvar umlItem = default(UMLItem);
+:iterator = lines.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (isItem == false && line.Trim().EndsWith('{') && (line.Contains("class") || line.Contains("interface"))) then (<color:green>yes)
+      #WhiteSmoke:isItem = true;
+      #WhiteSmoke:umlItem = new UMLItem { line };
+      else (<color:red>no)
+        #LightYellow:if (isItem == false && line.Trim().StartsWith("start", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+          #WhiteSmoke:isItem = true;
+          #WhiteSmoke:umlItem = new UMLItem { line };
+          else (<color:red>no)
+            #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith('}') == false && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase) == false) then (<color:green>yes)
+              #WhiteSmoke:umlItem.Add(line);
+              else (<color:red>no)
+                #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith('}')) then (<color:green>yes)
+                  #WhiteSmoke:umlItem.Add(line);
+                  #WhiteSmoke:result.Add(umlItem);
+                  #WhiteSmoke:umlItem = default;
+                  #WhiteSmoke:isItem = false;
+                  else (<color:red>no)
+                    #LightYellow:if (isItem && umlItem != default && line.Trim().StartsWith("stop", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+                      #WhiteSmoke:umlItem.Add(line);
+                      #WhiteSmoke:result.Add(umlItem);
+                      #WhiteSmoke:umlItem = default;
+                      #WhiteSmoke:isItem = false;
+                    endif
+                endif
+            endif
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.ExtractUMLRelations
+#LightGreen:Params(IEnumerable<string> lines);
+#LightSkyBlue:var result = new UMLItem();
+:iterator = lines.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("<|--") || line.Contains("--|>")) then (<color:green>yes)
+      #WhiteSmoke:result.Add(line);
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.UpdateDiagramPath
+#LightGreen:Params(string path,string infoFileFilter);
+#LightSkyBlue:var infoLines = new List<string>()\nvar infoFiles = Directory.GetFiles(path, infoFileFilter, SearchOption.TopDirectoryOnly);
+:iterator = infoFiles.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :infoFile = iterator.Current();
+    #WhiteSmoke:infoLines.AddRange(File.ReadAllLines(infoFile));
+endwhile (<color:red>no)
+#LightSkyBlue:var files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories);
+:iterator = files.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #LightYellow:if (infoLines.Any(l => l.StartsWith($"fileName:{fileName}")) == false) then (<color:green>yes)
+      #WhiteSmoke:File.Delete(file);
+    endif
+endwhile (<color:red>no)
+stop
+start
+note right:  DiagramCreator.FindTypeDeclaration
+#LightGreen:Params(SemanticModel semanticModel,BaseTypeSyntax baseTypeSyntax);
+#LightSkyBlue:var result = default(TypeDeclarationSyntax)\nvar typeDeclarations = semanticModel.SyntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>();
+#LightYellow:if (baseTypeSyntax.Type is IdentifierNameSyntax identifierName) then (<color:green>yes)
+  #WhiteSmoke:result = typeDeclarations.FirstOrDefault(t => t.Identifier.Text == identifierText);
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.CreateParticipant
+#LightGreen:Params(MethodDeclarationSyntax methodSyntax);
+#LightSkyBlue:var parameters = methodSyntax.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
+#Lavender:return $"{methodSyntax?.Identifier}{paramsStatement}".Replace($"{Environment.NewLine}", string.Empty);
+stop
+start
+note right:  DiagramCreator.CreateParticipantAlias
+#LightGreen:Params(MethodDeclarationSyntax methodSyntax);
+#LightSkyBlue:var identifier = methodSyntax.Identifier\nvar parameters = methodSyntax.ParameterList?.Parameters ?? []\nvar result = $"{identifier}" + (parameters.Any() ? $"_{string.Join("_", parameters.Select((item, index) => $"p{index}"))}" : string.Empty);
+#Lavender:return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
+stop
+start
+note right:  DiagramCreator.CreateParticipant
+#LightGreen:Params(InvocationExpressionSyntax invocationSyntax);
+#LightSkyBlue:var arguments = invocationSyntax.ArgumentList?.Arguments ?? []\nvar argsStatement = arguments.Any() ? string.Join(",", arguments.Select((item, index) => $"a{index}")) : string.Empty;
+#Lavender:return $"{invocationSyntax?.Expression}({argsStatement})".Replace($"{Environment.NewLine}", string.Empty) .Replace(" ", string.Empty);
+stop
+start
+note right:  DiagramCreator.CreateParticipantAlias
+#LightGreen:Params(InvocationExpressionSyntax invocationExpression);
+#LightSkyBlue:var identifier = invocationExpression.Expression.ToString()\nvar arguments = invocationExpression.ArgumentList?.Arguments ?? []\nvar result = $"{identifier}" + (arguments.Any() ? $"_{string.Join("_", arguments.Select((item, index) => $"a{index}"))}" : string.Empty);
+#Lavender:return result.Select(c => char.IsLetterOrDigit(c) ? c.ToString() : "_").Aggregate((a, b) => a + b).Shrink('_');
+stop
+start
+note right:  DiagramCreator.CreateArgumentList
+#LightGreen:Params(InvocationExpressionSyntax invocationExpression,Dictionary<string, string> methodResults);
+#LightSkyBlue:var result = string.Empty\nvar arguments = invocationExpression.ArgumentList?.Arguments ?? [];
+:iterator = arguments.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (result.Length > 0) then (<color:green>yes)
+      #WhiteSmoke:result += ", ";
+    endif
+    #LightYellow:if (item.Expression is InvocationExpressionSyntax argumentInvocationExpression) then (<color:green>yes)
+      #LightYellow:if (methodResults.TryGetValue(participant, out string? value)) then (<color:green>yes)
+        #WhiteSmoke:result = $"{result}{value}";
+        else (<color:red>no)
+          #WhiteSmoke:result = $"{result}{item}";
+      endif
+      else (<color:red>no)
+        #WhiteSmoke:result = $"{result}{item}";
+    endif
+endwhile (<color:red>no)
+#Lavender:return $"({result})";
+stop
+start
+note right:  DiagramCreator.CreateDiagramHirarchies
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<IEnumerable<Type>>();
+:iterator = types.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :type = iterator.Current();
+    #LightYellow:if (classHirarchy.Count() > 1) then (<color:green>yes)
+      #WhiteSmoke:result.Add(classHirarchy);
+    endif
+endwhile (<color:red>no)
+#LightSkyBlue:var calculatedHirarchies = new List<IEnumerable<Type>>();
+while (i < result.Count - 1) is (<color:green>yes)
+  while (j < result.Count) is (<color:green>yes)
+    #WhiteSmoke:commonSet = commonSet.Intersect(result[j]);
+  :j++;
+  endwhile (<color:red>no)
+  #LightYellow:if (commonSet.Count() > 1) then (<color:green>yes)
+    while (j < result.Count) is (<color:green>yes)
+      #LightYellow:if (commonSet.All(e => currentSet.Any(c => e == c)) && exceptSet.Any()) then (<color:green>yes)
+        #WhiteSmoke:calculatedHirarchies.Add(createSet);
+        else (<color:red>no)
+          #WhiteSmoke:calculatedHirarchies.Add(result[j]);
+      endif
+    :j++;
+    endwhile (<color:red>no)
+    else (<color:red>no)
+      #WhiteSmoke:calculatedHirarchies.AddRange(result);
+  endif
+  #WhiteSmoke:result.Clear();
+  #WhiteSmoke:result.AddRange(calculatedHirarchies);
+  #WhiteSmoke:calculatedHirarchies.Clear();
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result.Distinct();
+stop
+start
+note right:  DiagramCreator.GetFieldName
+#LightGreen:Params(FieldInfo fieldInfo);
+#LightSkyBlue:string? result;
+#LightYellow:if (fieldInfo.Name.Contains("k__BackingField")) then (<color:green>yes)
+  #WhiteSmoke:result = "_" + fieldInfo.Name.Betweenstring("<", ">");
+  #WhiteSmoke:result = string.Concat(result[..2].ToLower(), result.AsSpan(2));
+  else (<color:red>no)
+    #WhiteSmoke:result = fieldInfo.Name;
+endif
+#Lavender:return result;
+stop
+start
+note right:  DiagramCreator.GetParameters
+#LightGreen:Params(MethodInfo methodInfo);
+#LightSkyBlue:var counter = 0\nvar result = new StringBuilder();
+:iterator = methodInfo.GetParameters().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (counter++ > 0) then (<color:green>yes)
+      #WhiteSmoke:result.Append(", ");
+    endif
+    #WhiteSmoke:result.Append($"{item.ParameterType.Name} {item.Name}");
+endwhile (<color:red>no)
+#Lavender:return result.ToString();
+stop
+start
+note right:  DiagramCreator.GetFieldValue
+#LightGreen:Params(object obj,FieldInfo fieldInfo);
+#LightSkyBlue:object? value;
+#LightYellow:if (fieldInfo.IsStatic) then (<color:green>yes)
+  #WhiteSmoke:value = fieldInfo.GetValue(null);
+  else (<color:red>no)
+    #WhiteSmoke:value = fieldInfo.GetValue(obj);
+endif
+#Lavender:return value;
+stop
+start
+note right:  DiagramCreator.GetStateValue
+#LightGreen:Params(object obj,FieldInfo fieldInfo);
+#Lavender:return GetStateValue(obj, fieldInfo, 15);
+stop
+start
+note right:  DiagramCreator.GetStateValue
+#LightGreen:Params(object obj,FieldInfo fieldInfo,int maxLength);
+#LightSkyBlue:string? result\nvar value = GetFieldValue(obj, fieldInfo);
+#LightYellow:if (fieldInfo.FieldType.IsValueType) then (<color:green>yes)
+  #WhiteSmoke:result = value?.ToString() ?? string.Empty;
+  else (<color:red>no)
+    #LightYellow:if (fieldInfo.FieldType == typeof(string)) then (<color:green>yes)
+      #WhiteSmoke:result = $"\"{value}\"";
+      else (<color:red>no)
+        #LightYellow:if (value == null) then (<color:green>yes)
+          #WhiteSmoke:result = "null";
+          else (<color:red>no)
+            #WhiteSmoke:result = $"{value.GetHashCode()}";
+        endif
+    endif
+endif
+#Lavender:return result.Length > maxLength - 3 ? result[..(maxLength - 2)] + "..." : result;
+stop
+start
+note right:  DiagramCreator.IsAutoProperty
+#LightGreen:Params(PropertyDeclarationSyntax propertydeclaration);
+#LightSkyBlue:var accessorList = propertydeclaration.AccessorList;
+#Lavender:return accessorList != null && accessorList.Accessors.All(accessor => accessor.Body == null && accessor.ExpressionBody == null);
+stop
+start
+note right:  DiagramCreator.ReadCustomUMLFromFle
+#LightGreen:Params(string filePath);
+#LightSkyBlue:var result = new List<string>();
+#LightYellow:if (File.Exists(filePath)) then (<color:green>yes)
+  #LightYellow:if (customUMLLines.Count > 0) then (<color:green>yes)
+    #WhiteSmoke:customUMLLines.Insert(0, $"' {CustomUMLLabel}");
+    #WhiteSmoke:customUMLLines.Add($"' {CustomUMLLabel}");
+  endif
+  #WhiteSmoke:result.AddRange(customUMLLines);
+endif
+#Lavender:return [.. result];
+stop
+start
+note right:  DiagramCreator.ReadCustomUML
+#LightGreen:Params(IEnumerable<string> lines);
+#LightSkyBlue:var result = new List<string>()\nvar counter = 0;
+:iterator = lines.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains($"{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
+      #WhiteSmoke:counter++;
+      else (<color:red>no)
+        #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)
+          #WhiteSmoke:result.Add(line);
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+footer
+generated with the DiagramCreator by Prof.Gehrer
+end footer
+@enduml

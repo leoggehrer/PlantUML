@@ -1,0 +1,13 @@
+@startuml DiagramCreator.CreateTypeHirarchies
+title DiagramCreator.CreateTypeHirarchies
+start
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<string>();
+:iterator = CreateDiagramHirarchies(types).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #WhiteSmoke:result.AddRange(CreateTypeHierachy(item));
+endwhile (<color:red>no)
+#Lavender:return result.Distinct();
+stop
+@enduml

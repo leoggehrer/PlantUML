@@ -1,0 +1,58 @@
+@startuml DiagramCreator.CreateItemMembers
+title DiagramCreator.CreateItemMembers
+participant "CreateItemMembers(Type type)" as CreateItemMembers_p0 #LightYellow
+participant "type.GetFields(a0)" as type_GetFields_a0 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "type.GetProperties(a0)" as type_GetProperties_a0 #LightGreen
+participant "type.GetMethods(a0)" as type_GetMethods_a0 #LightGreen
+autonumber
+loop#LightCoral type.GetFields(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetFields_a0 : (bindingFlags)
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($"{(item.IsPublic ? "+" : "-")}" + " {static}" + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}")
+end
+alt#LightBlue counter > 0
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral type.GetFields(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetFields_a0 : (bindingFlags)
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($"{prefix}" + " " + $"{item.FieldType.GetSourceTypeName()} {GetFieldName(item)}")
+end
+alt#LightBlue counter > 0
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral type.GetProperties(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetProperties_a0 : (bindingFlags)
+ alt#LightBlue item.CanRead
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : (" + {static}" + $"{item.PropertyType.GetSourceTypeName()} get{item.Name}()")
+ end
+ alt#LightBlue item.CanWrite
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : (" + {static}" + $"set{item.Name}({item.PropertyType.GetSourceTypeName()} value)")
+ end
+end
+alt#LightBlue counter > 0
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral type.GetProperties(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetProperties_a0 : (bindingFlags)
+ alt#LightBlue item.CanRead
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($" + {item.PropertyType.GetSourceTypeName()} get{item.Name}()")
+ end
+ alt#LightBlue item.CanWrite
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($" + set{item.Name}({item.PropertyType.GetSourceTypeName()} value)")
+ end
+end
+alt#LightBlue counter > 0
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral type.GetMethods(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetMethods_a0 : (bindingFlags)
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($"{prefix} " + "{static}" + $"{item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})")
+end
+alt#LightBlue counter > 0
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ("---")
+end
+loop#LightCoral type.GetMethods(bindingFlags)
+ CreateItemMembers_p0 -[#grey]> type_GetMethods_a0 : (bindingFlags)
+ CreateItemMembers_p0 -[#grey]> result_Add_a0 : ($"{prefix} {item.ReturnType.GetSourceTypeName()} {item.Name}({GetParameters(item)})")
+end
+@enduml

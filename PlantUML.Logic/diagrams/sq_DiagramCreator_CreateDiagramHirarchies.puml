@@ -1,0 +1,60 @@
+@startuml DiagramCreator.CreateDiagramHirarchies
+title DiagramCreator.CreateDiagramHirarchies
+participant "CreateDiagramHirarchies(IEnumerable<Type> types)" as CreateDiagramHirarchies_p0 #LightYellow
+participant "type.GetClassHierarchy()" as type_GetClassHierarchy #LightGreen
+participant "classHirarchy.Count()" as classHirarchy_Count #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "commonSet.Intersect(a0)" as commonSet_Intersect_a0 #LightGreen
+participant "commonSet.Count()" as commonSet_Count #LightGreen
+participant "currentSet.Except(a0)" as currentSet_Except_a0 #LightGreen
+participant "commonSet.All(a0)" as commonSet_All_a0 #LightGreen
+participant "exceptSet.Any()" as exceptSet_Any #LightGreen
+participant "result[j].Intersect(a0)" as result_j_Intersect_a0 #LightGreen
+participant "exceptSet.Union(a0)" as exceptSet_Union_a0 #LightGreen
+participant "calculatedHirarchies.Add(a0)" as calculatedHirarchies_Add_a0 #LightGreen
+participant "calculatedHirarchies.AddRange(a0)" as calculatedHirarchies_AddRange_a0 #LightGreen
+participant "result.Clear()" as result_Clear #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "calculatedHirarchies.Clear()" as calculatedHirarchies_Clear #LightGreen
+participant "result.Distinct()" as result_Distinct #LightGreen
+autonumber
+loop#LightCoral types
+ CreateDiagramHirarchies_p0 -[#grey]> type_GetClassHierarchy
+ type_GetClassHierarchy -[#blue]-> CreateDiagramHirarchies_p0 : classHirarchy
+ alt#LightBlue classHirarchy.Count() > 1
+ CreateDiagramHirarchies_p0 -[#grey]> classHirarchy_Count
+ CreateDiagramHirarchies_p0 -[#grey]> result_Add_a0 : (classHirarchy)
+ end
+end
+loop#LightCoral i < result.Count - 1
+ loop#LightCoral j < result.Count
+ CreateDiagramHirarchies_p0 -[#grey]> commonSet_Intersect_a0 : (result[j])
+ commonSet_Intersect_a0 -[#blue]-> CreateDiagramHirarchies_p0 : commonSet
+ end
+ alt#LightBlue commonSet.Count() > 1
+ CreateDiagramHirarchies_p0 -[#grey]> commonSet_Count
+ loop#LightCoral j < result.Count
+ CreateDiagramHirarchies_p0 -[#grey]> currentSet_Except_a0 : (commonSet)
+ currentSet_Except_a0 -[#blue]-> CreateDiagramHirarchies_p0 : exceptSet
+ alt#LightBlue commonSet.All(e => currentSet.Any(c => e == c)) && exceptSet.Any()
+ CreateDiagramHirarchies_p0 -[#grey]> commonSet_All_a0 : (e => currentSet.Any(c => e == c))
+ CreateDiagramHirarchies_p0 -[#grey]> exceptSet_Any
+ CreateDiagramHirarchies_p0 -[#grey]> result_j_Intersect_a0 : ([commonSet.First()])
+ result_j_Intersect_a0 -[#blue]-> CreateDiagramHirarchies_p0 : intersectSet
+ CreateDiagramHirarchies_p0 -[#grey]> exceptSet_Union_a0 : (intersectSet)
+ exceptSet_Union_a0 -[#blue]-> CreateDiagramHirarchies_p0 : createSet
+ CreateDiagramHirarchies_p0 -[#grey]> calculatedHirarchies_Add_a0 : (createSet)
+ else
+ CreateDiagramHirarchies_p0 -[#grey]> calculatedHirarchies_Add_a0 : (result[j])
+ end
+ end
+ else
+ CreateDiagramHirarchies_p0 -[#grey]> calculatedHirarchies_AddRange_a0 : (result)
+ end
+ CreateDiagramHirarchies_p0 -[#grey]> result_Clear
+ CreateDiagramHirarchies_p0 -[#grey]> result_AddRange_a0 : (calculatedHirarchies)
+ CreateDiagramHirarchies_p0 -[#grey]> calculatedHirarchies_Clear
+end
+CreateDiagramHirarchies_p0 -[#grey]> result_Distinct
+result_Distinct -[#blue]-> CreateDiagramHirarchies_p0 : result
+@enduml

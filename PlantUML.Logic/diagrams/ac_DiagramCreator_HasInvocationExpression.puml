@@ -1,0 +1,13 @@
+@startuml DiagramCreator.HasInvocationExpression
+title DiagramCreator.HasInvocationExpression
+start
+#LightGreen:Params(SyntaxNode syntaxNode);
+#LightSkyBlue:var result = syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>().Any();
+#LightYellow:if (result == false) then (<color:green>yes)
+  while (result == false && iterator.MoveNext()) is (<color:green>yes)
+    #WhiteSmoke:result = HasInvocationExpression(iterator.Current);
+  endwhile (<color:red>no)
+endif
+#Lavender:return result;
+stop
+@enduml

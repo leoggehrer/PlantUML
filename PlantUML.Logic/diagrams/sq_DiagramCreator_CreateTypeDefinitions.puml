@@ -1,0 +1,11 @@
+@startuml DiagramCreator.CreateTypeDefinitions
+title DiagramCreator.CreateTypeDefinitions
+participant "CreateTypeDefinitions(IEnumerable<Type> types,DiagramCreationFlags diagramCreationFlags)" as CreateTypeDefinitions_p0_p1 #LightYellow
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "CreateTypeDefinition(a0,a1)" as CreateTypeDefinition_a0_a1 #LightGreen
+autonumber
+loop#LightCoral types
+ CreateTypeDefinitions_p0_p1 -[#grey]> result_AddRange_a0 : (CreateTypeDefinition(type, diagramCreationFlags))
+ result_AddRange_a0 -[#grey]> CreateTypeDefinition_a0_a1 : (CreateTypeDefinition(type, diagramCreationFlags))
+end
+@enduml

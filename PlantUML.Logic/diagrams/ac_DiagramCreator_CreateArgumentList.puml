@@ -1,0 +1,24 @@
+@startuml DiagramCreator.CreateArgumentList
+title DiagramCreator.CreateArgumentList
+start
+#LightGreen:Params(InvocationExpressionSyntax invocationExpression,Dictionary<string, string> methodResults);
+#LightSkyBlue:var result = string.Empty\nvar arguments = invocationExpression.ArgumentList?.Arguments ?? [];
+:iterator = arguments.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (result.Length > 0) then (<color:green>yes)
+      #WhiteSmoke:result += ", ";
+    endif
+    #LightYellow:if (item.Expression is InvocationExpressionSyntax argumentInvocationExpression) then (<color:green>yes)
+      #LightYellow:if (methodResults.TryGetValue(participant, out string? value)) then (<color:green>yes)
+        #WhiteSmoke:result = $"{result}{value}";
+        else (<color:red>no)
+          #WhiteSmoke:result = $"{result}{item}";
+      endif
+      else (<color:red>no)
+        #WhiteSmoke:result = $"{result}{item}";
+    endif
+endwhile (<color:red>no)
+#Lavender:return $"({result})";
+stop
+@enduml

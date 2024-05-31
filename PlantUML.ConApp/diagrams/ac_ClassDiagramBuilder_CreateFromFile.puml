@@ -1,0 +1,10 @@
+@startuml ClassDiagramBuilder.CreateFromFile
+title ClassDiagramBuilder.CreateFromFile
+start
+#LightSkyBlue:var fileDirectory = Path.GetDirectoryName(SourcePath!) ?? string.Empty\nvar defines = ReadDefinesFromProjectFiles(fileDirectory!)\nvar diagramsDirectory = DiagramFolder.HasContent() ? Path.Combine(fileDirectory, DiagramFolder) : fileDirectory\nvar source = File.ReadAllText(SourcePath!);
+#WhiteSmoke:Logic.DiagramCreator.CreateClassDiagram(diagramsDirectory, source, defines, Force);
+#LightYellow:if (CreateCompleteDiagram) then (<color:green>yes)
+  #WhiteSmoke:Logic.DiagramCreator.CreateCompleteClassDiagram(diagramsDirectory, Force);
+endif
+stop
+@enduml

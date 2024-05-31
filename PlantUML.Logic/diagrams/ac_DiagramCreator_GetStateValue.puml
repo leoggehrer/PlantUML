@@ -1,0 +1,7 @@
+@startuml DiagramCreator.GetStateValue
+title DiagramCreator.GetStateValue
+start
+#LightGreen:Params(object obj,FieldInfo fieldInfo);
+#Lavender:return GetStateValue(obj, fieldInfo, 15);
+stop
+@enduml

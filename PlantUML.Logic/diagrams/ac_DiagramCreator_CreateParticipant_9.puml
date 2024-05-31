@@ -1,0 +1,8 @@
+@startuml DiagramCreator.CreateParticipant
+title DiagramCreator.CreateParticipant
+start
+#LightGreen:Params(InvocationExpressionSyntax invocationSyntax);
+#LightSkyBlue:var arguments = invocationSyntax.ArgumentList?.Arguments ?? []\nvar argsStatement = arguments.Any() ? string.Join(",", arguments.Select((item, index) => $"a{index}")) : string.Empty;
+#Lavender:return $"{invocationSyntax?.Expression}({argsStatement})".Replace($"{Environment.NewLine}", string.Empty) .Replace(" ", string.Empty);
+stop
+@enduml

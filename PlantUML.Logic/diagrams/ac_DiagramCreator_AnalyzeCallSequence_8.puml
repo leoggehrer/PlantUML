@@ -1,0 +1,175 @@
+@startuml DiagramCreator.AnalyzeCallSequence
+title DiagramCreator.AnalyzeCallSequence
+start
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,SyntaxNode syntaxNode,List<string> participantAliasse,List<string> messages,Dictionary<string, string> methodResults,int level);
+#LightYellow:if (syntaxNode is LocalDeclarationStatementSyntax localDeclarationStatement) then (<color:green>yes)
+  :iterator = localDeclarationStatement.Declaration.Variables.GetIterator();
+  while (iterator.MoveNext()) is (<color:green>yes)
+    :variable = iterator.Current();
+        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, variable, participantAliasse, messages, methodResults, level);
+  endwhile (<color:red>no)
+  else (<color:red>no)
+    #LightYellow:if (syntaxNode is VariableDeclaratorSyntax variableDeclarator) then (<color:green>yes)
+      #LightYellow:if (variableDeclarator.Initializer != null) then (<color:green>yes)
+        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, variableDeclarator.Initializer, participantAliasse, messages, methodResults, level);
+      endif
+      :iterator = variableDeclarator.Initializer?.Value?.ChildNodes() ?? [].GetIterator();
+      while (iterator.MoveNext()) is (<color:green>yes)
+        :item = iterator.Current();
+                #LightYellow:if (item is InvocationExpressionSyntax varInvocationExpression) then (<color:green>yes)
+                  #LightYellow:if (varInvocationExpression.ArgumentList?.Arguments.Count == 0) then (<color:green>yes)
+                    :iterator = varInvocationExpression.ArgumentList.Arguments.GetIterator();
+                    while (iterator.MoveNext()) is (<color:green>yes)
+                      :argument = iterator.Current();
+                                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, argument, participantAliasse, messages, methodResults, level);
+                    endwhile (<color:red>no)
+                  endif
+                endif
+      endwhile (<color:red>no)
+      else (<color:red>no)
+        #LightYellow:if (syntaxNode is InvocationExpressionSyntax invocationExpression) then (<color:green>yes)
+          #LightYellow:if (participantAliasse.Contains(participantFrom) && participantAliasse.Contains(participantTo)) then (<color:green>yes)
+            #LightYellow:if (argumentList != "()") then (<color:green>yes)
+              #WhiteSmoke:messages.Add($"{participantFrom} -[#grey]> {participantTo} : {argumentList}".SetIndent(level));
+              :iterator = invocationExpression.ArgumentList.Arguments.GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :item = iterator.Current();
+                                #LightYellow:if (item.Expression is InvocationExpressionSyntax argInvocationExpression) then (<color:green>yes)
+                                  #LightYellow:if (participantAliasse.Contains(argfrom) && participantAliasse.Contains(argTo)) then (<color:green>yes)
+                                    #LightYellow:if (argArgumentList != "()") then (<color:green>yes)
+                                      #WhiteSmoke:messages.Add($"{argfrom} -[#grey]> {argTo} : {argArgumentList}".SetIndent(level));
+                                      else (<color:red>no)
+                                        #WhiteSmoke:messages.Add($"{argfrom} -[#grey]> {argTo}".SetIndent(level));
+                                    endif
+                                  endif
+                                endif
+              endwhile (<color:red>no)
+              else (<color:red>no)
+                #WhiteSmoke:messages.Add($"{participantFrom} -[#grey]> {participantTo}".SetIndent(level));
+            endif
+            #LightYellow:if (invocationExpression.Parent is AssignmentExpressionSyntax assignmentExpression) then (<color:green>yes)
+              #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+              else (<color:red>no)
+                #LightYellow:if (invocationExpression.Parent is EqualsValueClauseSyntax equalsValueClause) then (<color:green>yes)
+                  #LightYellow:if (equalsValueClause.Parent is VariableDeclaratorSyntax equalsVariableDeclarator) then (<color:green>yes)
+                    #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {equalsVariable}".SetIndent(level));
+                  endif
+                  else (<color:red>no)
+                    #LightYellow:if (invocationExpression.Parent is ReturnStatementSyntax) then (<color:green>yes)
+                      #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+                      else (<color:red>no)
+                        #LightYellow:if (symbolInfo.Symbol is IMethodSymbol methodSymbol) then (<color:green>yes)
+                          #LightYellow:if (result?.ToLower() != "void") then (<color:green>yes)
+                            #WhiteSmoke:messages.Add($"{participantTo} -[#blue]-> {participantFrom} : {resultVariable}".SetIndent(level));
+                          endif
+                        endif
+                    endif
+                endif
+            endif
+            else (<color:red>no)
+              :iterator = invocationExpression.ChildNodes().GetIterator();
+              while (iterator.MoveNext()) is (<color:green>yes)
+                :item = iterator.Current();
+                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
+              endwhile (<color:red>no)
+          endif
+          else (<color:red>no)
+            #LightYellow:if (syntaxNode is ExpressionStatementSyntax expressionStatement) then (<color:green>yes)
+              #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, expressionStatement.Expression, participantAliasse, messages, methodResults, level);
+              else (<color:red>no)
+                #LightYellow:if (syntaxNode is AssignmentExpressionSyntax assignmentExpression) then (<color:green>yes)
+                  #LightYellow:if (assignmentExpression.Right is InvocationExpressionSyntax rightExpression) then (<color:green>yes)
+                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, rightExpression, participantAliasse, messages, methodResults, level);
+                  endif
+                  else (<color:red>no)
+                    #LightYellow:if (syntaxNode is BinaryExpressionSyntax binaryExpression) then (<color:green>yes)
+                      #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Left, participantAliasse, messages, methodResults, level);
+                      #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, binaryExpression.Right, participantAliasse, messages, methodResults, level);
+                      else (<color:red>no)
+                        #LightYellow:if (syntaxNode is DoStatementSyntax doStatement && HasInvocationExpression(doStatement)) then (<color:green>yes)
+                          :iterator = doStatement.ChildNodes().GetIterator();
+                          while (iterator.MoveNext()) is (<color:green>yes)
+                            :item = iterator.Current();
+                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                          endwhile (<color:red>no)
+                          #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                            #WhiteSmoke:messages.Add($"loop#LightCoral {doStatement.Condition}".SetIndent(level));
+                            #WhiteSmoke:messages.AddRange(innerMessages);
+                            #WhiteSmoke:messages.Add("end".SetIndent(level));
+                          endif
+                          else (<color:red>no)
+                            #LightYellow:if (syntaxNode is WhileStatementSyntax whileStatement && HasInvocationExpression(whileStatement)) then (<color:green>yes)
+                              :iterator = whileStatement.ChildNodes().GetIterator();
+                              while (iterator.MoveNext()) is (<color:green>yes)
+                                :item = iterator.Current();
+                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                              endwhile (<color:red>no)
+                              #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                #WhiteSmoke:messages.Add($"loop#LightCoral {whileStatement.Condition}".SetIndent(level));
+                                #WhiteSmoke:messages.AddRange(innerMessages);
+                                #WhiteSmoke:messages.Add("end".SetIndent(level));
+                              endif
+                              else (<color:red>no)
+                                #LightYellow:if (syntaxNode is ForStatementSyntax forStatement && HasInvocationExpression(forStatement)) then (<color:green>yes)
+                                  :iterator = forStatement.ChildNodes().GetIterator();
+                                  while (iterator.MoveNext()) is (<color:green>yes)
+                                    :item = iterator.Current();
+                                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                  endwhile (<color:red>no)
+                                  #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                    #WhiteSmoke:messages.Add($"loop#LightCoral {forStatement.Condition}".SetIndent(level));
+                                    #WhiteSmoke:messages.AddRange(innerMessages);
+                                    #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                  endif
+                                  else (<color:red>no)
+                                    #LightYellow:if (syntaxNode is ForEachStatementSyntax forEachStatement && HasInvocationExpression(forEachStatement)) then (<color:green>yes)
+                                      :iterator = forEachStatement.ChildNodes().GetIterator();
+                                      while (iterator.MoveNext()) is (<color:green>yes)
+                                        :item = iterator.Current();
+                                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                      endwhile (<color:red>no)
+                                      #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                        #WhiteSmoke:messages.Add($"loop#LightCoral {forEachStatement.Expression}".SetIndent(level));
+                                        #WhiteSmoke:messages.AddRange(innerMessages);
+                                        #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                      endif
+                                      else (<color:red>no)
+                                        #LightYellow:if (syntaxNode is IfStatementSyntax ifStatement && HasInvocationExpression(ifStatement)) then (<color:green>yes)
+                                          :iterator = ifStatement.ChildNodes().GetIterator();
+                                          while (iterator.MoveNext()) is (<color:green>yes)
+                                            :item = iterator.Current();
+                                                                                        #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, innerMessages, methodResults, level + 1);
+                                          endwhile (<color:red>no)
+                                          #LightYellow:if (innerMessages.Count > 0) then (<color:green>yes)
+                                            #WhiteSmoke:messages.Add($"alt#LightBlue {ifStatement.Condition}".SetIndent(level));
+                                            #WhiteSmoke:messages.AddRange(innerMessages);
+                                            #WhiteSmoke:messages.Add("end".SetIndent(level));
+                                          endif
+                                          else (<color:red>no)
+                                            #LightYellow:if (syntaxNode is ElseClauseSyntax elseClause && HasInvocationExpression(elseClause)) then (<color:green>yes)
+                                              #WhiteSmoke:messages.Add($"else".SetIndent(level));
+                                              :iterator = elseClause.ChildNodes().GetIterator();
+                                              while (iterator.MoveNext()) is (<color:green>yes)
+                                                :item = iterator.Current();
+                                                                                                #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level + 1);
+                                              endwhile (<color:red>no)
+                                              else (<color:red>no)
+                                                :iterator = syntaxNode.ChildNodes().GetIterator();
+                                                while (iterator.MoveNext()) is (<color:green>yes)
+                                                  :item = iterator.Current();
+                                                                                                    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration, item, participantAliasse, messages, methodResults, level);
+                                                endwhile (<color:red>no)
+                                            endif
+                                        endif
+                                    endif
+                                endif
+                            endif
+                        endif
+                    endif
+                endif
+            endif
+        endif
+    endif
+endif
+stop
+@enduml

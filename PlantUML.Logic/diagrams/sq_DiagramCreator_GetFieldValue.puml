@@ -1,0 +1,13 @@
+@startuml DiagramCreator.GetFieldValue
+title DiagramCreator.GetFieldValue
+participant "GetFieldValue(object obj,FieldInfo fieldInfo)" as GetFieldValue_p0_p1 #LightYellow
+participant "fieldInfo.GetValue(a0)" as fieldInfo_GetValue_a0 #LightGreen
+autonumber
+alt#LightBlue fieldInfo.IsStatic
+ GetFieldValue_p0_p1 -[#grey]> fieldInfo_GetValue_a0 : (null)
+ fieldInfo_GetValue_a0 -[#blue]-> GetFieldValue_p0_p1 : value
+ else
+ GetFieldValue_p0_p1 -[#grey]> fieldInfo_GetValue_a0 : (obj)
+ fieldInfo_GetValue_a0 -[#blue]-> GetFieldValue_p0_p1 : value
+end
+@enduml

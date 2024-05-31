@@ -1,0 +1,14 @@
+@startuml DiagramCreator.GetItemNameFrom
+title DiagramCreator.GetItemNameFrom
+start
+#LightGreen:Params(string line);
+#LightSkyBlue:var result = string.Empty\nvar parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+while (i < parts.Length && result == string.Empty) is (<color:green>yes)
+  #LightYellow:if ((parts[i] == "class" || parts[i] == "interface") && i + 1 < parts.Length) then (<color:green>yes)
+    #WhiteSmoke:result = parts[i + 1];
+  endif
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

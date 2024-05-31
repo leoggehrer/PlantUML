@@ -1,0 +1,38 @@
+@startuml PlantUMLApp.CreateMenuItems
+title PlantUMLApp.CreateMenuItems
+participant "CreateMenuItems" as CreateMenuItems #LightYellow
+participant "CreateMenuSeparator()" as CreateMenuSeparator #LightGreen
+participant "ToLabelText(a0,a1)" as ToLabelText_a0_a1 #LightGreen
+participant "TemplatePath.GetSubPaths(a0,a1)" as TemplatePath_GetSubPaths_a0_a1 #LightGreen
+participant "TemplatePath.ContainsFiles(a0,a1)" as TemplatePath_ContainsFiles_a0_a1 #LightGreen
+participant "menuItems.AddRange(a0)" as menuItems_AddRange_a0 #LightGreen
+participant "CreatePageMenuItems(a0,a1,a2)" as CreatePageMenuItems_a0_a1_a2 #LightGreen
+participant "menuItems.Union(a0)" as menuItems_Union_a0 #LightGreen
+participant "CreateExitMenuItems()" as CreateExitMenuItems #LightGreen
+autonumber
+CreateMenuItems -[#grey]> CreateMenuSeparator
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Force", "Change force flag")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Path-Depth", "Change max sub path depth")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Generation-Depth", "Change max generation depth")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Projects path", "Change projects path")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Target path", "Change target path")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> CreateMenuSeparator
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Create", "Change create complete diagram")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Folder", "Change diagram folder")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> ToLabelText_a0_a1 : ("Builder", "Change diagram builder")
+ToLabelText_a0_a1 -[#blue]-> CreateMenuItems : Text
+CreateMenuItems -[#grey]> CreateMenuSeparator
+CreateMenuItems -[#grey]> TemplatePath_GetSubPaths_a0_a1 : (ProjectsPath, MaxSubPathDepth)
+CreateMenuItems -[#grey]> TemplatePath_ContainsFiles_a0_a1 : (p, "*.cs")
+CreateMenuItems -[#grey]> menuItems_AddRange_a0 : (CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) => { Expression }))
+menuItems_AddRange_a0 -[#grey]> CreatePageMenuItems_a0_a1_a2 : (CreatePageMenuItems(ref mnuIdx, paths, (item, menuItem) => { Expression }))
+CreateMenuItems -[#grey]> menuItems_Union_a0 : (CreateExitMenuItems())
+menuItems_Union_a0 -[#grey]> CreateExitMenuItems : (CreateExitMenuItems())
+@enduml

@@ -1,0 +1,17 @@
+@startuml PlantUMLApp.CreateDiagram
+title PlantUMLApp.CreateDiagram
+start
+#LightGreen:Params(MenuItem menuItem,bool force);
+#LightSkyBlue:var sourcePath = menuItem.Params["sourcePath"]?.ToString() ?? string.Empty\nvar targetPath = menuItem.Params["targetPath"]?.ToString() ?? string.Empty;
+#WhiteSmoke:StartProgressBar();
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Activity) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Class) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+#LightYellow:if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0) then (<color:green>yes)
+  #WhiteSmoke:execute(builder, menuItem);
+endif
+stop
+@enduml

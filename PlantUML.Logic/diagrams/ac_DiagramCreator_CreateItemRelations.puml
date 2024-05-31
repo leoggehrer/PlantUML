@@ -1,0 +1,62 @@
+@startuml DiagramCreator.CreateItemRelations
+title DiagramCreator.CreateItemRelations
+start
+#LightGreen:Params(string typeLine,IEnumerable<string> digramData,List<string> relations);
+#LightSkyBlue:var extractItemNames = new List<string>()\nvar currentItemName = string.Empty\nvar typeName = GetTypeNameFrom(typeLine)\nvar cleanTypeName = typeName.Replace("?", string.Empty) .Replace("[]", string.Empty)\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
+:iterator = digramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :diagramLine = iterator.Current();
+    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
+    endif
+endwhile (<color:red>no)
+:iterator = digramData.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :diagramLine = iterator.Current();
+    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = true;
+      #WhiteSmoke:currentItemName = GetItemNameFrom(diagramLine);
+      else (<color:red>no)
+        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+          #WhiteSmoke:isFieldRange = true;
+          else (<color:red>no)
+            #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = false;
+              #WhiteSmoke:isPropertyRange = true;
+              #WhiteSmoke:isMethodRange = false;
+              else (<color:red>no)
+                #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                  #WhiteSmoke:isFieldRange = false;
+                  #WhiteSmoke:isPropertyRange = false;
+                  #WhiteSmoke:isMethodRange = true;
+                  else (<color:red>no)
+                    #LightYellow:if (isTypeDefinition && diagramLine.Contains('}')) then (<color:green>yes)
+                      #WhiteSmoke:isTypeDefinition = false;
+                      #WhiteSmoke:isFieldRange = false;
+                      #WhiteSmoke:isPropertyRange = false;
+                      #WhiteSmoke:isMethodRange = false;
+                      #WhiteSmoke:currentItemName = string.Empty;
+                    endif
+                endif
+            endif
+        endif
+    endif
+    #LightYellow:if (isTypeDefinition && isFieldRange) then (<color:green>yes)
+      #LightYellow:if (cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName)) then (<color:green>yes)
+        #LightYellow:if (isNullable) then (<color:green>yes)
+          #WhiteSmoke:relation = $"{currentItemName} \"0..1\" *-- \"1\" {cleanTypeName} : {memberName}";
+          else (<color:red>no)
+            #LightYellow:if (IsArray) then (<color:green>yes)
+              #WhiteSmoke:relation = $"{currentItemName} \"many\" *-- \"1\" {cleanTypeName} : {memberName}";
+              else (<color:red>no)
+                #WhiteSmoke:relation = $"{currentItemName} -- {cleanTypeName} : {memberName}";
+            endif
+        endif
+        #LightYellow:if (relations.Contains(relation) == false) then (<color:green>yes)
+          #WhiteSmoke:relations.Add(relation);
+        endif
+      endif
+    endif
+endwhile (<color:red>no)
+stop
+@enduml

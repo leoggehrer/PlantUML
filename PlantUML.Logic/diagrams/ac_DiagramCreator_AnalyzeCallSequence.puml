@@ -1,0 +1,22 @@
+@startuml DiagramCreator.AnalyzeCallSequence
+title DiagramCreator.AnalyzeCallSequence
+start
+#LightGreen:Params(SemanticModel semanticModel,MethodDeclarationSyntax methodDeclaration,List<string> participantAliasse,List<string> messages,int level);
+#LightSkyBlue:var methodResults = new Dictionary<string, string>()\nvar statements = methodDeclaration?.Body?.Statements ?? [];
+:iterator = statements!.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :statement = iterator.Current();
+    #WhiteSmoke:AnalyzeCallSequence(semanticModel, methodDeclaration!, statement, participantAliasse, messages, methodResults, level);
+endwhile (<color:red>no)
+while (i < messages.Count) is (<color:green>yes)
+  #WhiteSmoke:index = clearMessage.IndexOf("=>");
+  #LightYellow:if (index > -1) then (<color:green>yes)
+    #LightYellow:if (between.HasContent()) then (<color:green>yes)
+      #WhiteSmoke:clearMessage = clearMessage.Replace(between, " Expression ");
+    endif
+  endif
+  #WhiteSmoke:messages[i] = clearMessage;
+:i++;
+endwhile (<color:red>no)
+stop
+@enduml

@@ -1,0 +1,5 @@
+@startuml Color.ClassConstructing
+title Color.ClassConstructing
+start
+stop
+@enduml

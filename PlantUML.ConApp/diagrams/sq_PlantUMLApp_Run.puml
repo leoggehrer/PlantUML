@@ -1,0 +1,7 @@
+@startuml PlantUMLApp.Run
+title PlantUMLApp.Run
+participant "Run(string[] args)" as Run_p0 #LightYellow
+participant "base.Run(a0)" as base_Run_a0 #LightGreen
+autonumber
+Run_p0 -[#grey]> base_Run_a0 : (args)
+@enduml

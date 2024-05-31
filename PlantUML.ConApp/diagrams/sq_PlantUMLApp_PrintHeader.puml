@@ -1,0 +1,24 @@
+@startuml PlantUMLApp.PrintHeader
+title PlantUMLApp.PrintHeader
+participant "PrintHeader" as PrintHeader #LightYellow
+participant "Clear()" as Clear #LightGreen
+participant "PrintLine(a0)" as PrintLine_a0 #LightGreen
+participant "PrintLine(a0,a1)" as PrintLine_a0_a1 #LightGreen
+participant "PrintLine()" as PrintLine #LightGreen
+autonumber
+PrintHeader -[#grey]> Clear
+PrintHeader -[#grey]> PrintLine_a0 : (nameof(PlantUML))
+PrintLine_a0 -[#blue]-> PrintHeader : count
+PrintHeader -[#grey]> PrintLine_a0_a1 : ('=', count)
+PrintHeader -[#grey]> PrintLine
+PrintHeader -[#grey]> PrintLine_a0 : ($"Force flag: {Force}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Max. sub path depth: {MaxSubPathDepth}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Max. generat. depth: {MaxGenerationDepth}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Projets path: {ProjectsPath}")
+PrintHeader -[#grey]> PrintLine
+PrintHeader -[#grey]> PrintLine_a0 : ($"Target path: {TargetPath}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Diagram folder: {DiagramFolder}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Diagram complete: {CreateCompleteDiagram}")
+PrintHeader -[#grey]> PrintLine_a0 : ($"Diagram builder: {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]")
+PrintHeader -[#grey]> PrintLine
+@enduml

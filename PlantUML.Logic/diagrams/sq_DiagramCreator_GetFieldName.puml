@@ -1,0 +1,16 @@
+@startuml DiagramCreator.GetFieldName
+title DiagramCreator.GetFieldName
+participant "GetFieldName(FieldInfo fieldInfo)" as GetFieldName_p0 #LightYellow
+participant "fieldInfo.Name.Contains(a0)" as fieldInfo_Name_Contains_a0 #LightGreen
+participant "string.Concat(a0,a1)" as string_Concat_a0_a1 #LightGreen
+participant "result[..2].ToLower()" as result_2_ToLower #LightGreen
+participant "result.AsSpan(a0)" as result_AsSpan_a0 #LightGreen
+autonumber
+alt#LightBlue fieldInfo.Name.Contains("k__BackingField")
+ GetFieldName_p0 -[#grey]> fieldInfo_Name_Contains_a0 : ("k__BackingField")
+ GetFieldName_p0 -[#grey]> string_Concat_a0_a1 : (result[..2].ToLower(), result.AsSpan(2))
+ string_Concat_a0_a1 -[#grey]> result_2_ToLower : (result[..2].ToLower(), result.AsSpan(2))
+ string_Concat_a0_a1 -[#grey]> result_AsSpan_a0 : (result[..2].ToLower(), result.AsSpan(2))
+ string_Concat_a0_a1 -[#blue]-> GetFieldName_p0 : result
+end
+@enduml

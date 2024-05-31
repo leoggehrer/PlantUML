@@ -1,0 +1,69 @@
+@startuml DiagramCreator.CreateClassDiagram
+title DiagramCreator.CreateClassDiagram
+participant "CreateClassDiagram(DiagramCreationFlags diagramCreationFlags,params Type[] types)" as CreateClassDiagram_p0_p1 #LightYellow
+participant "allTypes.Clone().Where(a0)" as allTypes_Clone_Where_a0 #LightGreen
+participant "allTypes.Clone()" as allTypes_Clone #LightGreen
+participant "allTypes.AddRange(a0)" as allTypes_AddRange_a0 #LightGreen
+participant "type.GetClassHierarchy().Where(a0)" as type_GetClassHierarchy_Where_a0 #LightGreen
+participant "type.GetClassHierarchy()" as type_GetClassHierarchy #LightGreen
+participant "type.GetDeclaredInterfaces().Where(a0)" as type_GetDeclaredInterfaces_Where_a0 #LightGreen
+participant "type.GetDeclaredInterfaces()" as type_GetDeclaredInterfaces #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "CreateTypeDefinitions(a0,a1)" as CreateTypeDefinitions_a0_a1 #LightGreen
+participant "CreateTypeHirarchies(a0)" as CreateTypeHirarchies_a0 #LightGreen
+participant "allTypes.Where(a0)" as allTypes_Where_a0 #LightGreen
+participant "type.GetInterfaceHierarchy()" as type_GetInterfaceHierarchy #LightGreen
+participant "extend.Extends.ForEach(a0)" as extend_Extends_ForEach_a0 #LightGreen
+participant "CreateTypeImplements(a0)" as CreateTypeImplements_a0 #LightGreen
+participant "CreateTypeRelations(a0,a1)" as CreateTypeRelations_a0_a1 #LightGreen
+autonumber
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0
+ loop#LightCoral allTypes.Clone().Where(t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Clone_Where_a0 : (t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_AddRange_a0 : (type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false))
+ allTypes_AddRange_a0 -[#grey]> type_GetClassHierarchy_Where_a0 : (type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false))
+ end
+end
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0
+ loop#LightCoral allTypes.Clone()
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Clone
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_AddRange_a0 : (type.GetDeclaredInterfaces().Where(e => allTypes.Contains(e) == false))
+ allTypes_AddRange_a0 -[#grey]> type_GetDeclaredInterfaces_Where_a0 : (type.GetDeclaredInterfaces().Where(e => allTypes.Contains(e) == false))
+ end
+end
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0
+ loop#LightCoral allTypes.Clone().Where(t => t.IsInterface)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Clone_Where_a0 : (t => t.IsInterface)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_AddRange_a0 : (type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false))
+ allTypes_AddRange_a0 -[#grey]> type_GetClassHierarchy_Where_a0 : (type.GetClassHierarchy().Where(e => allTypes.Contains(e) == false))
+ end
+end
+CreateClassDiagram_p0_p1 -[#grey]> result_AddRange_a0 : (CreateTypeDefinitions(allTypes, diagramCreationFlags))
+result_AddRange_a0 -[#grey]> CreateTypeDefinitions_a0_a1 : (CreateTypeDefinitions(allTypes, diagramCreationFlags))
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.TypeExtends) > 0
+ CreateClassDiagram_p0_p1 -[#grey]> result_AddRange_a0 : (CreateTypeHirarchies(allTypes.Where(t => t.IsClass)))
+ result_AddRange_a0 -[#grey]> CreateTypeHirarchies_a0 : (CreateTypeHirarchies(allTypes.Where(t => t.IsClass)))
+end
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.InterfaceExtends) > 0
+ loop#LightCoral allTypes.Where(t => t.IsInterface)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Where_a0 : (t => t.IsInterface)
+ CreateClassDiagram_p0_p1 -[#grey]> type_GetInterfaceHierarchy
+ type_GetInterfaceHierarchy -[#blue]-> CreateClassDiagram_p0_p1 : extend
+ CreateClassDiagram_p0_p1 -[#grey]> extend_Extends_ForEach_a0 : (e => result.AddRange(CreateTypeHierachy([extend.Type!, e.Type!])))
+ end
+end
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.ImplementedInterfaces) > 0
+ loop#LightCoral allTypes.Where(t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Where_a0 : (t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> result_AddRange_a0 : (CreateTypeImplements(type))
+ result_AddRange_a0 -[#grey]> CreateTypeImplements_a0 : (CreateTypeImplements(type))
+ end
+end
+alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.ClassRelations) > 0
+ loop#LightCoral allTypes.Where(t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> allTypes_Where_a0 : (t => t.IsClass)
+ CreateClassDiagram_p0_p1 -[#grey]> result_AddRange_a0 : (CreateTypeRelations(type, 0))
+ result_AddRange_a0 -[#grey]> CreateTypeRelations_a0_a1 : (CreateTypeRelations(type, 0))
+ end
+end
+@enduml

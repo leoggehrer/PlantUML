@@ -1,0 +1,36 @@
+@startuml UMLDiagramBuilder.ReadDefinesFromProjectFiles
+title UMLDiagramBuilder.ReadDefinesFromProjectFiles
+participant "ReadDefinesFromProjectFiles(string path)" as ReadDefinesFromProjectFiles_p0 #LightYellow
+participant "Directory.Exists(a0)" as Directory_Exists_a0 #LightGreen
+participant "Application.FindFilesFromPathAndParentPath(a0,a1)" as Application_FindFilesFromPathAndParentPath_a0_a1 #LightGreen
+participant "File.ReadAllLines(a0,a1)" as File_ReadAllLines_a0_a1 #LightGreen
+participant "line.ExtractBetween(a0,a1)" as line_ExtractBetween_a0_a1 #LightGreen
+participant "defines.HasContent()" as defines_HasContent #LightGreen
+participant "defines.Split(a0,a1)" as defines_Split_a0_a1 #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "result.Distinct().ToArray()" as result_Distinct_ToArray #LightGreen
+participant "result.Distinct()" as result_Distinct #LightGreen
+autonumber
+alt#LightBlue Directory.Exists(path)
+ ReadDefinesFromProjectFiles_p0 -[#grey]> Directory_Exists_a0 : (path)
+ ReadDefinesFromProjectFiles_p0 -[#grey]> Application_FindFilesFromPathAndParentPath_a0_a1 : (path, "*.csproj")
+ Application_FindFilesFromPathAndParentPath_a0_a1 -[#blue]-> ReadDefinesFromProjectFiles_p0 : files
+ loop#LightCoral files
+ ReadDefinesFromProjectFiles_p0 -[#grey]> File_ReadAllLines_a0_a1 : (file, Encoding.Default)
+ File_ReadAllLines_a0_a1 -[#blue]-> ReadDefinesFromProjectFiles_p0 : lines
+ loop#LightCoral lines
+ ReadDefinesFromProjectFiles_p0 -[#grey]> line_ExtractBetween_a0_a1 : ("<DefineConstants>", "</DefineConstants>")
+ line_ExtractBetween_a0_a1 -[#blue]-> ReadDefinesFromProjectFiles_p0 : defines
+ alt#LightBlue defines.HasContent()
+ ReadDefinesFromProjectFiles_p0 -[#grey]> defines_HasContent
+ loop#LightCoral defines.Split(';', StringSplitOptions.RemoveEmptyEntries)
+ ReadDefinesFromProjectFiles_p0 -[#grey]> defines_Split_a0_a1 : (';', StringSplitOptions.RemoveEmptyEntries)
+ ReadDefinesFromProjectFiles_p0 -[#grey]> result_Add_a0 : (define)
+ end
+ end
+ end
+ end
+end
+ReadDefinesFromProjectFiles_p0 -[#grey]> result_Distinct_ToArray
+result_Distinct_ToArray -[#blue]-> ReadDefinesFromProjectFiles_p0 : result
+@enduml

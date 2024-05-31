@@ -1,0 +1,33 @@
+@startuml DiagramCreator.CreateClassDiagram
+title DiagramCreator.CreateClassDiagram
+start
+#LightGreen:Params(string path,string source,string[] defines,bool force);
+#LightSkyBlue:var infoFileName = "cd_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("ClassCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree)\nvar typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
+#LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
+  #WhiteSmoke:Directory.CreateDirectory(path);
+endif
+:iterator = typeDeclarations.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :itemNode = iterator.Current();
+    #LightYellow:if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false) then (<color:green>yes)
+      #WhiteSmoke:fileName = $"{fileName}{PlantUMLExtension}";
+      else (<color:red>no)
+        #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
+    endif
+    #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, itemNode, diagramData, 0);
+    #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+    #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
+    #WhiteSmoke:diagramData.Insert(1, $"title {title}");
+    #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+    #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+      #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+    endif
+    #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (CD)");
+    #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
+endwhile (<color:red>no)
+#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
+  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
+endif
+stop
+@enduml

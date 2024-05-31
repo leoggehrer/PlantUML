@@ -1,0 +1,12 @@
+@startuml DiagramCreator.CreateParticipant
+title DiagramCreator.CreateParticipant
+participant "CreateParticipant(MethodDeclarationSyntax methodSyntax)" as CreateParticipant_p0 #LightYellow
+participant "parameters.Any()" as parameters_Any #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "$"{methodSyntax?.Identifier}{paramsStatement}".Replace(a0,a1)" as _methodSyntax_Identifier_paramsStatement_Replace_a0_a1 #LightGreen
+autonumber
+CreateParticipant_p0 -[#grey]> parameters_Any
+CreateParticipant_p0 -[#grey]> string_Join_a0_a1 : (",", parameters)
+CreateParticipant_p0 -[#grey]> _methodSyntax_Identifier_paramsStatement_Replace_a0_a1 : ($"{Environment.NewLine}", string.Empty)
+_methodSyntax_Identifier_paramsStatement_Replace_a0_a1 -[#blue]-> CreateParticipant_p0 : result
+@enduml

@@ -1,0 +1,11 @@
+@startuml DiagramCreator.GetMemberNameFrom
+title DiagramCreator.GetMemberNameFrom
+start
+#LightGreen:Params(string line);
+#LightSkyBlue:var result = string.Empty\nvar cleanLine = line.Replace("+", string.Empty) .Replace("-", string.Empty) .Replace("#", string.Empty) .Replace("~", string.Empty) .Replace("{static}", string.Empty) .Replace("{abstract}", string.Empty) .Replace("{const}", string.Empty)\nvar parts = cleanLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+#LightYellow:if (parts.Length > 1) then (<color:green>yes)
+  #WhiteSmoke:result = parts[1];
+endif
+#Lavender:return result;
+stop
+@enduml

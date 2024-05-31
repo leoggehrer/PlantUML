@@ -1,0 +1,16 @@
+@startuml DiagramCreator.CreateTypeHierachy
+title DiagramCreator.CreateTypeHierachy
+participant "CreateTypeHierachy(IEnumerable<Type> types)" as CreateTypeHierachy_p0 #LightYellow
+participant "types.ToArray()" as types_ToArray #LightGreen
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+autonumber
+CreateTypeHierachy_p0 -[#grey]> types_ToArray
+types_ToArray -[#blue]-> CreateTypeHierachy_p0 : typeArray
+loop#LightCoral i < typeArray.Length - 1
+ alt#LightBlue typeArray[i + 1].IsInterface || typeArray[i].IsInterface
+ CreateTypeHierachy_p0 -[#grey]> result_Add_a0 : ($"{typeArray[i + 1].Name} <|.. {typeArray[i].Name}")
+ else
+ CreateTypeHierachy_p0 -[#grey]> result_Add_a0 : ($"{typeArray[i + 1].Name} <|-- {typeArray[i].Name}")
+ end
+end
+@enduml

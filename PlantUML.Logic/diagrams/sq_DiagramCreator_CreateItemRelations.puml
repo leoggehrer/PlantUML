@@ -1,0 +1,74 @@
+@startuml DiagramCreator.CreateItemRelations
+title DiagramCreator.CreateItemRelations
+participant "CreateItemRelations(string typeLine,IEnumerable<string> digramData,List<string> relations)" as CreateItemRelations_p0_p1_p2 #LightYellow
+participant "GetTypeNameFrom(a0)" as GetTypeNameFrom_a0 #LightGreen
+participant "typeName.Replace("?",string.Empty).Replace(a0,a1)" as typeName_Replace_string_Empty_Replace_a0_a1 #LightGreen
+participant "diagramLine.Contains(a0)" as diagramLine_Contains_a0 #LightGreen
+participant "extractItemNames.Add(a0)" as extractItemNames_Add_a0 #LightGreen
+participant "GetItemNameFrom(a0)" as GetItemNameFrom_a0 #LightGreen
+participant "diagramLine.StartsWith(a0)" as diagramLine_StartsWith_a0 #LightGreen
+participant "currentTypeName.Replace("?",string.Empty).Replace(a0,a1)" as currentTypeName_Replace_string_Empty_Replace_a0_a1 #LightGreen
+participant "cleanCurrentTypeName.Equals(a0)" as cleanCurrentTypeName_Equals_a0 #LightGreen
+participant "extractItemNames.Contains(a0)" as extractItemNames_Contains_a0 #LightGreen
+participant "GetMemberNameFrom(a0)" as GetMemberNameFrom_a0 #LightGreen
+participant "currentTypeName.EndsWith(a0)" as currentTypeName_EndsWith_a0 #LightGreen
+participant "relations.Contains(a0)" as relations_Contains_a0 #LightGreen
+participant "relations.Add(a0)" as relations_Add_a0 #LightGreen
+autonumber
+CreateItemRelations_p0_p1_p2 -[#grey]> GetTypeNameFrom_a0 : (typeLine)
+GetTypeNameFrom_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : typeName
+CreateItemRelations_p0_p1_p2 -[#grey]> typeName_Replace_string_Empty_Replace_a0_a1 : ("[]", string.Empty)
+typeName_Replace_string_Empty_Replace_a0_a1 -[#blue]-> CreateItemRelations_p0_p1_p2 : cleanTypeName
+loop#LightCoral digramData
+ alt#LightBlue diagramLine.Contains("class") || diagramLine.Contains("interface")
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("class")
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("interface")
+ CreateItemRelations_p0_p1_p2 -[#grey]> extractItemNames_Add_a0 : (GetItemNameFrom(diagramLine))
+ extractItemNames_Add_a0 -[#grey]> GetItemNameFrom_a0 : (GetItemNameFrom(diagramLine))
+ end
+end
+loop#LightCoral digramData
+ alt#LightBlue diagramLine.Contains("class") || diagramLine.Contains("interface")
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("class")
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ("interface")
+ CreateItemRelations_p0_p1_p2 -[#grey]> GetItemNameFrom_a0 : (diagramLine)
+ GetItemNameFrom_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : currentItemName
+ else
+ alt#LightBlue isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false
+ else
+ alt#LightBlue diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_StartsWith_a0 : ("---")
+ else
+ alt#LightBlue diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_StartsWith_a0 : ("---")
+ else
+ alt#LightBlue isTypeDefinition && diagramLine.Contains('}')
+ CreateItemRelations_p0_p1_p2 -[#grey]> diagramLine_Contains_a0 : ('}')
+ end
+ end
+ end
+ end
+ end
+ alt#LightBlue isTypeDefinition && isFieldRange
+ CreateItemRelations_p0_p1_p2 -[#grey]> GetTypeNameFrom_a0 : (diagramLine)
+ GetTypeNameFrom_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : currentTypeName
+ CreateItemRelations_p0_p1_p2 -[#grey]> currentTypeName_Replace_string_Empty_Replace_a0_a1 : ("[]", string.Empty)
+ currentTypeName_Replace_string_Empty_Replace_a0_a1 -[#blue]-> CreateItemRelations_p0_p1_p2 : cleanCurrentTypeName
+ alt#LightBlue cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName)
+ CreateItemRelations_p0_p1_p2 -[#grey]> cleanCurrentTypeName_Equals_a0 : (cleanTypeName)
+ cleanCurrentTypeName_Equals_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : result
+ CreateItemRelations_p0_p1_p2 -[#grey]> extractItemNames_Contains_a0 : (cleanTypeName)
+ CreateItemRelations_p0_p1_p2 -[#grey]> GetMemberNameFrom_a0 : (diagramLine)
+ GetMemberNameFrom_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : memberName
+ CreateItemRelations_p0_p1_p2 -[#grey]> currentTypeName_EndsWith_a0 : ('?')
+ currentTypeName_EndsWith_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : isNullable
+ CreateItemRelations_p0_p1_p2 -[#grey]> currentTypeName_EndsWith_a0 : ("[]")
+ currentTypeName_EndsWith_a0 -[#blue]-> CreateItemRelations_p0_p1_p2 : IsArray
+ alt#LightBlue relations.Contains(relation) == false
+ CreateItemRelations_p0_p1_p2 -[#grey]> relations_Contains_a0 : (relation)
+ CreateItemRelations_p0_p1_p2 -[#grey]> relations_Add_a0 : (relation)
+ end
+ end
+ end
+end
+@enduml

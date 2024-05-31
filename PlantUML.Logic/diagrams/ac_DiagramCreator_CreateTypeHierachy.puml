@@ -1,0 +1,16 @@
+@startuml DiagramCreator.CreateTypeHierachy
+title DiagramCreator.CreateTypeHierachy
+start
+#LightGreen:Params(IEnumerable<Type> types);
+#LightSkyBlue:var result = new List<string>()\nvar typeArray = types.ToArray();
+while (i < typeArray.Length - 1) is (<color:green>yes)
+  #LightYellow:if (typeArray[i + 1].IsInterface || typeArray[i].IsInterface) then (<color:green>yes)
+    #WhiteSmoke:result.Add($"{typeArray[i + 1].Name} <|.. {typeArray[i].Name}");
+    else (<color:red>no)
+      #WhiteSmoke:result.Add($"{typeArray[i + 1].Name} <|-- {typeArray[i].Name}");
+  endif
+:i++;
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

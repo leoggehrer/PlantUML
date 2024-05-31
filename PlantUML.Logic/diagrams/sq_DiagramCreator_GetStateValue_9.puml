@@ -1,0 +1,17 @@
+@startuml DiagramCreator.GetStateValue
+title DiagramCreator.GetStateValue
+participant "GetStateValue(object obj,FieldInfo fieldInfo,int maxLength)" as GetStateValue_p0_p1_p2 #LightYellow
+participant "GetFieldValue(a0,a1)" as GetFieldValue_a0_a1 #LightGreen
+autonumber
+GetStateValue_p0_p1_p2 -[#grey]> GetFieldValue_a0_a1 : (obj, fieldInfo)
+GetFieldValue_a0_a1 -[#blue]-> GetStateValue_p0_p1_p2 : value
+alt#LightBlue fieldInfo.FieldType.IsValueType
+ else
+ alt#LightBlue fieldInfo.FieldType == typeof(string)
+ else
+ alt#LightBlue value == null
+ else
+ end
+ end
+end
+@enduml

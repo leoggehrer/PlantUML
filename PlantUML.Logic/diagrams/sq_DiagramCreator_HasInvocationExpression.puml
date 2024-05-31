@@ -1,0 +1,22 @@
+@startuml DiagramCreator.HasInvocationExpression
+title DiagramCreator.HasInvocationExpression
+participant "HasInvocationExpression(SyntaxNode syntaxNode)" as HasInvocationExpression_p0 #LightYellow
+participant "syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>().Any()" as syntaxNode_ChildNodes_OfType_InvocationExpressionSyntax_Any #LightGreen
+participant "syntaxNode.ChildNodes().OfType<InvocationExpressionSyntax>()" as syntaxNode_ChildNodes_OfType_InvocationExpressionSyntax_ #LightGreen
+participant "syntaxNode.ChildNodes()" as syntaxNode_ChildNodes #LightGreen
+participant "syntaxNode.ChildNodes().GetEnumerator()" as syntaxNode_ChildNodes_GetEnumerator #LightGreen
+participant "iterator.MoveNext()" as iterator_MoveNext #LightGreen
+participant "HasInvocationExpression(a0)" as HasInvocationExpression_a0 #LightGreen
+autonumber
+HasInvocationExpression_p0 -[#grey]> syntaxNode_ChildNodes_OfType_InvocationExpressionSyntax_Any
+syntaxNode_ChildNodes_OfType_InvocationExpressionSyntax_Any -[#blue]-> HasInvocationExpression_p0 : result
+alt#LightBlue result == false
+ HasInvocationExpression_p0 -[#grey]> syntaxNode_ChildNodes_GetEnumerator
+ syntaxNode_ChildNodes_GetEnumerator -[#blue]-> HasInvocationExpression_p0 : iterator
+ loop#LightCoral result == false && iterator.MoveNext()
+ HasInvocationExpression_p0 -[#grey]> iterator_MoveNext
+ HasInvocationExpression_p0 -[#grey]> HasInvocationExpression_a0 : (iterator.Current)
+ HasInvocationExpression_a0 -[#blue]-> HasInvocationExpression_p0 : result
+ end
+end
+@enduml

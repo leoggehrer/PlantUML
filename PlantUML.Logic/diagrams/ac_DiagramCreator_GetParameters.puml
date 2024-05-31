@@ -1,0 +1,16 @@
+@startuml DiagramCreator.GetParameters
+title DiagramCreator.GetParameters
+start
+#LightGreen:Params(MethodInfo methodInfo);
+#LightSkyBlue:var counter = 0\nvar result = new StringBuilder();
+:iterator = methodInfo.GetParameters().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (counter++ > 0) then (<color:green>yes)
+      #WhiteSmoke:result.Append(", ");
+    endif
+    #WhiteSmoke:result.Append($"{item.ParameterType.Name} {item.Name}");
+endwhile (<color:red>no)
+#Lavender:return result.ToString();
+stop
+@enduml

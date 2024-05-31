@@ -1,0 +1,41 @@
+@startuml DiagramCreator.CreateTypeDefinition
+title DiagramCreator.CreateTypeDefinition
+participant "CreateTypeDefinition(Type type,DiagramCreationFlags diagramCreationFlags)" as CreateTypeDefinition_p0_p1 #LightYellow
+participant "result.Add(a0)" as result_Add_a0 #LightGreen
+participant "Enum.GetValues(a0)" as Enum_GetValues_a0 #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "CreateItemMembers(type).SetIndent(a0)" as CreateItemMembers_type_SetIndent_a0 #LightGreen
+autonumber
+alt#LightBlue type.IsEnum
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ($"enum {type.Name} #light" + $"blue " + "{")
+ alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.EnumMembers) > 0
+ loop#LightCoral Enum.GetValues(type)
+ CreateTypeDefinition_p0_p1 -[#grey]> Enum_GetValues_a0 : (type)
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ($" {item}")
+ end
+ end
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ("}")
+ else
+ alt#LightBlue type.IsClass
+ alt#LightBlue type.IsAbstract
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ($"{prefix}abstract class {type.Name} {Color.Class} " + "{")
+ else
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ($"{prefix}class {type.Name} {Color.AbstractClass} " + "{")
+ end
+ alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.ClassMembers) > 0
+ CreateTypeDefinition_p0_p1 -[#grey]> result_AddRange_a0 : (CreateItemMembers(type).SetIndent(1))
+ result_AddRange_a0 -[#grey]> CreateItemMembers_type_SetIndent_a0 : (CreateItemMembers(type).SetIndent(1))
+ end
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ("}")
+ else
+ alt#LightBlue type.IsInterface
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ($"interface {type.Name} {Color.Interface} " + "{")
+ alt#LightBlue (diagramCreationFlags & DiagramCreationFlags.InterfaceMembers) > 0
+ CreateTypeDefinition_p0_p1 -[#grey]> result_AddRange_a0 : (CreateItemMembers(type).SetIndent(1))
+ result_AddRange_a0 -[#grey]> CreateItemMembers_type_SetIndent_a0 : (CreateItemMembers(type).SetIndent(1))
+ end
+ CreateTypeDefinition_p0_p1 -[#grey]> result_Add_a0 : ("}")
+ end
+ end
+end
+@enduml

@@ -1,0 +1,8 @@
+@startuml Program.Main
+title Program.Main
+start
+#LightGreen:Params(string[] args);
+#LightSkyBlue:PlantUMLApp app = new();
+#WhiteSmoke:app.Run(args);
+stop
+@enduml

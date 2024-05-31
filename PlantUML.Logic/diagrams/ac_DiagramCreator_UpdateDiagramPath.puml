@@ -1,0 +1,20 @@
+@startuml DiagramCreator.UpdateDiagramPath
+title DiagramCreator.UpdateDiagramPath
+start
+#LightGreen:Params(string path,string infoFileFilter);
+#LightSkyBlue:var infoLines = new List<string>()\nvar infoFiles = Directory.GetFiles(path, infoFileFilter, SearchOption.TopDirectoryOnly);
+:iterator = infoFiles.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :infoFile = iterator.Current();
+    #WhiteSmoke:infoLines.AddRange(File.ReadAllLines(infoFile));
+endwhile (<color:red>no)
+#LightSkyBlue:var files = Directory.GetFiles(path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories);
+:iterator = files.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #LightYellow:if (infoLines.Any(l => l.StartsWith($"fileName:{fileName}")) == false) then (<color:green>yes)
+      #WhiteSmoke:File.Delete(file);
+    endif
+endwhile (<color:red>no)
+stop
+@enduml

@@ -1,0 +1,10 @@
+@startuml PlantUMLApp.ChangeMaxGenerationDepth
+title PlantUMLApp.ChangeMaxGenerationDepth
+start
+#WhiteSmoke:PrintLine();
+#WhiteSmoke:Print("Enter the maximum generation depth: ");
+#LightYellow:if (int.TryParse(ReadLine(), out var result)) then (<color:green>yes)
+  #WhiteSmoke:MaxGenerationDepth = result;
+endif
+stop
+@enduml

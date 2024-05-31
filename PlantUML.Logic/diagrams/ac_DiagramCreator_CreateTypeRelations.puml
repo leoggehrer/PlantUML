@@ -1,0 +1,33 @@
+@startuml DiagramCreator.CreateTypeRelations
+title DiagramCreator.CreateTypeRelations
+start
+#LightGreen:Params(Type type,int deep);
+#LightSkyBlue:var result = new List<string>();
+:iterator = type.GetRelations(deep).GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (item.IsArray) then (<color:green>yes)
+      #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+        #WhiteSmoke:result.Add($"{type.Name} --> \"0..1\" {elemType.Name}");
+        else (<color:red>no)
+          #WhiteSmoke:result.Add($"{type.Name} --> \"1\" {elemType.Name}");
+      endif
+      else (<color:red>no)
+        #LightYellow:if (item.IsGenericCollectionType()) then (<color:green>yes)
+          #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+            #WhiteSmoke:result.Add($"{type.Name} \"*\" o-- \"0..1\" {elemType.Name}");
+            else (<color:red>no)
+              #WhiteSmoke:result.Add($"{type.Name} \"*\" *-- \"1\" {elemType.Name}");
+          endif
+          else (<color:red>no)
+            #LightYellow:if (item.IsNullableType()) then (<color:green>yes)
+              #WhiteSmoke:result.Add($"{type.Name} --> \"0..1\" {item.Name}");
+              else (<color:red>no)
+                #WhiteSmoke:result.Add($"{type.Name} --> \"1\" {item.Name}");
+            endif
+        endif
+    endif
+endwhile (<color:red>no)
+#Lavender:return result;
+stop
+@enduml

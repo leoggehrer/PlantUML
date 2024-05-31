@@ -1,0 +1,21 @@
+@startuml DiagramCreator.GetStateValue
+title DiagramCreator.GetStateValue
+start
+#LightGreen:Params(object obj,FieldInfo fieldInfo,int maxLength);
+#LightSkyBlue:string? result\nvar value = GetFieldValue(obj, fieldInfo);
+#LightYellow:if (fieldInfo.FieldType.IsValueType) then (<color:green>yes)
+  #WhiteSmoke:result = value?.ToString() ?? string.Empty;
+  else (<color:red>no)
+    #LightYellow:if (fieldInfo.FieldType == typeof(string)) then (<color:green>yes)
+      #WhiteSmoke:result = $"\"{value}\"";
+      else (<color:red>no)
+        #LightYellow:if (value == null) then (<color:green>yes)
+          #WhiteSmoke:result = "null";
+          else (<color:red>no)
+            #WhiteSmoke:result = $"{value.GetHashCode()}";
+        endif
+    endif
+endif
+#Lavender:return result.Length > maxLength - 3 ? result[..(maxLength - 2)] + "..." : result;
+stop
+@enduml

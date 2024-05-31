@@ -1,0 +1,14 @@
+@startuml DiagramCreator.GetFieldName
+title DiagramCreator.GetFieldName
+start
+#LightGreen:Params(FieldInfo fieldInfo);
+#LightSkyBlue:string? result;
+#LightYellow:if (fieldInfo.Name.Contains("k__BackingField")) then (<color:green>yes)
+  #WhiteSmoke:result = "_" + fieldInfo.Name.Betweenstring("<", ">");
+  #WhiteSmoke:result = string.Concat(result[..2].ToLower(), result.AsSpan(2));
+  else (<color:red>no)
+    #WhiteSmoke:result = fieldInfo.Name;
+endif
+#Lavender:return result;
+stop
+@enduml

@@ -34,6 +34,7 @@ namespace PlantUML.ConApp
         {
             Constructing();
             PageSize = 15;
+            MaxSubPathDepth = 1;
             Constructed();
         }
         /// <summary>
@@ -62,11 +63,15 @@ namespace PlantUML.ConApp
         /// <summary>
         /// Gets or sets the folder path for diagrams.
         /// </summary>
-        public static string DiagramFolder { get; set; } = "diagrams";
+        public string DiagramFolder { get; set; } = "diagrams";
         /// <summary>
         /// Gets or sets a value indicating whether to create a complete diagram.
         /// </summary>
-        public static bool CreateCompleteDiagram { get; set; } = true;
+        public bool CreateCompleteDiagram { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the generation depth.
+        /// </summary>
+        public int MaxGenerationDepth { get; set; } = 1;
         #endregion app properties
 
         #region overrides
@@ -89,8 +94,14 @@ namespace PlantUML.ConApp
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Depth", "Change max sub path depth"),
+                    Text = ToLabelText("Path-Depth", "Change max sub path depth"),
                     Action = (self) => ChangeMaxSubPathDepth(),
+                },
+                new()
+                {
+                    Key = $"{++mnuIdx}",
+                    Text = ToLabelText("Generation-Depth", "Change max generation depth"),
+                    Action = (self) => ChangeMaxGenerationDepth(),
                 },
                 new()
                 {
@@ -100,7 +111,7 @@ namespace PlantUML.ConApp
                     {
                         var savePath = ProjectsPath;
 
-                        ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth, [ SourcePath ]);
+                        ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth + 1, [ SourcePath ]);
                         if (savePath != ProjectsPath)
                         {
                             PageIndex = 0;
@@ -119,7 +130,7 @@ namespace PlantUML.ConApp
                     {
                         var savePath = TargetPath;
 
-                        TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth, [ SourcePath ]);
+                        TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth + 1, [ SourcePath ]);
                         if (savePath != TargetPath)
                         {
                             PageIndex = 0;
@@ -153,7 +164,7 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth + 1))
+            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth))
                                                .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
                                                .OrderBy(p => p)
                                                .ToArray();
@@ -191,14 +202,15 @@ namespace PlantUML.ConApp
             PrintLine('=', count);
             PrintLine();
             ForegroundColor = saveForeColor;
-            PrintLine($"Force flag:       {Force}");
-            PrintLine($"Max. path depth:  {MaxSubPathDepth}");
-            PrintLine($"Projets path:     {ProjectsPath}");
+            PrintLine($"Force flag:          {Force}");
+            PrintLine($"Max. sub path depth: {MaxSubPathDepth}");
+            PrintLine($"Max. generat. depth: {MaxGenerationDepth}");
+            PrintLine($"Projets path:        {ProjectsPath}");
             PrintLine();
-            PrintLine($"Target path:      {TargetPath}");
-            PrintLine($"Diagram folder:   {DiagramFolder}");
-            PrintLine($"Diagram complete: {CreateCompleteDiagram}");
-            PrintLine($"Diagram builder:  {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
+            PrintLine($"Target path:         {TargetPath}");
+            PrintLine($"Diagram folder:      {DiagramFolder}");
+            PrintLine($"Diagram complete:    {CreateCompleteDiagram}");
+            PrintLine($"Diagram builder:     {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
             PrintLine();
         }
 
@@ -216,10 +228,23 @@ namespace PlantUML.ConApp
         /// <summary>
         /// Changes the diagram folder name.
         /// </summary>
-        private static void ChangeDiagramFolder()
+        private void ChangeDiagramFolder()
         {
             DiagramFolder = ReadLine("Enter the diagram folder name: ").Trim();
         }
+        /// <summary>
+        /// Changes the max. generation depth.
+        /// </summary>
+        public void ChangeMaxGenerationDepth()
+        {
+            PrintLine();
+            Print("Enter the maximum generation depth: ");
+            if (int.TryParse(ReadLine(), out var result))
+            {
+                MaxGenerationDepth = result;
+            }
+        }
+
         /// <summary>
         /// Changes the diagram builder type based on the current value of DiagramBuilder.
         /// </summary>
@@ -256,19 +281,19 @@ namespace PlantUML.ConApp
             StartProgressBar();
             if ((DiagramBuilder & DiagramBuilderType.Activity) > 0)
             {
-                var builder = new ActivityDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+                var builder = new ActivityDiagramBuilder(sourcePath, Math.Max(0, MaxGenerationDepth - 1), targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
                 execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Class) > 0)
             {
-                var builder = new ClassDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, CreateCompleteDiagram, force);
+                var builder = new ClassDiagramBuilder(sourcePath, Math.Max(0, MaxGenerationDepth - 1), targetPath, DiagramFolder, CreateCompleteDiagram, force);
 
                 execute(builder, menuItem);
             }
             if ((DiagramBuilder & DiagramBuilderType.Sequence) > 0)
             {
-                var builder = new SequenceDiagramBuilder(sourcePath, MaxSubPathDepth, targetPath, DiagramFolder, force);
+                var builder = new SequenceDiagramBuilder(sourcePath, Math.Max(0, MaxGenerationDepth - 1), targetPath, DiagramFolder, force);
 
                 execute(builder, menuItem);
             }

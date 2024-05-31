@@ -1,0 +1,55 @@
+@startuml DiagramCreator.CreateCompleteClassDiagram
+title DiagramCreator.CreateCompleteClassDiagram
+start
+#LightGreen:Params(string path,bool force);
+#LightSkyBlue:var result = new List<string>()\nvar umlItems = new List<UMLItem>()\nvar umlRelations = new List<UMLItem>()\nvar files = Directory.GetFiles(path, $"*{PlantUMLExtension}", SearchOption.AllDirectories) .Where(f => Path.GetFileName(f).StartsWith("cd_"));
+:iterator = files.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :file = iterator.Current();
+    #WhiteSmoke:umlItems.AddRange(ExtractUMLItems(lines));
+    #WhiteSmoke:umlRelations.Add(ExtractUMLRelations(lines));
+endwhile (<color:red>no)
+:iterator = umlItems.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    #LightYellow:if (isContained == false) then (<color:green>yes)
+      #WhiteSmoke:result.AddRange(item);
+    endif
+endwhile (<color:red>no)
+:iterator = umlRelations.SelectMany(e => e).Distinct().GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :item = iterator.Current();
+    :iterator = itemData.GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :relationPart = iterator.Current();
+          #LightYellow:if (result.Any(l => l.Contains(relationPart)) == false) then (<color:green>yes)
+            #LightYellow:if (relationPart.Length > 1 && relationPart[0] == 'I' && char.IsUpper(relationPart[1])) then (<color:green>yes)
+              #WhiteSmoke:result.Add($"interface {relationPart} {Color.Interface}");
+              else (<color:red>no)
+                #WhiteSmoke:result.Add($"class {relationPart} {Color.Class}");
+            endif
+          endif
+    endwhile (<color:red>no)
+    #WhiteSmoke:result.Add(item);
+endwhile (<color:red>no)
+#LightSkyBlue:var fileName = "CompleteClassDiagram.puml"\nvar filePath = Path.Combine(path, fileName)\nvar diagramData = new List<string>(result)\nvar completeInfoData = new List<string>();
+#LightYellow:if (diagramData.Count > 0) then (<color:green>yes)
+  #WhiteSmoke:diagramData.AddRange(CreateRelations(diagramData));
+  #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
+  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
+  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
+  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
+    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
+  endif
+  #WhiteSmoke:completeInfoData.Add($"title:All class diagrams (CD)");
+  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
+  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
+  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
+endif
+#LightSkyBlue:var comleteInfoFileName = "CompleteClassDiagram_info.txt";
+#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
+  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
+endif
+stop
+@enduml

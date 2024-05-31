@@ -1,0 +1,13 @@
+@startuml DiagramCreator.CreateParticipantAlias
+title DiagramCreator.CreateParticipantAlias
+participant "CreateParticipantAlias(MethodDeclarationSyntax methodSyntax)" as CreateParticipantAlias_p0 #LightYellow
+participant "parameters.Any()" as parameters_Any #LightGreen
+participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
+participant "parameters.Select(a0)" as parameters_Select_a0 #LightGreen
+participant "result.Select(a0)" as result_Select_a0 #LightGreen
+autonumber
+CreateParticipantAlias_p0 -[#grey]> parameters_Any
+CreateParticipantAlias_p0 -[#grey]> string_Join_a0_a1 : ("_", parameters.Select((item,  Expression ) => $"p{ Expression }"))
+string_Join_a0_a1 -[#grey]> parameters_Select_a0 : ("_", parameters.Select((item,  Expression ) => $"p{ Expression }"))
+CreateParticipantAlias_p0 -[#grey]> result_Select_a0 : (c => char.IsLetterOrDigit(c) ? c.ToString() : "_")
+@enduml

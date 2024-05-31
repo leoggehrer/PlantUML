@@ -1,0 +1,29 @@
+@startuml DiagramCreator.UpdateDiagramPath
+title DiagramCreator.UpdateDiagramPath
+participant "UpdateDiagramPath(string path,string infoFileFilter)" as UpdateDiagramPath_p0_p1 #LightYellow
+participant "Directory.GetFiles(a0,a1,a2)" as Directory_GetFiles_a0_a1_a2 #LightGreen
+participant "infoLines.AddRange(a0)" as infoLines_AddRange_a0 #LightGreen
+participant "File.ReadAllLines(a0)" as File_ReadAllLines_a0 #LightGreen
+participant "PlantUMLExtension.Replace(a0,a1)" as PlantUMLExtension_Replace_a0_a1 #LightGreen
+participant "Path.GetFileName(a0)" as Path_GetFileName_a0 #LightGreen
+participant "infoLines.Any(a0)" as infoLines_Any_a0 #LightGreen
+participant "File.Delete(a0)" as File_Delete_a0 #LightGreen
+autonumber
+UpdateDiagramPath_p0_p1 -[#grey]> Directory_GetFiles_a0_a1_a2 : (path, infoFileFilter, SearchOption.TopDirectoryOnly)
+Directory_GetFiles_a0_a1_a2 -[#blue]-> UpdateDiagramPath_p0_p1 : infoFiles
+loop#LightCoral infoFiles
+ UpdateDiagramPath_p0_p1 -[#grey]> infoLines_AddRange_a0 : (File.ReadAllLines(infoFile))
+ infoLines_AddRange_a0 -[#grey]> File_ReadAllLines_a0 : (File.ReadAllLines(infoFile))
+end
+UpdateDiagramPath_p0_p1 -[#grey]> Directory_GetFiles_a0_a1_a2 : (path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories)
+Directory_GetFiles_a0_a1_a2 -[#grey]> PlantUMLExtension_Replace_a0_a1 : (path, PlantUMLExtension.Replace(".", "*."), SearchOption.AllDirectories)
+Directory_GetFiles_a0_a1_a2 -[#blue]-> UpdateDiagramPath_p0_p1 : files
+loop#LightCoral files
+ UpdateDiagramPath_p0_p1 -[#grey]> Path_GetFileName_a0 : (file)
+ Path_GetFileName_a0 -[#blue]-> UpdateDiagramPath_p0_p1 : fileName
+ alt#LightBlue infoLines.Any(l => l.StartsWith($" Expression :{ Expression }")) == false
+ UpdateDiagramPath_p0_p1 -[#grey]> infoLines_Any_a0 : (l => l.StartsWith($" Expression :{ Expression }"))
+ UpdateDiagramPath_p0_p1 -[#grey]> File_Delete_a0 : (file)
+ end
+end
+@enduml

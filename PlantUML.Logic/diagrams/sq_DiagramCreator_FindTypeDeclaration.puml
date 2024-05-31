@@ -1,0 +1,15 @@
+@startuml DiagramCreator.FindTypeDeclaration
+title DiagramCreator.FindTypeDeclaration
+participant "FindTypeDeclaration(SemanticModel semanticModel,BaseTypeSyntax baseTypeSyntax)" as FindTypeDeclaration_p0_p1 #LightYellow
+participant "semanticModel.SyntaxTree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>()" as semanticModel_SyntaxTree_GetRoot_DescendantNodes_OfType_TypeDeclarationSyntax_ #LightGreen
+participant "semanticModel.SyntaxTree.GetRoot().DescendantNodes()" as semanticModel_SyntaxTree_GetRoot_DescendantNodes #LightGreen
+participant "semanticModel.SyntaxTree.GetRoot()" as semanticModel_SyntaxTree_GetRoot #LightGreen
+participant "typeDeclarations.FirstOrDefault(a0)" as typeDeclarations_FirstOrDefault_a0 #LightGreen
+autonumber
+FindTypeDeclaration_p0_p1 -[#grey]> semanticModel_SyntaxTree_GetRoot_DescendantNodes_OfType_TypeDeclarationSyntax_
+semanticModel_SyntaxTree_GetRoot_DescendantNodes_OfType_TypeDeclarationSyntax_ -[#blue]-> FindTypeDeclaration_p0_p1 : typeDeclarations
+alt#LightBlue baseTypeSyntax.Type is IdentifierNameSyntax identifierName
+ FindTypeDeclaration_p0_p1 -[#grey]> typeDeclarations_FirstOrDefault_a0 : (t => t.Identifier.Text == identifierText)
+ typeDeclarations_FirstOrDefault_a0 -[#blue]-> FindTypeDeclaration_p0_p1 : result
+end
+@enduml

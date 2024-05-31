@@ -1,0 +1,8 @@
+@startuml PlantUMLApp.ChangeDiagramFolder
+title PlantUMLApp.ChangeDiagramFolder
+participant "ChangeDiagramFolder" as ChangeDiagramFolder #LightYellow
+participant "ReadLine("Enterthediagramfoldername:").Trim()" as ReadLine_Enter_the_diagram_folder_name_Trim #LightGreen
+autonumber
+ChangeDiagramFolder -[#grey]> ReadLine_Enter_the_diagram_folder_name_Trim
+ReadLine_Enter_the_diagram_folder_name_Trim -[#blue]-> ChangeDiagramFolder : DiagramFolder
+@enduml

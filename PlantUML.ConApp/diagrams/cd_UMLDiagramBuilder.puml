@@ -1,0 +1,28 @@
+@startuml UMLDiagramBuilder
+title UMLDiagramBuilder
+abstract class UMLDiagramBuilder #White {
+- string _sourcepath
+- int _maxsubpathdeep
+- string _targetpath
+- string _diagramfolder
+- bool _createcompletediagram
+- bool _force
+---
++ string getSourcePath()
+- Void setSourcePath(string value)
++ int getMaxSubPathDeep()
+- Void setMaxSubPathDeep(int value)
++ string getTargetPath()
+- Void setTargetPath(string value)
++ string getDiagramFolder()
++ Void setDiagramFolder(string value)
++ bool getCreateCompleteDiagram()
++ Void setCreateCompleteDiagram(bool value)
++ bool getForce()
+- Void setForce(bool value)
+---
++ abstract void CreateFromFile()
++ abstract void CreateFromPath()
++ {static} string[] ReadDefinesFromProjectFiles(string path)
+}
+@enduml

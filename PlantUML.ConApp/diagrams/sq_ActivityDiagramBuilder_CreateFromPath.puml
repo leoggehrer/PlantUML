@@ -1,0 +1,37 @@
+@startuml ActivityDiagramBuilder.CreateFromPath
+title ActivityDiagramBuilder.CreateFromPath
+participant "CreateFromPath" as CreateFromPath #LightYellow
+participant "Directory.Exists(a0)" as Directory_Exists_a0 #LightGreen
+participant "ReadDefinesFromProjectFiles(a0)" as ReadDefinesFromProjectFiles_a0 #LightGreen
+participant "Application.GetSourceCodeFiles(a0,a1,a2)" as Application_GetSourceCodeFiles_a0_a1_a2 #LightGreen
+participant "File.ReadAllText(a0)" as File_ReadAllText_a0 #LightGreen
+participant "builder.AppendLine(a0)" as builder_AppendLine_a0 #LightGreen
+participant "DiagramFolder.HasContent()" as DiagramFolder_HasContent #LightGreen
+participant "Path.Combine(a0,a1)" as Path_Combine_a0_a1 #LightGreen
+participant "Logic.DiagramCreator.CreateActivityDiagram(a0,a1,a2,a3)" as Logic_DiagramCreator_CreateActivityDiagram_a0_a1_a2_a3 #LightGreen
+participant "Logic.DiagramCreator.CreateCompleteActivityDiagram(a0,a1)" as Logic_DiagramCreator_CreateCompleteActivityDiagram_a0_a1 #LightGreen
+autonumber
+alt#LightBlue Directory.Exists(SourcePath)
+ CreateFromPath -[#grey]> Directory_Exists_a0 : (SourcePath)
+ Directory_Exists_a0 -[#blue]-> CreateFromPath : result
+ CreateFromPath -[#grey]> ReadDefinesFromProjectFiles_a0 : (SourcePath!)
+ ReadDefinesFromProjectFiles_a0 -[#blue]-> CreateFromPath : defines
+ CreateFromPath -[#grey]> Application_GetSourceCodeFiles_a0_a1_a2 : (SourcePath, ["*.cs"], MaxSubPathDeep)
+ Application_GetSourceCodeFiles_a0_a1_a2 -[#blue]-> CreateFromPath : sourceFiles
+ loop#LightCoral sourceFiles
+ CreateFromPath -[#grey]> File_ReadAllText_a0 : (file)
+ File_ReadAllText_a0 -[#blue]-> CreateFromPath : source
+ CreateFromPath -[#grey]> builder_AppendLine_a0 : (source)
+ builder_AppendLine_a0 -[#blue]-> CreateFromPath : result
+ end
+ alt#LightBlue DiagramFolder.HasContent()
+ CreateFromPath -[#grey]> DiagramFolder_HasContent
+ CreateFromPath -[#grey]> Path_Combine_a0_a1 : (TargetPath, DiagramFolder)
+ Path_Combine_a0_a1 -[#blue]-> CreateFromPath : diagramsDirectory
+ end
+ CreateFromPath -[#grey]> Logic_DiagramCreator_CreateActivityDiagram_a0_a1_a2_a3 : (diagramsDirectory, builder.ToString(), defines, Force)
+ alt#LightBlue CreateCompleteDiagram
+ CreateFromPath -[#grey]> Logic_DiagramCreator_CreateCompleteActivityDiagram_a0_a1 : (diagramsDirectory, Force)
+ end
+end
+@enduml
