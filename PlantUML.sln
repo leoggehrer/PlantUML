@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlantUML.Logic", "PlantUML.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlantUML.ConApp", "PlantUML.ConApp\PlantUML.ConApp.csproj", "{878EA569-5BBF-444F-A142-380244905421}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonTool", "..\CommonTool\CommonTool\CommonTool.csproj", "{4AA9C623-53CE-4E24-AFAF-7D0673262B58}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileWatcher.ConApp", "..\FileWatcher\FileWatcher.ConApp\FileWatcher.ConApp.csproj", "{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{878EA569-5BBF-444F-A142-380244905421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{878EA569-5BBF-444F-A142-380244905421}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{878EA569-5BBF-444F-A142-380244905421}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4AA9C623-53CE-4E24-AFAF-7D0673262B58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4AA9C623-53CE-4E24-AFAF-7D0673262B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4AA9C623-53CE-4E24-AFAF-7D0673262B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4AA9C623-53CE-4E24-AFAF-7D0673262B58}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Release|Any CPU.ActiveCfg = Release|Any CPU

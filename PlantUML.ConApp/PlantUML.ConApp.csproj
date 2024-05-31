@@ -16,8 +16,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="CommonTool.Console" Version="1.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\PlantUML.Logic\PlantUML.Logic.csproj" />
-		<ProjectReference Include="..\..\CommonTool\CommonTool\CommonTool.csproj" />
 	</ItemGroup>
 
 </Project>
