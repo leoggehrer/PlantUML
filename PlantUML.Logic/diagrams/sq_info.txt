@@ -1,200 +1,212 @@
+title:CSharpAnalyzer.QueryTypeDeclarations (SQ)
+fileName:sq_CSharpAnalyzer_QueryTypeDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
+title:CSharpAnalyzer.QueryClassDeclarations (SQ)
+fileName:sq_CSharpAnalyzer_QueryClassDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
+title:CSharpAnalyzer.QueryMethodDeclarations (SQ)
+fileName:sq_CSharpAnalyzer_QueryMethodDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (SQ)
 fileName:sq_DiagramCreator_CreateActivityDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (SQ)
 fileName:sq_DiagramCreator_CreateActivityDiagram_1.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (SQ)
 fileName:sq_DiagramCreator_CreateActivityDiagram_2.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (SQ)
 fileName:sq_DiagramCreator_CreateActivityDiagram_3.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCompleteActivityDiagram (SQ)
 fileName:sq_DiagramCreator_CreateCompleteActivityDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.FormatActivityDiagram (SQ)
 fileName:sq_DiagramCreator_FormatActivityDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateClassDiagram (SQ)
 fileName:sq_DiagramCreator_CreateClassDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCompleteClassDiagram (SQ)
 fileName:sq_DiagramCreator_CreateCompleteClassDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateRelations (SQ)
 fileName:sq_DiagramCreator_CreateRelations.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateItemRelations (SQ)
 fileName:sq_DiagramCreator_CreateItemRelations.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetItemNameFrom (SQ)
 fileName:sq_DiagramCreator_GetItemNameFrom.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetTypeNameFrom (SQ)
 fileName:sq_DiagramCreator_GetTypeNameFrom.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetMemberNameFrom (SQ)
 fileName:sq_DiagramCreator_GetMemberNameFrom.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateSequenceDiagram (SQ)
 fileName:sq_DiagramCreator_CreateSequenceDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateSequenceDiagram (SQ)
 fileName:sq_DiagramCreator_CreateSequenceDiagram_4.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateClassDiagram (SQ)
 fileName:sq_DiagramCreator_CreateClassDiagram_5.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectName (SQ)
 fileName:sq_DiagramCreator_CreateObjectName.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectDiagram (SQ)
 fileName:sq_DiagramCreator_CreateObjectDiagram.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeDeclarationSyntax (SQ)
 fileName:sq_DiagramCreator_AnalyzeDeclarationSyntax.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeCallSequence (SQ)
 fileName:sq_DiagramCreator_AnalyzeCallSequence.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeCallSequence (SQ)
 fileName:sq_DiagramCreator_AnalyzeCallSequence_6.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.HasInvocationExpression (SQ)
 fileName:sq_DiagramCreator_HasInvocationExpression.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeStatement (SQ)
 fileName:sq_DiagramCreator_AnalyzeStatement.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeDefinition (SQ)
 fileName:sq_DiagramCreator_CreateTypeDefinition.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeHirarchies (SQ)
 fileName:sq_DiagramCreator_CreateTypeHirarchies.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeHierachy (SQ)
 fileName:sq_DiagramCreator_CreateTypeHierachy.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeRelations (SQ)
 fileName:sq_DiagramCreator_CreateTypeRelations.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeImplements (SQ)
 fileName:sq_DiagramCreator_CreateTypeImplements.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeDefinitions (SQ)
 fileName:sq_DiagramCreator_CreateTypeDefinitions.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateItemMembers (SQ)
 fileName:sq_DiagramCreator_CreateItemMembers.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectState (SQ)
 fileName:sq_DiagramCreator_CreateObjectState.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCollectionState (SQ)
 fileName:sq_DiagramCreator_CreateCollectionState.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ExtractUMLItems (SQ)
 fileName:sq_DiagramCreator_ExtractUMLItems.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ExtractUMLRelations (SQ)
 fileName:sq_DiagramCreator_ExtractUMLRelations.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.UpdateDiagramPath (SQ)
 fileName:sq_DiagramCreator_UpdateDiagramPath.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.FindTypeDeclaration (SQ)
 fileName:sq_DiagramCreator_FindTypeDeclaration.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipant (SQ)
 fileName:sq_DiagramCreator_CreateParticipant.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipantAlias (SQ)
 fileName:sq_DiagramCreator_CreateParticipantAlias.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipant (SQ)
 fileName:sq_DiagramCreator_CreateParticipant_7.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipantAlias (SQ)
 fileName:sq_DiagramCreator_CreateParticipantAlias_8.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateArgumentList (SQ)
 fileName:sq_DiagramCreator_CreateArgumentList.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateDiagramHirarchies (SQ)
 fileName:sq_DiagramCreator_CreateDiagramHirarchies.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetFieldName (SQ)
 fileName:sq_DiagramCreator_GetFieldName.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetParameters (SQ)
 fileName:sq_DiagramCreator_GetParameters.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetFieldValue (SQ)
 fileName:sq_DiagramCreator_GetFieldValue.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetStateValue (SQ)
 fileName:sq_DiagramCreator_GetStateValue.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetStateValue (SQ)
 fileName:sq_DiagramCreator_GetStateValue_9.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.IsAutoProperty (SQ)
 fileName:sq_DiagramCreator_IsAutoProperty.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ReadCustomUMLFromFle (SQ)
 fileName:sq_DiagramCreator_ReadCustomUMLFromFle.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ReadCustomUML (SQ)
 fileName:sq_DiagramCreator_ReadCustomUML.puml
-generated_on:31.05.2024 22:20:29
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer

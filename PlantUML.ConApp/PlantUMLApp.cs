@@ -106,6 +106,12 @@ namespace PlantUML.ConApp
                 new()
                 {
                     Key = $"{++mnuIdx}",
+                    Text = ToLabelText("Page-Size", "Change the page size"),
+                    Action = (self) => ChangePageSize(),
+                },
+                new()
+                {
+                    Key = $"{++mnuIdx}",
                     Text = ToLabelText("Projects path", "Change projects path"),
                     Action = (self) =>
                     {
@@ -205,6 +211,7 @@ namespace PlantUML.ConApp
             PrintLine($"Force flag:          {Force}");
             PrintLine($"Max. sub path depth: {MaxSubPathDepth}");
             PrintLine($"Max. generat. depth: {MaxGenerationDepth}");
+            PrintLine($"Page size:           {PageSize}");
             PrintLine($"Projets path:        {ProjectsPath}");
             PrintLine();
             PrintLine($"Target path:         {TargetPath}");
@@ -244,7 +251,6 @@ namespace PlantUML.ConApp
                 MaxGenerationDepth = result;
             }
         }
-
         /// <summary>
         /// Changes the diagram builder type based on the current value of DiagramBuilder.
         /// </summary>
@@ -258,6 +264,19 @@ namespace PlantUML.ConApp
                 "sequence" => DiagramBuilderType.All,
                 _ => DiagramBuilder,
             };
+        }
+        /// <summary>
+        /// Changes the page size.
+        /// </summary>
+        public void ChangePageSize()
+        {
+            PrintLine();
+            Print("Enter page size > 0: ");
+            if (int.TryParse(ReadLine(), out var result) && result > 0)
+            {
+                PageIndex = 0;
+                PageSize = result;
+            }
         }
 
         /// <summary>

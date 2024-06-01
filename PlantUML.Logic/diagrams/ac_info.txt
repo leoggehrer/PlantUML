@@ -1,236 +1,248 @@
+title:CSharpAnalyzer.QueryTypeDeclarations (AC)
+fileName:ac_CSharpAnalyzer_QueryTypeDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
+title:CSharpAnalyzer.QueryClassDeclarations (AC)
+fileName:ac_CSharpAnalyzer_QueryClassDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
+title:CSharpAnalyzer.QueryMethodDeclarations (AC)
+fileName:ac_CSharpAnalyzer_QueryMethodDeclarations.puml
+generated_on:01.06.2024 13:07:06
+generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ClassConstructing (AC)
 fileName:ac_DiagramCreator_ClassConstructing.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ClassConstructed (AC)
 fileName:ac_DiagramCreator_ClassConstructed.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.Constructing (AC)
 fileName:ac_DiagramCreator_Constructing.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.Constructed (AC)
 fileName:ac_DiagramCreator_Constructed.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ClassConstructing (AC)
 fileName:ac_DiagramCreator_ClassConstructing_1.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ClassConstructed (AC)
 fileName:ac_DiagramCreator_ClassConstructed_2.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (AC)
 fileName:ac_DiagramCreator_CreateActivityDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (AC)
 fileName:ac_DiagramCreator_CreateActivityDiagram_3.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (AC)
 fileName:ac_DiagramCreator_CreateActivityDiagram_4.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateActivityDiagram (AC)
 fileName:ac_DiagramCreator_CreateActivityDiagram_5.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCompleteActivityDiagram (AC)
 fileName:ac_DiagramCreator_CreateCompleteActivityDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.FormatActivityDiagram (AC)
 fileName:ac_DiagramCreator_FormatActivityDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateClassDiagram (AC)
 fileName:ac_DiagramCreator_CreateClassDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCompleteClassDiagram (AC)
 fileName:ac_DiagramCreator_CreateCompleteClassDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateRelations (AC)
 fileName:ac_DiagramCreator_CreateRelations.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateItemRelations (AC)
 fileName:ac_DiagramCreator_CreateItemRelations.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetItemNameFrom (AC)
 fileName:ac_DiagramCreator_GetItemNameFrom.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetTypeNameFrom (AC)
 fileName:ac_DiagramCreator_GetTypeNameFrom.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetMemberNameFrom (AC)
 fileName:ac_DiagramCreator_GetMemberNameFrom.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateSequenceDiagram (AC)
 fileName:ac_DiagramCreator_CreateSequenceDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateSequenceDiagram (AC)
 fileName:ac_DiagramCreator_CreateSequenceDiagram_6.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateClassDiagram (AC)
 fileName:ac_DiagramCreator_CreateClassDiagram_7.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectName (AC)
 fileName:ac_DiagramCreator_CreateObjectName.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCollectionName (AC)
 fileName:ac_DiagramCreator_CreateCollectionName.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectDiagram (AC)
 fileName:ac_DiagramCreator_CreateObjectDiagram.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeDeclarationSyntax (AC)
 fileName:ac_DiagramCreator_AnalyzeDeclarationSyntax.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeCallSequence (AC)
 fileName:ac_DiagramCreator_AnalyzeCallSequence.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeCallSequence (AC)
 fileName:ac_DiagramCreator_AnalyzeCallSequence_8.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.HasInvocationExpression (AC)
 fileName:ac_DiagramCreator_HasInvocationExpression.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.AnalyzeStatement (AC)
 fileName:ac_DiagramCreator_AnalyzeStatement.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeDefinition (AC)
 fileName:ac_DiagramCreator_CreateTypeDefinition.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeHirarchies (AC)
 fileName:ac_DiagramCreator_CreateTypeHirarchies.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeHierachy (AC)
 fileName:ac_DiagramCreator_CreateTypeHierachy.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeRelations (AC)
 fileName:ac_DiagramCreator_CreateTypeRelations.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeImplements (AC)
 fileName:ac_DiagramCreator_CreateTypeImplements.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateTypeDefinitions (AC)
 fileName:ac_DiagramCreator_CreateTypeDefinitions.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateItemMembers (AC)
 fileName:ac_DiagramCreator_CreateItemMembers.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateObjectState (AC)
 fileName:ac_DiagramCreator_CreateObjectState.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateCollectionState (AC)
 fileName:ac_DiagramCreator_CreateCollectionState.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ExtractUMLItems (AC)
 fileName:ac_DiagramCreator_ExtractUMLItems.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ExtractUMLRelations (AC)
 fileName:ac_DiagramCreator_ExtractUMLRelations.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.UpdateDiagramPath (AC)
 fileName:ac_DiagramCreator_UpdateDiagramPath.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.FindTypeDeclaration (AC)
 fileName:ac_DiagramCreator_FindTypeDeclaration.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipant (AC)
 fileName:ac_DiagramCreator_CreateParticipant.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipantAlias (AC)
 fileName:ac_DiagramCreator_CreateParticipantAlias.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipant (AC)
 fileName:ac_DiagramCreator_CreateParticipant_9.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateParticipantAlias (AC)
 fileName:ac_DiagramCreator_CreateParticipantAlias_10.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateArgumentList (AC)
 fileName:ac_DiagramCreator_CreateArgumentList.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.CreateDiagramHirarchies (AC)
 fileName:ac_DiagramCreator_CreateDiagramHirarchies.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetFieldName (AC)
 fileName:ac_DiagramCreator_GetFieldName.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetParameters (AC)
 fileName:ac_DiagramCreator_GetParameters.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetFieldValue (AC)
 fileName:ac_DiagramCreator_GetFieldValue.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetStateValue (AC)
 fileName:ac_DiagramCreator_GetStateValue.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.GetStateValue (AC)
 fileName:ac_DiagramCreator_GetStateValue_11.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.IsAutoProperty (AC)
 fileName:ac_DiagramCreator_IsAutoProperty.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ReadCustomUMLFromFle (AC)
 fileName:ac_DiagramCreator_ReadCustomUMLFromFle.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:DiagramCreator.ReadCustomUML (AC)
 fileName:ac_DiagramCreator_ReadCustomUML.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:Color.ClassConstructing (AC)
 fileName:ac_Color_ClassConstructing.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer
 title:Color.ClassConstructed (AC)
 fileName:ac_Color_ClassConstructed.puml
-generated_on:31.05.2024 22:20:14
+generated_on:01.06.2024 13:07:06
 generated_by:generated with the DiagramCreator by Prof.Gehrer

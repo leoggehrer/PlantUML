@@ -1,6 +1,6 @@
 @startuml SequenceDiagramBuilder
 title SequenceDiagramBuilder
- class SequenceDiagramBuilder #GhostWhite {
+class SequenceDiagramBuilder #GhostWhite {
 ---
 ---
 + void CreateFromFile()
@@ -31,6 +31,5 @@ abstract class UMLDiagramBuilder #White {
 + abstract void CreateFromPath()
 + {static} string[] ReadDefinesFromProjectFiles(string path)
 }
-SequenceDiagramBuilder <|-- UMLDiagramBuilder
-class UMLDiagramBuilder #GhostWhite
+UMLDiagramBuilder <|-- SequenceDiagramBuilder
 @enduml

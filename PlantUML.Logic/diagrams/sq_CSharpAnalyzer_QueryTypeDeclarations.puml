@@ -1,0 +1,15 @@
+@startuml CSharpAnalyzer.QueryTypeDeclarations
+title CSharpAnalyzer.QueryTypeDeclarations
+participant "QueryTypeDeclarations" as QueryTypeDeclarations #LightYellow
+participant "SyntaxTree.GetRoot()" as SyntaxTree_GetRoot #LightGreen
+participant "syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>()" as syntaxRoot_DescendantNodes_OfType_TypeDeclarationSyntax_ #LightGreen
+participant "syntaxRoot.DescendantNodes()" as syntaxRoot_DescendantNodes #LightGreen
+participant "result.ToArray()" as result_ToArray #LightGreen
+autonumber
+QueryTypeDeclarations -[#grey]> SyntaxTree_GetRoot
+SyntaxTree_GetRoot -[#blue]-> QueryTypeDeclarations : syntaxRoot
+QueryTypeDeclarations -[#grey]> syntaxRoot_DescendantNodes_OfType_TypeDeclarationSyntax_
+syntaxRoot_DescendantNodes_OfType_TypeDeclarationSyntax_ -[#blue]-> QueryTypeDeclarations : result
+QueryTypeDeclarations -[#grey]> result_ToArray
+result_ToArray -[#blue]-> QueryTypeDeclarations : result
+@enduml

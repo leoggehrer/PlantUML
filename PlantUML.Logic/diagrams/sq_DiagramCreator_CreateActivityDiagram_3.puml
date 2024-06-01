@@ -1,6 +1,6 @@
 @startuml DiagramCreator.CreateActivityDiagram
 title DiagramCreator.CreateActivityDiagram
-participant "CreateActivityDiagram(MethodDeclarationSyntax methodNode,bool declarations)" as CreateActivityDiagram_p0_p1 #LightYellow
+participant "CreateActivityDiagram(MethodDeclarationSyntax methodNode,bool withDeclarations)" as CreateActivityDiagram_p0_p1 #LightYellow
 participant "parameters.Any()" as parameters_Any #LightGreen
 participant "string.Join(a0,a1)" as string_Join_a0_a1 #LightGreen
 participant "paramsStatement.HasContent()" as paramsStatement_HasContent #LightGreen
@@ -20,7 +20,7 @@ loop#LightCoral methodNode?.Body?.Statements ?? []
  CreateActivityDiagram_p0_p1 -[#grey]> diagramData_Add_a0 : ($"{Color.Declaration}:{localDeclarationStatement.Declaration}")
  end
  else
- CreateActivityDiagram_p0_p1 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (statement, diagramData, declarations, 0)
+ CreateActivityDiagram_p0_p1 -[#grey]> AnalyzeStatement_a0_a1_a2_a3 : (statement, diagramData, withDeclarations, 0)
  end
 end
 CreateActivityDiagram_p0_p1 -[#grey]> FormatActivityDiagram_a0 : (diagramData)

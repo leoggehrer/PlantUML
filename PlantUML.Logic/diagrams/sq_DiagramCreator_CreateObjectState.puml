@@ -8,6 +8,7 @@ participant "obj.GetType().GetAllClassFields()" as obj_GetType_GetAllClassFields
 autonumber
 loop#LightCoral obj.GetType().GetFields(bindingFlags)
  CreateObjectState_p0 -[#grey]> obj_GetType_GetFields_a0 : (bindingFlags)
+ obj_GetType_GetFields_a0 -[#blue]-> CreateObjectState_p0 : result
  CreateObjectState_p0 -[#grey]> result_Add_a0 : ("{static}" + $"{GetFieldName(item)} => { Expression }")
 end
 alt#LightBlue counter > 0

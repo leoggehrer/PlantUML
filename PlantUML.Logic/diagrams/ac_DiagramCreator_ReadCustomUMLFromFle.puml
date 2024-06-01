@@ -11,9 +11,5 @@ start
   #WhiteSmoke:result.AddRange(customUMLLines);
 endif
 #Lavender:return [.. result];
-' CustomUML
-  endif
-  endif
-' CustomUML
 stop
 @enduml

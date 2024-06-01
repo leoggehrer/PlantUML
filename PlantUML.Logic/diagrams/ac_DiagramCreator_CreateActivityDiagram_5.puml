@@ -1,7 +1,7 @@
 @startuml DiagramCreator.CreateActivityDiagram
 title DiagramCreator.CreateActivityDiagram
 start
-#LightGreen:Params(MethodDeclarationSyntax methodNode,bool declarations);
+#LightGreen:Params(MethodDeclarationSyntax methodNode,bool withDeclarations);
 #LightSkyBlue:var diagramData = new List<string>()\nvar islocalDeclaration = false\nvar parameters = methodNode.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
 #LightYellow:if (paramsStatement.HasContent()) then (<color:green>yes)
   #WhiteSmoke:diagramData.Add($"{Color.Parameters}:Params{paramsStatement};");
@@ -21,7 +21,7 @@ while (iterator.MoveNext()) is (<color:green>yes)
           #WhiteSmoke:islocalDeclaration = false;
           #WhiteSmoke:diagramData[^1] += ";";
         endif
-        #WhiteSmoke:AnalyzeStatement(statement, diagramData, declarations, 0);
+        #WhiteSmoke:AnalyzeStatement(statement, diagramData, withDeclarations, 0);
     endif
 endwhile (<color:red>no)
 #Lavender:return FormatActivityDiagram(diagramData);

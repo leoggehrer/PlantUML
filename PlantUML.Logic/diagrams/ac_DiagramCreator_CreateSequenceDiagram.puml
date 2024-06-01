@@ -2,7 +2,7 @@
 title DiagramCreator.CreateSequenceDiagram
 start
 #LightGreen:Params(string path,string source,string[] defines,bool force);
-#LightSkyBlue:var infoFileName = "sq_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree);
+#LightSkyBlue:var infoFileName = "sq_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar analyzer = new CSharpAnalyzer(source, defines)\nvar semanticModel = analyzer.SemanticModel\nvar classNodes = analyzer.QueryClassDeclarations();
 #LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
   #WhiteSmoke:Directory.CreateDirectory(path);
 endif
@@ -36,24 +36,5 @@ endwhile (<color:red>no)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
   #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
 endif
-' CustomUML
-            #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
-            #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
-              #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
-            endif
-            #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (SQ)");
-            #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
-            #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
-            #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
-          endif
-    endwhile (<color:red>no)
-endwhile (<color:red>no)
-#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
-  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
-  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
-endif
-stop
-@enduml
-' CustomUML
 stop
 @enduml

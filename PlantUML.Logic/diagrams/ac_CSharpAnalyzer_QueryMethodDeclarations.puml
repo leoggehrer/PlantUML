@@ -1,0 +1,12 @@
+@startuml CSharpAnalyzer.QueryMethodDeclarations
+title CSharpAnalyzer.QueryMethodDeclarations
+start
+#LightSkyBlue:var result = new List<MethodDeclarationSyntax>()\nvar classNodes = QueryClassDeclarations();
+:iterator = classNodes.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :classNode = iterator.Current();
+    #WhiteSmoke:result.AddRange(methodNodes);
+endwhile (<color:red>no)
+#Lavender:return result.ToArray();
+stop
+@enduml

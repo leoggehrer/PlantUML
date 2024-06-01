@@ -6,6 +6,7 @@ participant "result.Append(a0)" as result_Append_a0 #LightGreen
 autonumber
 loop#LightCoral methodInfo.GetParameters()
  GetParameters_p0 -[#grey]> methodInfo_GetParameters
+ methodInfo_GetParameters -[#blue]-> GetParameters_p0 : result
  alt#LightBlue counter++ > 0
  GetParameters_p0 -[#grey]> result_Append_a0 : (", ")
  end

@@ -5,37 +5,37 @@ start
 #LightSkyBlue:var extractItemNames = new List<string>()\nvar currentItemName = string.Empty\nvar typeName = GetTypeNameFrom(typeLine)\nvar cleanTypeName = typeName.Replace("?", string.Empty) .Replace("[]", string.Empty)\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
 :iterator = digramData.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
-  :diagramLine = iterator.Current();
-    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
-      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(line));
     endif
 endwhile (<color:red>no)
-:iterator = digramData.Where(l => l.Equals("---") == false).GetIterator();
+:iterator = digramData.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
-  :diagramLine = iterator.Current();
-    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
-      #WhiteSmoke:isTypeDefinition = true;
-      #WhiteSmoke:currentItemName = GetItemNameFrom(diagramLine);
+  :line = iterator.Current();
+    #LightYellow:if (line.Equals("}")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = false;
+      #WhiteSmoke:isFieldRange = false;
+      #WhiteSmoke:isPropertyRange = false;
+      #WhiteSmoke:isMethodRange = false;
+      #WhiteSmoke:currentItemName = string.Empty;
       else (<color:red>no)
-        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
-          #WhiteSmoke:isFieldRange = true;
+        #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+          #WhiteSmoke:isTypeDefinition = true;
+          #WhiteSmoke:currentItemName = GetItemNameFrom(line);
           else (<color:red>no)
-            #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
-              #WhiteSmoke:isFieldRange = false;
-              #WhiteSmoke:isPropertyRange = true;
-              #WhiteSmoke:isMethodRange = false;
+            #LightYellow:if (line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = true;
               else (<color:red>no)
-                #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
                   #WhiteSmoke:isFieldRange = false;
-                  #WhiteSmoke:isPropertyRange = false;
-                  #WhiteSmoke:isMethodRange = true;
+                  #WhiteSmoke:isPropertyRange = true;
+                  #WhiteSmoke:isMethodRange = false;
                   else (<color:red>no)
-                    #LightYellow:if (isTypeDefinition && diagramLine.Contains('}')) then (<color:green>yes)
-                      #WhiteSmoke:isTypeDefinition = false;
+                    #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
                       #WhiteSmoke:isFieldRange = false;
                       #WhiteSmoke:isPropertyRange = false;
-                      #WhiteSmoke:isMethodRange = false;
-                      #WhiteSmoke:currentItemName = string.Empty;
+                      #WhiteSmoke:isMethodRange = true;
                     endif
                 endif
             endif

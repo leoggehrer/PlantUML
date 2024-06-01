@@ -8,6 +8,7 @@ participant "result.AsSpan(a0)" as result_AsSpan_a0 #LightGreen
 autonumber
 alt#LightBlue fieldInfo.Name.Contains("k__BackingField")
  GetFieldName_p0 -[#grey]> fieldInfo_Name_Contains_a0 : ("k__BackingField")
+ fieldInfo_Name_Contains_a0 -[#blue]-> GetFieldName_p0 : result
  GetFieldName_p0 -[#grey]> string_Concat_a0_a1 : (result[..2].ToLower(), result.AsSpan(2))
  string_Concat_a0_a1 -[#grey]> result_2_ToLower : (result[..2].ToLower(), result.AsSpan(2))
  string_Concat_a0_a1 -[#grey]> result_AsSpan_a0 : (result[..2].ToLower(), result.AsSpan(2))

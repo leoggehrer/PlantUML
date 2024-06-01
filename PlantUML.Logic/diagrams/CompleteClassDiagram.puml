@@ -1,6 +1,6 @@
 @startuml CompleteClassDiagram
 title CompleteClassDiagram
- class Color << static >> #GhostWhite {
+class Color << static >>  #GhostWhite {
 - {static} string _enum
 - {static} string _struct
 - {static} string _class
@@ -51,7 +51,32 @@ title CompleteClassDiagram
 - {static} void ClassConstructing()
 - {static} void ClassConstructed()
 }
- class DiagramCreator #GhostWhite {
+class CSharpAnalyzer #GhostWhite {
+- CSharpParseOptions _parseoptions
+- SyntaxTree _syntaxtree
+- PortableExecutableReference _mscorelibreference
+- PortableExecutableReference _systemcorelibreference
+- CSharpCompilation _compilation
+- SemanticModel _semanticmodel
+---
++ CSharpParseOptions getParseOptions()
+- Void setParseOptions(CSharpParseOptions value)
++ SyntaxTree getSyntaxTree()
+- Void setSyntaxTree(SyntaxTree value)
++ PortableExecutableReference getMSCoreLibReference()
+- Void setMSCoreLibReference(PortableExecutableReference value)
++ PortableExecutableReference getSystemCoreLibReference()
+- Void setSystemCoreLibReference(PortableExecutableReference value)
++ CSharpCompilation getCompilation()
+- Void setCompilation(CSharpCompilation value)
++ SemanticModel getSemanticModel()
+- Void setSemanticModel(SemanticModel value)
+---
++ TypeDeclarationSyntax[] QueryTypeDeclarations()
++ ClassDeclarationSyntax[] QueryClassDeclarations()
++ MethodDeclarationSyntax[] QueryMethodDeclarations()
+}
+class DiagramCreator #GhostWhite {
 ---
 + {static} string getInfoFileFilter()
 + {static} string getPlantUMLExtension()
@@ -67,8 +92,8 @@ title CompleteClassDiagram
 - void Constructed()
 + {static} void CreateActivityDiagram(string path, string source, bool force)
 + {static} void CreateActivityDiagram(string path, string source, string[] defines, bool force)
-+ {static} void CreateActivityDiagram(string path, string source, string[] defines, bool declarations, bool force)
-- {static} List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool declarations)
++ {static} void CreateActivityDiagram(string path, string source, string[] defines, bool withDeclarations, bool force)
++ {static} List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool withDeclarations)
 + {static} void CreateCompleteActivityDiagram(string path, bool force)
 - {static} List<string> FormatActivityDiagram(List<string> diagramData)
 + {static} void CreateClassDiagram(string path, string source, string[] defines, bool force)
@@ -117,9 +142,9 @@ title CompleteClassDiagram
 + {static} string[] ReadCustomUMLFromFle(string filePath)
 - {static} List<string> ReadCustomUML(IEnumerable<string> lines)
 }
- class UMLItem #GhostWhite {
+class UMLItem #GhostWhite {
 ---
 ---
 }
-UMLItem <|-- List
+List <|-- UMLItem
 @enduml

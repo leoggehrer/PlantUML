@@ -14,18 +14,4 @@ loop#LightCoral lines
  end
  end
 end
-' CustomUML
-participant "line.Contains(a0,a1)" as line_Contains_a0_a1 #LightGreen
-participant "result.Add(a0)" as result_Add_a0 #LightGreen
-autonumber
-loop#LightCoral lines
- else
- alt#LightBlue counter > 0 && counter % 2 > 0
-participant "line.Contains(a0,a1)" as line_Contains_a0_a1 #LightGreen
-participant "result.Add(a0)" as result_Add_a0 #LightGreen
-autonumber
-loop#LightCoral lines
- else
- alt#LightBlue counter > 0 && counter % 2 > 0
-' CustomUML
 @enduml

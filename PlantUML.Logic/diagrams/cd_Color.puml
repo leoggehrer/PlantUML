@@ -1,6 +1,6 @@
 @startuml Color
 title Color
- class Color << static >> #GhostWhite {
+class Color << static >>  #GhostWhite {
 - {static} string _enum
 - {static} string _struct
 - {static} string _class

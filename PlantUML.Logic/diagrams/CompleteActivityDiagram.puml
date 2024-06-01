@@ -1,8 +1,28 @@
 @startuml CompleteActivityDiagram
 header
-generated on 31.05.2024 22:20:14
+generated on 01.06.2024 13:07:06
 end header
 title CompleteActivityDiagram
+start
+note right:  CSharpAnalyzer.QueryTypeDeclarations
+#LightSkyBlue:var syntaxRoot = SyntaxTree.GetRoot()\nvar result = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
+#Lavender:return result.ToArray();
+stop
+start
+note right:  CSharpAnalyzer.QueryClassDeclarations
+#LightSkyBlue:var syntaxRoot = SyntaxTree.GetRoot()\nvar result = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+#Lavender:return result.ToArray();
+stop
+start
+note right:  CSharpAnalyzer.QueryMethodDeclarations
+#LightSkyBlue:var result = new List<MethodDeclarationSyntax>()\nvar classNodes = QueryClassDeclarations();
+:iterator = classNodes.GetIterator();
+while (iterator.MoveNext()) is (<color:green>yes)
+  :classNode = iterator.Current();
+    #WhiteSmoke:result.AddRange(methodNodes);
+endwhile (<color:red>no)
+#Lavender:return result.ToArray();
+stop
 start
 note right:  DiagramCreator.CreateActivityDiagram
 #LightGreen:Params(string path,string source,bool force);
@@ -15,8 +35,8 @@ note right:  DiagramCreator.CreateActivityDiagram
 stop
 start
 note right:  DiagramCreator.CreateActivityDiagram
-#LightGreen:Params(string path,string source,string[] defines,bool declarations,bool force);
-#LightSkyBlue:var infoFileName = "ac_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+#LightGreen:Params(string path,string source,string[] defines,bool withDeclarations,bool force);
+#LightSkyBlue:var infoFileName = "ac_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar analyzer = new CSharpAnalyzer(source, defines)\nvar classNodes = analyzer.QueryClassDeclarations();
 #LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
   #WhiteSmoke:Directory.CreateDirectory(path);
 endif
@@ -50,29 +70,10 @@ endwhile (<color:red>no)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
   #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
 endif
-' CustomUML
-          #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
-          #WhiteSmoke:diagramData.Insert(1, $"title {title}");
-          #WhiteSmoke:diagramData.Insert(2, "start");
-          #WhiteSmoke:diagramData.Add("stop");
-          #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
-          #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
-            #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
-          endif
-          #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (AC)");
-          #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
-          #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
-          #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
-    endwhile (<color:red>no)
-endwhile (<color:red>no)
-#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
-  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
-  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
-endif
 stop
 start
 note right:  DiagramCreator.CreateActivityDiagram
-#LightGreen:Params(MethodDeclarationSyntax methodNode,bool declarations);
+#LightGreen:Params(MethodDeclarationSyntax methodNode,bool withDeclarations);
 #LightSkyBlue:var diagramData = new List<string>()\nvar islocalDeclaration = false\nvar parameters = methodNode.ParameterList?.Parameters ?? []\nvar paramsStatement = parameters.Any() ? $"({string.Join(",", parameters)})" : string.Empty;
 #LightYellow:if (paramsStatement.HasContent()) then (<color:green>yes)
   #WhiteSmoke:diagramData.Add($"{Color.Parameters}:Params{paramsStatement};");
@@ -92,7 +93,7 @@ while (iterator.MoveNext()) is (<color:green>yes)
           #WhiteSmoke:islocalDeclaration = false;
           #WhiteSmoke:diagramData[^1] += ";";
         endif
-        #WhiteSmoke:AnalyzeStatement(statement, diagramData, declarations, 0);
+        #WhiteSmoke:AnalyzeStatement(statement, diagramData, withDeclarations, 0);
     endif
 endwhile (<color:red>no)
 #Lavender:return FormatActivityDiagram(diagramData);
@@ -164,34 +165,26 @@ stop
 start
 note right:  DiagramCreator.CreateClassDiagram
 #LightGreen:Params(string path,string source,string[] defines,bool force);
-#LightSkyBlue:var infoFileName = "cd_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("ClassCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree)\nvar typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
+#LightSkyBlue:var infoFileName = "cd_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar analyzer = new CSharpAnalyzer(source, defines)\nvar semanticModel = analyzer.SemanticModel\nvar typeDeclarations = analyzer.QueryTypeDeclarations();
 #LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
   #WhiteSmoke:Directory.CreateDirectory(path);
 endif
 :iterator = typeDeclarations.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
-  :itemNode = iterator.Current();
+  :typeDeclaration = iterator.Current();
     #LightYellow:if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false) then (<color:green>yes)
       #WhiteSmoke:fileName = $"{fileName}{PlantUMLExtension}";
       else (<color:red>no)
         #WhiteSmoke:fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
     endif
-    #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, itemNode, diagramData, 0);
+    #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, typeDeclaration, diagramData, 0);
+    :iterator = typeDeclaration.Members.Where(m => m is ClassDeclarationSyntax).GetIterator();
+    while (iterator.MoveNext()) is (<color:green>yes)
+      :member = iterator.Current();
+          #WhiteSmoke:AnalyzeDeclarationSyntax(semanticModel, member, diagramData, 0);
+    endwhile (<color:red>no)
+    #WhiteSmoke:diagramData.AddRange(relations);
     #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-    #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
-    #WhiteSmoke:diagramData.Insert(1, $"title {title}");
-    #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
-    #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
-      #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
-    endif
-    #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (CD)");
-    #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
-endwhile (<color:red>no)
-#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
-  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
-  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
-endif
-' CustomUML
     #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
     #WhiteSmoke:diagramData.Insert(1, $"title {title}");
     #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
@@ -260,22 +253,6 @@ endif
 #LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
   #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
 endif
-' CustomUML
-  #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
-  #WhiteSmoke:diagramData.Insert(1, "title CompleteClassDiagram");
-  #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
-  #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
-    #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
-  endif
-  #WhiteSmoke:completeInfoData.Add($"title:All class diagrams (CD)");
-  #WhiteSmoke:completeInfoData.Add($"{nameof(fileName)}:{fileName}");
-  #WhiteSmoke:completeInfoData.Add($"generated_on:{DateTime.UtcNow}");
-  #WhiteSmoke:completeInfoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
-endif
-#LightSkyBlue:var comleteInfoFileName = "CompleteClassDiagram_info.txt";
-#LightYellow:if (force || Path.Exists(Path.Combine(path, comleteInfoFileName)) == false) then (<color:green>yes)
-  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, comleteInfoFileName), completeInfoData);
-endif
 stop
 start
 note right:  DiagramCreator.CreateRelations
@@ -284,30 +261,30 @@ note right:  DiagramCreator.CreateRelations
 :iterator = diagramData.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
   :line = iterator.Current();
-    #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
-      #WhiteSmoke:isTypeDefinition = true;
+    #LightYellow:if (line.Equals("}")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = false;
       #WhiteSmoke:isFieldRange = false;
       #WhiteSmoke:isPropertyRange = false;
       #WhiteSmoke:isMethodRange = false;
       else (<color:red>no)
-        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
-          #WhiteSmoke:isFieldRange = true;
+        #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+          #WhiteSmoke:isTypeDefinition = true;
+          #WhiteSmoke:isFieldRange = false;
+          #WhiteSmoke:isPropertyRange = false;
+          #WhiteSmoke:isMethodRange = false;
           else (<color:red>no)
-            #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
-              #WhiteSmoke:isFieldRange = false;
-              #WhiteSmoke:isPropertyRange = true;
-              #WhiteSmoke:isMethodRange = false;
+            #LightYellow:if (line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = true;
               else (<color:red>no)
-                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
                   #WhiteSmoke:isFieldRange = false;
-                  #WhiteSmoke:isPropertyRange = false;
-                  #WhiteSmoke:isMethodRange = true;
+                  #WhiteSmoke:isPropertyRange = true;
+                  #WhiteSmoke:isMethodRange = false;
                   else (<color:red>no)
-                    #LightYellow:if (isTypeDefinition && line.Contains('}')) then (<color:green>yes)
-                      #WhiteSmoke:isTypeDefinition = false;
+                    #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
                       #WhiteSmoke:isFieldRange = false;
                       #WhiteSmoke:isPropertyRange = false;
-                      #WhiteSmoke:isMethodRange = false;
+                      #WhiteSmoke:isMethodRange = true;
                     endif
                 endif
             endif
@@ -325,37 +302,37 @@ note right:  DiagramCreator.CreateItemRelations
 #LightSkyBlue:var extractItemNames = new List<string>()\nvar currentItemName = string.Empty\nvar typeName = GetTypeNameFrom(typeLine)\nvar cleanTypeName = typeName.Replace("?", string.Empty) .Replace("[]", string.Empty)\nbool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
 :iterator = digramData.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
-  :diagramLine = iterator.Current();
-    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
-      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(diagramLine));
+  :line = iterator.Current();
+    #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+      #WhiteSmoke:extractItemNames.Add(GetItemNameFrom(line));
     endif
 endwhile (<color:red>no)
-:iterator = digramData.Where(l => l.Equals("---") == false).GetIterator();
+:iterator = digramData.GetIterator();
 while (iterator.MoveNext()) is (<color:green>yes)
-  :diagramLine = iterator.Current();
-    #LightYellow:if (diagramLine.Contains("class") || diagramLine.Contains("interface")) then (<color:green>yes)
-      #WhiteSmoke:isTypeDefinition = true;
-      #WhiteSmoke:currentItemName = GetItemNameFrom(diagramLine);
+  :line = iterator.Current();
+    #LightYellow:if (line.Equals("}")) then (<color:green>yes)
+      #WhiteSmoke:isTypeDefinition = false;
+      #WhiteSmoke:isFieldRange = false;
+      #WhiteSmoke:isPropertyRange = false;
+      #WhiteSmoke:isMethodRange = false;
+      #WhiteSmoke:currentItemName = string.Empty;
       else (<color:red>no)
-        #LightYellow:if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
-          #WhiteSmoke:isFieldRange = true;
+        #LightYellow:if (line.Contains("class") || line.Contains("interface")) then (<color:green>yes)
+          #WhiteSmoke:isTypeDefinition = true;
+          #WhiteSmoke:currentItemName = GetItemNameFrom(line);
           else (<color:red>no)
-            #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
-              #WhiteSmoke:isFieldRange = false;
-              #WhiteSmoke:isPropertyRange = true;
-              #WhiteSmoke:isMethodRange = false;
+            #LightYellow:if (line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false) then (<color:green>yes)
+              #WhiteSmoke:isFieldRange = true;
               else (<color:red>no)
-                #LightYellow:if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
+                #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false) then (<color:green>yes)
                   #WhiteSmoke:isFieldRange = false;
-                  #WhiteSmoke:isPropertyRange = false;
-                  #WhiteSmoke:isMethodRange = true;
+                  #WhiteSmoke:isPropertyRange = true;
+                  #WhiteSmoke:isMethodRange = false;
                   else (<color:red>no)
-                    #LightYellow:if (isTypeDefinition && diagramLine.Contains('}')) then (<color:green>yes)
-                      #WhiteSmoke:isTypeDefinition = false;
+                    #LightYellow:if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false) then (<color:green>yes)
                       #WhiteSmoke:isFieldRange = false;
                       #WhiteSmoke:isPropertyRange = false;
-                      #WhiteSmoke:isMethodRange = false;
-                      #WhiteSmoke:currentItemName = string.Empty;
+                      #WhiteSmoke:isMethodRange = true;
                     endif
                 endif
             endif
@@ -412,7 +389,7 @@ stop
 start
 note right:  DiagramCreator.CreateSequenceDiagram
 #LightGreen:Params(string path,string source,string[] defines,bool force);
-#LightSkyBlue:var infoFileName = "sq_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar options = new CSharpParseOptions().WithPreprocessorSymbols(defines)\nvar syntaxTree = CSharpSyntaxTree.ParseText(source, options)\nvar syntaxRoot = syntaxTree.GetRoot()\nvar classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>()\nvar mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location)\nvar systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location)\nvar compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore])\nvar semanticModel = compilation.GetSemanticModel(syntaxTree);
+#LightSkyBlue:var infoFileName = "sq_info.txt"\nvar fileCounter = 0\nvar infoData = new List<string>()\nvar analyzer = new CSharpAnalyzer(source, defines)\nvar semanticModel = analyzer.SemanticModel\nvar classNodes = analyzer.QueryClassDeclarations();
 #LightYellow:if (Path.Exists(path) == false) then (<color:green>yes)
   #WhiteSmoke:Directory.CreateDirectory(path);
 endif
@@ -431,22 +408,6 @@ while (iterator.MoveNext()) is (<color:green>yes)
             #WhiteSmoke:diagramData.Insert(0, $"@{StartUmlLabel} {title}");
             #WhiteSmoke:diagramData.Insert(1, $"title {title}");
             #WhiteSmoke:diagramData.AddRange(ReadCustomUMLFromFle(filePath));
-            #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
-            #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
-              #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
-            endif
-            #WhiteSmoke:infoData.Add($"{nameof(title)}:{title} (SQ)");
-            #WhiteSmoke:infoData.Add($"{nameof(fileName)}:{fileName}");
-            #WhiteSmoke:infoData.Add($"generated_on:{DateTime.UtcNow}");
-            #WhiteSmoke:infoData.Add($"generated_by:generated with the DiagramCreator by Prof.Gehrer");
-          endif
-    endwhile (<color:red>no)
-endwhile (<color:red>no)
-#LightYellow:if (force || Path.Exists(Path.Combine(path, infoFileName)) == false) then (<color:green>yes)
-  #WhiteSmoke:File.WriteAllLines(Path.Combine(path, infoFileName), infoData);
-  #WhiteSmoke:UpdateDiagramPath(path, InfoFileFilter);
-endif
-' CustomUML
             #WhiteSmoke:diagramData.Add($"@{EndUmlLabel}");
             #LightYellow:if (force || Path.Exists(filePath) == false) then (<color:green>yes)
               #WhiteSmoke:File.WriteAllLines(filePath, diagramData);
@@ -1490,10 +1451,6 @@ note right:  DiagramCreator.ReadCustomUMLFromFle
   #WhiteSmoke:result.AddRange(customUMLLines);
 endif
 #Lavender:return [.. result];
-' CustomUML
-  endif
-  endif
-' CustomUML
 stop
 start
 note right:  DiagramCreator.ReadCustomUML
@@ -1503,15 +1460,6 @@ note right:  DiagramCreator.ReadCustomUML
 while (iterator.MoveNext()) is (<color:green>yes)
   :line = iterator.Current();
     #LightYellow:if (line.StartsWith($"'{CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase) || line.StartsWith($"' {CustomUMLLabel}", StringComparison.CurrentCultureIgnoreCase)) then (<color:green>yes)
-      #WhiteSmoke:counter++;
-      else (<color:red>no)
-        #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)
-          #WhiteSmoke:result.Add(line);
-        endif
-    endif
-endwhile (<color:red>no)
-#Lavender:return result;
-' CustomUML
       #WhiteSmoke:counter++;
       else (<color:red>no)
         #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)

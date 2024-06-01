@@ -1,25 +1,27 @@
 @startuml DiagramCreator.CreateRelations
 title DiagramCreator.CreateRelations
 participant "CreateRelations(IEnumerable<string> diagramData)" as CreateRelations_p0 #LightYellow
+participant "line.Equals(a0)" as line_Equals_a0 #LightGreen
 participant "line.Contains(a0)" as line_Contains_a0 #LightGreen
 participant "line.StartsWith(a0)" as line_StartsWith_a0 #LightGreen
 participant "CreateItemRelations(a0,a1,a2)" as CreateItemRelations_a0_a1_a2 #LightGreen
 autonumber
 loop#LightCoral diagramData
+ alt#LightBlue line.Equals("}")
+ CreateRelations_p0 -[#grey]> line_Equals_a0 : ("}")
+ else
  alt#LightBlue line.Contains("class") || line.Contains("interface")
  CreateRelations_p0 -[#grey]> line_Contains_a0 : ("class")
  CreateRelations_p0 -[#grey]> line_Contains_a0 : ("interface")
  else
- alt#LightBlue isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false
+ alt#LightBlue line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false
+ CreateRelations_p0 -[#grey]> line_StartsWith_a0 : ("---")
  else
  alt#LightBlue line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false
  CreateRelations_p0 -[#grey]> line_StartsWith_a0 : ("---")
  else
  alt#LightBlue line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false
  CreateRelations_p0 -[#grey]> line_StartsWith_a0 : ("---")
- else
- alt#LightBlue isTypeDefinition && line.Contains('}')
- CreateRelations_p0 -[#grey]> line_Contains_a0 : ('}')
  end
  end
  end

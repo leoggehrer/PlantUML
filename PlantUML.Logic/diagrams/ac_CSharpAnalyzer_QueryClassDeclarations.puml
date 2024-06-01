@@ -1,0 +1,7 @@
+@startuml CSharpAnalyzer.QueryClassDeclarations
+title CSharpAnalyzer.QueryClassDeclarations
+start
+#LightSkyBlue:var syntaxRoot = SyntaxTree.GetRoot()\nvar result = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+#Lavender:return result.ToArray();
+stop
+@enduml

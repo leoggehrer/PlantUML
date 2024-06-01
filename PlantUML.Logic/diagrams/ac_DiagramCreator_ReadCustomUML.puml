@@ -15,17 +15,5 @@ while (iterator.MoveNext()) is (<color:green>yes)
     endif
 endwhile (<color:red>no)
 #Lavender:return result;
-' CustomUML
-      #WhiteSmoke:counter++;
-      else (<color:red>no)
-        #LightYellow:if (counter > 0 && counter % 2 > 0) then (<color:green>yes)
-          #WhiteSmoke:result.Add(line);
-        endif
-    endif
-endwhile (<color:red>no)
-#Lavender:return result;
-stop
-@enduml
-' CustomUML
 stop
 @enduml

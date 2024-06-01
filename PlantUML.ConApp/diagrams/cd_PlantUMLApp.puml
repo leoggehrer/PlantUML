@@ -1,6 +1,6 @@
 @startuml PlantUMLApp
 title PlantUMLApp
- class PlantUMLApp #GhostWhite {
+class PlantUMLApp #GhostWhite {
 - {static} string _projectspath
 - {static} string _targetpath
 - DiagramBuilderType _diagrambuilder
@@ -33,5 +33,9 @@ title PlantUMLApp
 - void ChangeDiagramBuilder()
 - void CreateDiagram(MenuItem menuItem, bool force)
 }
-PlantUMLApp <|-- ConsoleApplication
+ConsoleApplication <|-- PlantUMLApp
+' CustomUML
+abstract class ConsoleApplication #LightBlue {
+}
+' CustomUML
 @enduml

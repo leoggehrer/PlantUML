@@ -1,6 +1,6 @@
 @startuml CompleteClassDiagram
 title CompleteClassDiagram
- class ActivityDiagramBuilder #GhostWhite {
+class ActivityDiagramBuilder #GhostWhite {
 ---
 ---
 + void CreateFromFile()
@@ -31,13 +31,13 @@ abstract class UMLDiagramBuilder #White {
 + abstract void CreateFromPath()
 + {static} string[] ReadDefinesFromProjectFiles(string path)
 }
- class ClassDiagramBuilder #GhostWhite {
+class ClassDiagramBuilder #GhostWhite {
 ---
 ---
 + void CreateFromFile()
 + void CreateFromPath()
 }
- class PlantUMLApp #GhostWhite {
+class PlantUMLApp #GhostWhite {
 - {static} string _projectspath
 - {static} string _targetpath
 - DiagramBuilderType _diagrambuilder
@@ -70,20 +70,21 @@ abstract class UMLDiagramBuilder #White {
 - void ChangeDiagramBuilder()
 - void CreateDiagram(MenuItem menuItem, bool force)
 }
- class Program #GhostWhite {
+abstract class ConsoleApplication #LightBlue {
+}
+class Program #GhostWhite {
 ---
 ---
 + {static} void Main(string[] args)
 }
- class SequenceDiagramBuilder #GhostWhite {
+class SequenceDiagramBuilder #GhostWhite {
 ---
 ---
 + void CreateFromFile()
 + void CreateFromPath()
 }
-ActivityDiagramBuilder <|-- UMLDiagramBuilder
-ClassDiagramBuilder <|-- UMLDiagramBuilder
-class ConsoleApplication #GhostWhite
-PlantUMLApp <|-- ConsoleApplication
-SequenceDiagramBuilder <|-- UMLDiagramBuilder
+UMLDiagramBuilder <|-- ActivityDiagramBuilder
+UMLDiagramBuilder <|-- ClassDiagramBuilder
+ConsoleApplication <|-- PlantUMLApp
+UMLDiagramBuilder <|-- SequenceDiagramBuilder
 @enduml

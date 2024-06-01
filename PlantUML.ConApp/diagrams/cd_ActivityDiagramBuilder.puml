@@ -1,6 +1,6 @@
 @startuml ActivityDiagramBuilder
 title ActivityDiagramBuilder
- class ActivityDiagramBuilder #GhostWhite {
+class ActivityDiagramBuilder #GhostWhite {
 ---
 ---
 + void CreateFromFile()
@@ -31,6 +31,5 @@ abstract class UMLDiagramBuilder #White {
 + abstract void CreateFromPath()
 + {static} string[] ReadDefinesFromProjectFiles(string path)
 }
-ActivityDiagramBuilder <|-- UMLDiagramBuilder
-class UMLDiagramBuilder #GhostWhite
+UMLDiagramBuilder <|-- ActivityDiagramBuilder
 @enduml

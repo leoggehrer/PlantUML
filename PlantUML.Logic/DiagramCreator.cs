@@ -7,7 +7,6 @@ using PlantUML.Logic.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Text.RegularExpressions;
 
 namespace PlantUML.Logic
 {
@@ -184,17 +183,15 @@ namespace PlantUML.Logic
         /// <param name="path">The path where the activity diagrams will be saved.</param>
         /// <param name="source">The source code to generate the activity diagrams from.</param>
         /// <param name="defines">An array of preprocessor symbols to be used during parsing.</param>
-        /// <param name="declarations">A flag indicating whether to generate declarations.</param>
+        /// <param name="withDeclarations">A flag indicating whether to generate declarations.</param>
         /// <param name="force">A flag indicating whether to overwrite existing diagrams.</param>
-        public static void CreateActivityDiagram(string path, string source, string[] defines, bool declarations, bool force)
+        public static void CreateActivityDiagram(string path, string source, string[] defines, bool withDeclarations, bool force)
         {
             var infoFileName = "ac_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
-            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
-            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
-            var syntaxRoot = syntaxTree.GetRoot();
-            var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
+            var analyzer = new CSharpAnalyzer(source, defines);
+            var classNodes = analyzer.QueryClassDeclarations();
 
             if (Path.Exists(path) == false)
             {
@@ -209,7 +206,7 @@ namespace PlantUML.Logic
                 {
                     var title = $"{classNode.Identifier.Text}.{methodNode.Identifier.Text}";
                     var fileName = $"ac_{classNode.Identifier.Text}_{methodNode.Identifier.Text}";
-                    var diagramData = CreateActivityDiagram(methodNode, declarations);
+                    var diagramData = CreateActivityDiagram(methodNode, withDeclarations);
 
                     if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false)
                     {
@@ -252,9 +249,9 @@ namespace PlantUML.Logic
         /// Creates an activity diagram based on the provided method declaration syntax.
         /// </summary>
         /// <param name="methodNode">The method declaration syntax to analyze.</param>
-        /// <param name="declarations">A flag indicating whether to generate declarations.</param>
+        /// <param name="withDeclarations">A flag indicating whether to generate declarations.</param>
         /// <returns>A list of strings representing the activity diagram data.</returns>
-        private static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool declarations)
+        public static List<string> CreateActivityDiagram(MethodDeclarationSyntax methodNode, bool withDeclarations)
         {
             var diagramData = new List<string>();
             var islocalDeclaration = false;
@@ -286,7 +283,7 @@ namespace PlantUML.Logic
                         islocalDeclaration = false;
                         diagramData[^1] += ";";
                     }
-                    AnalyzeStatement(statement, diagramData, declarations, 0);
+                    AnalyzeStatement(statement, diagramData, withDeclarations, 0);
                 }
             }
             return FormatActivityDiagram(diagramData);
@@ -447,24 +444,19 @@ namespace PlantUML.Logic
             var infoFileName = "cd_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
-            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
-            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
-            var syntaxRoot = syntaxTree.GetRoot();
-            var mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location);
-            var systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location);
-            var compilation = CSharpCompilation.Create("ClassCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore]);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var typeDeclarations = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
+            var analyzer = new CSharpAnalyzer(source, defines);
+            var semanticModel = analyzer.SemanticModel;
+            var typeDeclarations = analyzer.QueryTypeDeclarations();
 
             if (Path.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
 
-            foreach (var itemNode in typeDeclarations)
+            foreach (var typeDeclaration in typeDeclarations)
             {
-                var title = $"{itemNode.Identifier.Text}";
-                var fileName = $"cd_{itemNode.Identifier.Text}";
+                var title = $"{typeDeclaration.Identifier.Text}";
+                var fileName = $"cd_{typeDeclaration.Identifier.Text}";
                 var diagramData = new List<string>();
 
                 if (infoData.Contains($"{nameof(fileName)}:{fileName}{PlantUMLExtension}") == false)
@@ -476,7 +468,16 @@ namespace PlantUML.Logic
                     fileName = $"{fileName}_{++fileCounter}{PlantUMLExtension}";
                 }
 
-                AnalyzeDeclarationSyntax(semanticModel, itemNode, diagramData, 0);
+                AnalyzeDeclarationSyntax(semanticModel, typeDeclaration, diagramData, 0);
+
+                foreach (var member in typeDeclaration.Members.Where(m => m is ClassDeclarationSyntax))
+                {
+                    AnalyzeDeclarationSyntax(semanticModel, member, diagramData, 0);
+                }
+
+                var relations = CreateRelations(diagramData);
+
+                diagramData.AddRange(relations);
 
                 var filePath = Path.Combine(path, fileName);
 
@@ -539,24 +540,6 @@ namespace PlantUML.Logic
 
             foreach (var item in umlRelations.SelectMany(e => e).Distinct())
             {
-                var itemData = item.Trim()
-                                   .Split([" <|-- ", " --|> "], StringSplitOptions.RemoveEmptyEntries)
-                                   .ToArray();
-
-                foreach (var relationPart in itemData)
-                {
-                    if (result.Any(l => l.Contains(relationPart)) == false)
-                    {
-                        if (relationPart.Length > 1 && relationPart[0] == 'I' && char.IsUpper(relationPart[1]))
-                        {
-                            result.Add($"interface {relationPart} {Color.Interface}");
-                        }
-                        else
-                        {
-                            result.Add($"class {relationPart} {Color.Class}");
-                        }
-                    }
-                }
                 result.Add(item);
             }
 
@@ -567,10 +550,10 @@ namespace PlantUML.Logic
 
             if (diagramData.Count > 0)
             {
-                //var relations = CreateRelations(diagramData);
+                var relations = CreateRelations(diagramData);
                 var customUML = ReadCustomUMLFromFle(filePath);
 
-                //diagramData.AddRange(relations);
+                diagramData.AddRange(relations);
                 diagramData.AddRange(customUML);
                 diagramData.Insert(0, $"@{StartUmlLabel} CompleteClassDiagram");
                 diagramData.Insert(1, "title CompleteClassDiagram");
@@ -606,14 +589,21 @@ namespace PlantUML.Logic
 
             foreach (var line in diagramData)
             {
-                if (line.Contains("class") || line.Contains("interface"))
+                if (line.Equals("}"))
+                {
+                    isTypeDefinition = false;
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = false;
+                }
+                else if (line.Contains("class") || line.Contains("interface"))
                 {
                     isTypeDefinition = true;
                     isFieldRange = false;
                     isPropertyRange = false;
                     isMethodRange = false;
                 }
-                else if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
+                else if (line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
                 {
                     isFieldRange = true;
                 }
@@ -628,13 +618,6 @@ namespace PlantUML.Logic
                     isFieldRange = false;
                     isPropertyRange = false;
                     isMethodRange = true;
-                }
-                else if (isTypeDefinition && line.Contains('}'))
-                {
-                    isTypeDefinition = false;
-                    isFieldRange = false;
-                    isPropertyRange = false;
-                    isMethodRange = false;
                 }
 
                 if (isTypeDefinition && isFieldRange)
@@ -659,38 +642,17 @@ namespace PlantUML.Logic
                                         .Replace("[]", string.Empty);
             bool isTypeDefinition = false, isFieldRange = false, isPropertyRange = false, isMethodRange = false;
 
-            foreach (var diagramLine in digramData)
+            foreach (var line in digramData)
             {
-                if (diagramLine.Contains("class") || diagramLine.Contains("interface"))
+                if (line.Contains("class") || line.Contains("interface"))
                 {
-                    extractItemNames.Add(GetItemNameFrom(diagramLine));
+                    extractItemNames.Add(GetItemNameFrom(line));
                 }
             }
 
-            foreach (var diagramLine in digramData.Where(l => l.Equals("---") == false))
+            foreach (var line in digramData)
             {
-                if (diagramLine.Contains("class") || diagramLine.Contains("interface"))
-                {
-                    isTypeDefinition = true;
-                    currentItemName = GetItemNameFrom(diagramLine);
-                }
-                else if (isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
-                {
-                    isFieldRange = true;
-                }
-                else if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false)
-                {
-                    isFieldRange = false;
-                    isPropertyRange = true;
-                    isMethodRange = false;
-                }
-                else if (diagramLine.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false)
-                {
-                    isFieldRange = false;
-                    isPropertyRange = false;
-                    isMethodRange = true;
-                }
-                else if (isTypeDefinition && diagramLine.Contains('}'))
+                if (line.Equals("}"))
                 {
                     isTypeDefinition = false;
                     isFieldRange = false;
@@ -698,16 +660,37 @@ namespace PlantUML.Logic
                     isMethodRange = false;
                     currentItemName = string.Empty;
                 }
+                else if (line.Contains("class") || line.Contains("interface"))
+                {
+                    isTypeDefinition = true;
+                    currentItemName = GetItemNameFrom(line);
+                }
+                else if (line.StartsWith("---") == false && isTypeDefinition && isFieldRange == false && isPropertyRange == false && isMethodRange == false)
+                {
+                    isFieldRange = true;
+                }
+                else if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = true;
+                    isMethodRange = false;
+                }
+                else if (line.StartsWith("---") && isTypeDefinition && isFieldRange == true && isPropertyRange == true && isMethodRange == false)
+                {
+                    isFieldRange = false;
+                    isPropertyRange = false;
+                    isMethodRange = true;
+                }
 
                 if (isTypeDefinition && isFieldRange)
                 {
-                    var currentTypeName = GetTypeNameFrom(diagramLine);
+                    var currentTypeName = GetTypeNameFrom(line);
                     var cleanCurrentTypeName = currentTypeName.Replace("?", string.Empty)
                                                               .Replace("[]", string.Empty);
 
                     if (cleanCurrentTypeName.Equals(cleanTypeName) && extractItemNames.Contains(cleanTypeName))
                     {
-                        var memberName = GetMemberNameFrom(diagramLine);
+                        var memberName = GetMemberNameFrom(line);
                         var isNullable = currentTypeName.EndsWith('?');
                         var IsArray = currentTypeName.EndsWith("[]");
                         string? relation;
@@ -815,14 +798,9 @@ namespace PlantUML.Logic
             var infoFileName = "sq_info.txt";
             var fileCounter = 0;
             var infoData = new List<string>();
-            var options = new CSharpParseOptions().WithPreprocessorSymbols(defines);
-            var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
-            var syntaxRoot = syntaxTree.GetRoot();
-            var classNodes = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>();
-            var mscorlib = MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location);
-            var systemCore = MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location);
-            var compilation = CSharpCompilation.Create("SequenceCompilation", syntaxTrees: [syntaxTree], references: [mscorlib, systemCore]);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var analyzer = new CSharpAnalyzer(source, defines);
+            var semanticModel = analyzer.SemanticModel;
+            var classNodes = analyzer.QueryClassDeclarations();
 
             if (Path.Exists(path) == false)
             {
@@ -1285,9 +1263,13 @@ namespace PlantUML.Logic
                 var isAbstract = declaration.Contains("abstract");
 
                 declaration = declaration.Replace("{static}", string.Empty);
-                declaration += $" class {classDeclaration.Identifier}";
-                declaration += isStatic ? $" << static >> " : " ";
-                declaration += isAbstract ? $"{Color.AbstractClass}" : $"{Color.Class}";
+                if (declaration.HasContent())
+                {
+                    declaration += " ";
+                }
+                declaration += $"class {classDeclaration.Identifier}";
+                declaration += isStatic ? $" << static >> " : string.Empty;
+                declaration += isAbstract ? $" {Color.AbstractClass}" : $" {Color.Class}";
                 declaration += " {";
                 diagramData.Add(declaration);
 
@@ -1330,32 +1312,32 @@ namespace PlantUML.Logic
                         {
                             identifierText = identifierName.Identifier.Text;
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                            diagramData.Add($"{identifierText} <|-- {classDeclaration.Identifier}");
                         }
                         else if (baseType.Type is GenericNameSyntax genericName)
                         {
                             identifierText = genericName.Identifier.Text;
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                            diagramData.Add($"{identifierText} <|-- {classDeclaration.Identifier}");
                         }
                         else
                         {
                             identifierText = baseType.Type.ToString();
 
-                            diagramData.Add($"{classDeclaration.Identifier} <|-- {identifierText}");
+                            diagramData.Add($"{identifierText} <|-- {classDeclaration.Identifier}");
                         }
 
-                        if (typeDeclaration != default)
-                        {
-                            if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1]))
-                            {
-                                diagramData.Add($"interface {identifierText} {Color.Interface}");
-                            }
-                            else
-                            {
-                                diagramData.Add($"class {identifierText} {Color.Class}");
-                            }
-                        }
+                        //if (typeDeclaration != default)
+                        //{
+                        //    if (identifierText.Length > 1 && identifierText[0] == 'I' && char.IsUpper(identifierText[1]))
+                        //    {
+                        //        diagramData.Add($"interface {identifierText} {Color.Interface}");
+                        //    }
+                        //    else
+                        //    {
+                        //        diagramData.Add($"class {identifierText} {Color.Class}");
+                        //    }
+                        //}
                     }
                 }
             }

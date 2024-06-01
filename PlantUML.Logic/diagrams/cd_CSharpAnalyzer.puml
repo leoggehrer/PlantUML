@@ -1,0 +1,28 @@
+@startuml CSharpAnalyzer
+title CSharpAnalyzer
+class CSharpAnalyzer #GhostWhite {
+- CSharpParseOptions _parseoptions
+- SyntaxTree _syntaxtree
+- PortableExecutableReference _mscorelibreference
+- PortableExecutableReference _systemcorelibreference
+- CSharpCompilation _compilation
+- SemanticModel _semanticmodel
+---
++ CSharpParseOptions getParseOptions()
+- Void setParseOptions(CSharpParseOptions value)
++ SyntaxTree getSyntaxTree()
+- Void setSyntaxTree(SyntaxTree value)
++ PortableExecutableReference getMSCoreLibReference()
+- Void setMSCoreLibReference(PortableExecutableReference value)
++ PortableExecutableReference getSystemCoreLibReference()
+- Void setSystemCoreLibReference(PortableExecutableReference value)
++ CSharpCompilation getCompilation()
+- Void setCompilation(CSharpCompilation value)
++ SemanticModel getSemanticModel()
+- Void setSemanticModel(SemanticModel value)
+---
++ TypeDeclarationSyntax[] QueryTypeDeclarations()
++ ClassDeclarationSyntax[] QueryClassDeclarations()
++ MethodDeclarationSyntax[] QueryMethodDeclarations()
+}
+@enduml

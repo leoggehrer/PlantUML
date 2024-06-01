@@ -1,0 +1,19 @@
+@startuml CSharpAnalyzer.QueryMethodDeclarations
+title CSharpAnalyzer.QueryMethodDeclarations
+participant "QueryMethodDeclarations" as QueryMethodDeclarations #LightYellow
+participant "QueryClassDeclarations()" as QueryClassDeclarations #LightGreen
+participant "classNode.DescendantNodes().OfType<MethodDeclarationSyntax>()" as classNode_DescendantNodes_OfType_MethodDeclarationSyntax_ #LightGreen
+participant "classNode.DescendantNodes()" as classNode_DescendantNodes #LightGreen
+participant "result.AddRange(a0)" as result_AddRange_a0 #LightGreen
+participant "result.ToArray()" as result_ToArray #LightGreen
+autonumber
+QueryMethodDeclarations -[#grey]> QueryClassDeclarations
+QueryClassDeclarations -[#blue]-> QueryMethodDeclarations : classNodes
+loop#LightCoral classNodes
+ QueryMethodDeclarations -[#grey]> classNode_DescendantNodes_OfType_MethodDeclarationSyntax_
+ classNode_DescendantNodes_OfType_MethodDeclarationSyntax_ -[#blue]-> QueryMethodDeclarations : methodNodes
+ QueryMethodDeclarations -[#grey]> result_AddRange_a0 : (methodNodes)
+end
+QueryMethodDeclarations -[#grey]> result_ToArray
+result_ToArray -[#blue]-> QueryMethodDeclarations : result
+@enduml
