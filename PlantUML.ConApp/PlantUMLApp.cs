@@ -88,25 +88,31 @@ namespace PlantUML.ConApp
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Force", "Change force flag"),
+                    Text = ToLabelText($"{Force}", "Change force flag"),
                     Action = (self) => ChangeForce(),
                 },
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Path-Depth", "Change max sub path depth"),
+                    Text = ToLabelText($"{MaxSubPathDepth}", "Change max sub path depth"),
                     Action = (self) => ChangeMaxSubPathDepth(),
                 },
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Generation-Depth", "Change max generation depth"),
+                    Text = ToLabelText($"{MaxGenerationDepth}", "Change max generation depth"),
                     Action = (self) => ChangeMaxGenerationDepth(),
                 },
                 new()
                 {
                     Key = $"{++mnuIdx}",
-                    Text = ToLabelText("Page-Size", "Change the page size"),
+                    Text = ToLabelText($"{PageIndex}", "Change the page index"),
+                    Action = (self) => ChangePageIndex(),
+                },
+                new()
+                {
+                    Key = $"{++mnuIdx}",
+                    Text = ToLabelText($"{PageSize}", "Change the page size"),
                     Action = (self) => ChangePageSize(),
                 },
                 new()
@@ -117,7 +123,7 @@ namespace PlantUML.ConApp
                     {
                         var savePath = ProjectsPath;
 
-                        ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth + 1, [ SourcePath ]);
+                        ProjectsPath = SelectOrChangeToSubPath(ProjectsPath, MaxSubPathDepth, [ SourcePath ]);
                         if (savePath != ProjectsPath)
                         {
                             PageIndex = 0;
@@ -136,7 +142,7 @@ namespace PlantUML.ConApp
                     {
                         var savePath = TargetPath;
 
-                        TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth + 1, [ SourcePath ]);
+                        TargetPath = SelectOrChangeToSubPath(TargetPath, MaxSubPathDepth, [ SourcePath ]);
                         if (savePath != TargetPath)
                         {
                             PageIndex = 0;
@@ -170,7 +176,7 @@ namespace PlantUML.ConApp
                 mnuIdx += 10 - (mnuIdx % 10);
             }
 
-            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth))
+            var paths = new [] { ProjectsPath }.Union(TemplatePath.GetSubPaths(ProjectsPath, MaxSubPathDepth + 1))
                                                .Where(p => TemplatePath.ContainsFiles(p, "*.cs"))
                                                .OrderBy(p => p)
                                                .ToArray();
@@ -199,26 +205,19 @@ namespace PlantUML.ConApp
         /// <param name="sourcePath">The path of the solution.</param>
         protected override void PrintHeader()
         {
-            var count = 0;
-            var saveForeColor = ForegroundColor;
-
-            ForegroundColor = ConsoleColor.Green;
-            Clear();
-            count = PrintLine(nameof(PlantUML));
-            PrintLine('=', count);
-            PrintLine();
-            ForegroundColor = saveForeColor;
-            PrintLine($"Force flag:          {Force}");
-            PrintLine($"Max. sub path depth: {MaxSubPathDepth}");
-            PrintLine($"Max. generat. depth: {MaxGenerationDepth}");
-            PrintLine($"Page size:           {PageSize}");
-            PrintLine($"Projets path:        {ProjectsPath}");
-            PrintLine();
-            PrintLine($"Target path:         {TargetPath}");
-            PrintLine($"Diagram folder:      {DiagramFolder}");
-            PrintLine($"Diagram complete:    {CreateCompleteDiagram}");
-            PrintLine($"Diagram builder:     {DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]");
-            PrintLine();
+            base.PrintHeader(nameof(PlantUML),
+                                      //new("Force flag:", Force),
+                                      //new("Page index:", PageIndex),
+                                      //new("Page size:", PageSize),
+                                      //new("Max. sub path depth:", MaxSubPathDepth),
+                                      //new("Max. generat. depth:", MaxGenerationDepth),
+                                      //new("", string.Empty),
+                                      new("Projets path:", ProjectsPath),
+                                      new("Target path:", TargetPath),
+                                      new("Diagram folder:", DiagramFolder),
+                                      new("Diagram complete:", CreateCompleteDiagram),
+                                      new("Diagram builder:", $"{DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]")
+                                      );
         }
 
         /// <summary>
@@ -264,6 +263,18 @@ namespace PlantUML.ConApp
                 "sequence" => DiagramBuilderType.All,
                 _ => DiagramBuilder,
             };
+        }
+        /// <summary>
+        /// Changes the page index.
+        /// </summary>
+        public void ChangePageIndex()
+        {
+            PrintLine();
+            Print("Enter page index >= 0: ");
+            if (int.TryParse(ReadLine(), out var result) && result >= 0)
+            {
+                PageIndex = result;
+            }
         }
         /// <summary>
         /// Changes the page size.

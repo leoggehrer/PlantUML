@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlantUML.ConApp", "PlantUML
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileWatcher.ConApp", "..\FileWatcher\FileWatcher.ConApp\FileWatcher.ConApp.csproj", "{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonTool", "..\CommonTool\CommonTool\CommonTool.csproj", "{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58CBA31A-BC6A-41C9-AF67-9E7A30A2FB42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
