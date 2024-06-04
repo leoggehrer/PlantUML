@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<Version>1.0.1</Version>
+	<PackageId>PlantUML.LiveGeneration</PackageId>
+	<Authors>Gerhard Gehrer</Authors>
+	<Company>HTBLA Leonding</Company>
+	<Description>This console application monitors the source code changes of C# files and generates PantUML Activity, PlantUML Sequence and PlantUML Class diagrams after each change to the source data.</Description>
+	<PackageTags>PlantUML;UML Activity Diagram; UML Class Diagram; UML Sequence Diagram</PackageTags>
+	<RepositoryUrl>https://github.com/leoggehrer/FileWatcher</RepositoryUrl>
+	<IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommonTool.Console" Version="1.0.2" />
+		<PackageReference Include="PlantUML.Creator" Version="1.0.2" />
+	</ItemGroup>
+
+</Project>

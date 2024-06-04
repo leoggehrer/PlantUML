@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileWatcher.ConApp", "..\Fi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonTool", "..\CommonTool\CommonTool\CommonTool.csproj", "{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantUML.Watcher", "PlantUML.Watcher\PlantUML.Watcher.csproj", "{F73CAC87-00F9-4E88-A4B4-81FB16D951FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC1E9BE0-FECD-485B-86A2-3620F92E89BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F73CAC87-00F9-4E88-A4B4-81FB16D951FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F73CAC87-00F9-4E88-A4B4-81FB16D951FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F73CAC87-00F9-4E88-A4B4-81FB16D951FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F73CAC87-00F9-4E88-A4B4-81FB16D951FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

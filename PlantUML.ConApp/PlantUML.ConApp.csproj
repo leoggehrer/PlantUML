@@ -17,10 +17,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommonTool.Console" Version="1.0.2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\PlantUML.Logic\PlantUML.Logic.csproj" />
+		<PackageReference Include="PlantUML.Creator" Version="1.0.2" />
 	</ItemGroup>
 
 </Project>
