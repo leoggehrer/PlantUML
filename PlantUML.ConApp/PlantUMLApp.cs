@@ -206,18 +206,12 @@ namespace PlantUML.ConApp
         protected override void PrintHeader()
         {
             base.PrintHeader(nameof(PlantUML),
-                                      //new("Force flag:", Force),
-                                      //new("Page index:", PageIndex),
-                                      //new("Page size:", PageSize),
-                                      //new("Max. sub path depth:", MaxSubPathDepth),
-                                      //new("Max. generat. depth:", MaxGenerationDepth),
-                                      //new("", string.Empty),
-                                      new("Projets path:", ProjectsPath),
-                                      new("Target path:", TargetPath),
-                                      new("Diagram folder:", DiagramFolder),
-                                      new("Diagram complete:", CreateCompleteDiagram),
-                                      new("Diagram builder:", $"{DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]")
-                                      );
+                new("Projets path:", ProjectsPath),
+                new("Target path:", TargetPath),
+                new("Diagram folder:", DiagramFolder),
+                new("Diagram complete:", CreateCompleteDiagram),
+                new("Diagram builder:", $"{DiagramBuilder} [{DiagramBuilderType.All}|{DiagramBuilderType.Activity}|{DiagramBuilderType.Class}|{DiagramBuilderType.Sequence}]")
+            );
         }
 
         /// <summary>

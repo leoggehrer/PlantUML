@@ -1005,10 +1005,10 @@ namespace PlantUML.Logic
         /// <summary>
         /// Creates an object diagram for the given objects up to a specified depth.
         /// </summary>
-        /// <param name="maxDeep">The maximum depth of the object diagram.</param>
+        /// <param name="maxDepth">The maximum depth of the object diagram.</param>
         /// <param name="objects">The objects to include in the object diagram.</param>
         /// <returns>The lines representing the object diagram.</returns>
-        public static IEnumerable<string> CreateObjectDiagram(int maxDeep, params object[] objects)
+        public static IEnumerable<string> CreateObjectDiagram(int maxDepth, params object[] objects)
         {
             var result = new List<string>();
             var createdObjects = new List<object>();
@@ -1036,7 +1036,7 @@ namespace PlantUML.Logic
                         createdObjects.Add(obj);
                         CreateObjectState(obj, lines, deep);
 
-                        if (deep + 1 <= maxDeep)
+                        if (deep + 1 <= maxDepth)
                         {
                             var relations = obj.GetType().GetRelations();
                             var relationFieldInfos = obj.GetType().GetAllClassFields()
@@ -1052,7 +1052,7 @@ namespace PlantUML.Logic
 
                                     CreateMapCollectionState(collection, lines);
                                     lines.Add($"{CreateObjectName(obj)}::{GetFieldName(relFieldInfo)} --> {CreateCollectionName(value)}");
-                                    if (deep + 2 <= maxDeep)
+                                    if (deep + 2 <= maxDepth)
                                     {
                                         foreach (var item in collection)
                                         {
