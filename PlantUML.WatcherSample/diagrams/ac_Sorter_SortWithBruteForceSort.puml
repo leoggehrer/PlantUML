@@ -1,0 +1,16 @@
+@startuml Sorter.SortWithBruteForceSort
+title Sorter.SortWithBruteForceSort
+start
+#LightGreen:Params(int[] array);
+while (i < array.Length - 1) is (<color:green>yes)
+  while (j < array.Length) is (<color:green>yes)
+    #LightYellow:if (array[i] < array[j]) then (<color:green>yes)
+      #WhiteSmoke:array[i] = array[j];
+      #WhiteSmoke:array[j] = tmp;
+    endif
+  :j++;
+  endwhile (<color:red>no)
+:i++;
+endwhile (<color:red>no)
+stop
+@enduml

@@ -35,6 +35,7 @@ namespace PlantUML.Watcher
         public UMLWatcherApp()
         {
             Constructing();
+            Force = true;
             MaxSubPathDepth = 1;
             Constructed();
         }

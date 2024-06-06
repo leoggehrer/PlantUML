@@ -13,8 +13,18 @@
             "args": [],
             "cwd": "${workspaceFolder}/PlantUML.ConApp",
             "stopAtEntry": false,
-            "console": "integratedTerminal"
-        }
-
+            "console": "externalTerminal"
+        },
+        {
+            "name": "PlantUML-Watcher",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/PlantUML.Watcher/bin/Debug/net8.0/PlantUML.Watcher.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/PlantUML.Watcher",
+            "stopAtEntry": false,
+            "console": "externalTerminal"
+        },
     ]
 }

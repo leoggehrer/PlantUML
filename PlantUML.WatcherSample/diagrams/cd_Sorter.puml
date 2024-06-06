@@ -1,0 +1,8 @@
+@startuml Sorter
+title Sorter
+class Sorter #GhostWhite {
+---
+---
++ {static} void SortWithBruteForceSort(int[] array)
+}
+@enduml

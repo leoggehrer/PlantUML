@@ -1,0 +1,8 @@
+title:Program.Main (AC)
+fileName:ac_Program_Main.puml
+generated_on:06.06.2024 07:19:22
+generated_by:generated with the DiagramCreator by Prof.Gehrer
+title:Sorter.SortWithBruteForceSort (AC)
+fileName:ac_Sorter_SortWithBruteForceSort.puml
+generated_on:06.06.2024 07:19:22
+generated_by:generated with the DiagramCreator by Prof.Gehrer
