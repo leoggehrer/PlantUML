@@ -104,7 +104,7 @@
 
 ## Verwendung von PlantUML.Watcher
 
-Zu Beginn wird das zu überwachende Projekt erstellt. Dies kann mit Visual Studio, Visual Studio Code oder in der Konsole erfolgen. Anschließend wird das Programm *PlantUML.Watcher* gestartet (falls das Programm noch nicht gestartet worden ist).
+Zu Beginn wird das zu überwachende Projekt erstellt. Dies kann mit Visual Studio, Visual Studio Code oder in der Konsole erfolgen. Anschließend wird das Programm *PlantUML.Watcher* gestartet (falls das Programm noch nicht gestartet ist).
 
 **Ausgangslage:**
 
@@ -115,13 +115,17 @@ Zu Beginn wird das zu überwachende Projekt erstellt. Dies kann mit Visual Studi
 
 In diesem Abschnitt werden die wichtigsten Einstellungen von *PlantUML.Watcher* erläutert.
 
-- [  1] Force...Diese Einstellung erlaubt das überschreiben von Diagramm-Dateien (Einstellung: **True**)
-- [  5] Project path...Ändern des Projekt-Pfades (Einstellung: **../PlantUML.WatcherSample**)
-- [  7] Diagram folder...Mit dieser Option kann der Name für den Diagrammordner festgelegt werden (Einstellung: **diagrams**)
+- [ 1] Force...Diese Einstellung erlaubt das überschreiben von Diagramm-Dateien (Einstellung: **True**)
+- [ 5] Project path...Ändern des Projekt-Pfades (Einstellung: **../PlantUML.WatcherSample**)
+- [ 7] Diagram folder...Mit dieser Option kann der Name für den Diagrammordner festgelegt werden (Einstellung: **diagrams**)
+- [ 8] Diagram builder...Art der Diagramme welche erzeugt werden sollen (Einstellung: **All**)
 
-1. **Diagramm-Erstellung**:
+Das sind die wichtigsten Einstellungen für das Arbeiten mit dem *PlantUML.Watcher*. Nun wird im Abschnitt **Projekte** das entsprechende Projekt ausgewählt, welches überwacht werden soll. In diesem Beispiel wird das Projekt **PlantUML.WatcherSample** ausgewählt. Dazu wird die Nummer **15** ausgewählt. Als Ergebnis wird ein **File-Watcher** gestartet welcher die Dateien in diesem Projekt überwacht und beim Auftreten von Änderungen die entsprechenden Diagramme erstellt. In der folgenden Abbildung wird ist der Dialog abgebildet.
 
-   Die Diagramme werden automatisch erstellt und aktualisiert, wenn Änderungen im überwachten Verzeichnis erkannt werden. Es werden verschiedene Diagrammtypen wie Aktivitätsdiagramme, Klassendiagramme und Sequenzdiagramme unterstützt.
+![PlantUML.Watcher-Konsole](img/screenshot_01.png)
+
+**Hinweis:** Es können beliebig viele Projekte überwacht werden. Diese sollten allerdings vor Programmende beendet werden.
+
 
 ## Bekannte Probleme und Lösungen
 
