@@ -126,22 +126,51 @@ Das sind die wichtigsten Einstellungen für das Arbeiten mit dem *PlantUML.Watch
 
 **Hinweis:** Es können beliebig viele Projekte überwacht werden. Diese sollten allerdings vor Programmende beendet werden.
 
+### Implementierung von **PlantUML.WatcherSample**
+
+Zur Demonstration soll ein einfache Sortieralgorithmus implementiert werden. Sobald eine Änderung im Projekt ausgelöst wird, wird der *Watcher* aktiv und generiert die Diagramme mit dem aktuellen Quelldateien.
+
+![PlantUML.WatcherSample](img/screenshot_02.png)
+
+Im Projektordner wird vom *Watcher* der Ordner *diagrams* erstellt, in welchem die Diagramm-Dateien abgelegt werden. Die Bennenung der Diagramme erfolgt nach folgender Konvention:
+
+- Klassendiagramme
+  - **cd_Klasse.puml**
+
+- Aktivitätsdiagramme
+  - **ac_Klasse_Methode.puml**
+  
+- Sequenzdiagramme
+  - **sq_Klasse_Methode.puml**
+
+Falls mehrere Überladung von Methoden des gleichen Namens existieren, wird die Konvention mit einer Nummerierung ergänzt (z.B.: **'Klasse_Methode_1.puml'**).
+
+### Live-Ansicht der Diagramme
+
+In einer weiteren Instanz von Visual Studio Code kann die aktuelle Generierung der Diagramme angezeigt werden.
+
+![PlantUML.LiveGeneration](img/screenshot_03.png)
+
+Dazu muss das aktuelle Diagramm in Visual Studio Code geöffnet und die entsprechende Vorschau aktiviert werden. Nun können die Änderungen in den Quelldateien mitverfolgt werden.
+
+![PlantUML.LiveGeneration](img/screenshot_04.png)
+
+Jede Änderung in den Quelldateien führt zu einer neuen Generierung der Diagramme und somit zu einer Aktualisierung der grafischen Darstellung des Programmcodes.
+
+![PlantUML.LiveGeneration](img/screenshot_05.png)
+
+In der obigen Abbildung ist das Hinzufügen der inneren *for*-Schleife im Diagramm dargestellt.
+
+![PlantUML.LiveGeneration](img/screenshot_06.png)
+
+Zuletzt ist noch die Vertauschung der Array-Elemente hinzugefügt worden.
 
 ## Bekannte Probleme und Lösungen
 
-- **Problem**: Das Projekt kompiliert nicht.
-  **Lösung**: Stellen Sie sicher, dass alle Abhängigkeiten korrekt installiert sind und dass Sie die richtige .NET SDK-Version verwenden.
-- **Problem**: UML-Diagramme werden nicht aktualisiert.
-  **Lösung**: Überprüfen Sie, ob das überwachte Verzeichnis korrekt angegeben ist und ob Schreibberechtigungen vorhanden sind.
-
-## Dateien und Struktur
-
-- **ActivityDiagramBuilder.cs**: Enthält die Logik zur Erstellung von Aktivitätsdiagrammen.
-- **ClassDiagramBuilder.cs**: Enthält die Logik zur Erstellung von Klassendiagrammen.
-- **DiagramBuilderType.cs**: Definiert die verschiedenen Typen von Diagrammerstellern.
-- **FolderWatcher.cs**: Überwacht das Verzeichnis auf Änderungen.
-- **Program.cs**: Der Einstiegspunkt des Programms.
-- **SequenceDiagramBuilder.cs**: Enthält die Logik zur Erstellung von Sequenzdiagrammen.
-- **UMLDiagramBuilder.cs**: Basisklasse für die verschiedenen Diagrammersteller.
-- **UMLWatcher.cs**: Überwacht die Dateien und erstellt UML-Diagramme.
-- **UMLWatcherApp.cs**: Anwendungskonfiguration und -start.
+- **Problem**: Die UML-Diagramme werden nicht erstellt oder aktualisiert.
+  **Ursache A**: Der Watcher wurde nicht gestartet.
+  **Lösung A**: Starten Sie in der Watcher-Konsole den Watcher für ihr Projekt.
+  **Ursache B**: 'Auto Save' in Visual Studio Code ist nicht aktiviert.
+  **Lösung B**: Aktivieren Sie die Funktion 'Auto Save' im Menü **File** oder Lösen Sie die Speicherung manuell aus (STRG + S).
+- **Problem**: Das UML-Diagramm wird nicht angezeigt.
+  **Lösung**: Überprüfen Sie, ob die Erweiterung **PlantUML** installiert ist.
