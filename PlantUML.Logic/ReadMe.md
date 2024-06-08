@@ -18,43 +18,15 @@
   - Markdown All in One
   - PlantUML
 
-## Installation - GitHub-Repository
-
-1. **Projekt-Repository klonen**:
-
-   ```bash
-   git clone https://github.com/leoggehrer/PlantUML.git
-   ```
-
-2. **In das Projektverzeichnis wechseln**:
-
-   ```bash
-   cd PlantUML.Watcher/PlantUML.Watcher
-   ```
-
-3. **Abhängigkeiten wiederherstellen**:
-
-   ```bash
-   dotnet restore
-   ```
-
-**Verwendung:**
-
-1. **Projekt kompilieren und ausführen**:
-
-   ```bash
-   dotnet run
-   ```
-
 ## Installation - Nuget-Packages
 
 1. Erstellen einer Konsolenanwendung (--name kann frei gewählt werden).
 
    ```bash
-   dotnet new console --framework net8.0 --use-program-main --name UMLWatcher.ConApp
+   dotnet new console --framework net8.0 --use-program-main --name UMLCreator.ConApp
    ```
 
-2. Anpassen der Projektdatei (UMLWatcher.ConApp.csproj)
+2. Anpassen der Projektdatei (UMLCreator.ConApp.csproj)
 
    ```xml
    <Project Sdk="Microsoft.NET.Sdk">
@@ -67,7 +39,7 @@
    </PropertyGroup>
 
    <ItemGroup>
-      <PackageReference Include="PlantUML.LiveGeneration" Version="1.0.2" />
+      <PackageReference Include="PlantUML.Creator" Version="1.0.2" />
    </ItemGroup>
 
    </Project>
