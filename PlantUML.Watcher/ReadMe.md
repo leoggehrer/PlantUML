@@ -168,9 +168,9 @@ Zuletzt ist noch die Vertauschung der Array-Elemente hinzugefügt worden.
 ## Bekannte Probleme und Lösungen
 
 - **Problem**: Die UML-Diagramme werden nicht erstellt oder aktualisiert.
-  **Ursache A**: Der Watcher wurde nicht gestartet.
-  **Lösung A**: Starten Sie in der Watcher-Konsole den Watcher für ihr Projekt.
-  **Ursache B**: 'Auto Save' in Visual Studio Code ist nicht aktiviert.
-  **Lösung B**: Aktivieren Sie die Funktion 'Auto Save' im Menü **File** oder Lösen Sie die Speicherung manuell aus (STRG + S).
+- **Ursache A**: Der Watcher wurde nicht gestartet.
+- **Lösung A**: Starten Sie in der Watcher-Konsole den Watcher für ihr Projekt.
+- **Ursache B**: 'Auto Save' in Visual Studio Code ist nicht aktiviert.
+- **Lösung B**: Aktivieren Sie die Funktion 'Auto Save' im Menü **File** oder Lösen Sie die Speicherung manuell aus (STRG + S).
 - **Problem**: Das UML-Diagramm wird nicht angezeigt.
-  **Lösung**: Überprüfen Sie, ob die Erweiterung **PlantUML** installiert ist.
+- **Lösung**: Überprüfen Sie, ob die Erweiterung **PlantUML** installiert ist.
