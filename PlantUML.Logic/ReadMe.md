@@ -1,31 +1,30 @@
-# Bedienungsanleitung für PlantUML.Logic
+# Bedienungsanleitung fÃ¼r PlantUML.Logic
 
 ## Projektbeschreibung
 
-**PlantUML.Logic** ist ein C#-Projekt (Klassenbiliothek), das verwendet wird, um UML-Diagramme zu erstellen. Für die Generierung der Diagramme wird der entsprechende C#-Quellcode verwendet. Das System kann folgende UML-Diagramme generieren:
+**PlantUML.Logic** ist ein C#-Projekt (Klassenbiliothek), das verwendet wird, um UML-Diagramme zu erstellen. FÃ¼r die Generierung der Diagramme wird der entsprechende C#-Quellcode verwendet. Das System kann folgende UML-Diagramme generieren:
 
 - Klassendiagramm
-- Aktivitätsdiagramm
+- AktivitÃ¤tsdiagramm
 - Sequenzdiagramm
 - Objektdiagramm
 
 ## Voraussetzungen
 
-- **.NET SDK**: Stellen Sie sicher, dass das .NET SDK installiert ist. Sie können es von der [offiziellen .NET-Website](https://dotnet.microsoft.com/download) herunterladen.
+- **.NET SDK**: Stellen Sie sicher, dass das .NET SDK installiert ist. Sie kÃ¶nnen es von der [offiziellen .NET-Website](https://dotnet.microsoft.com/download) herunterladen.
 - **IDE**: Eine integrierte Entwicklungsumgebung (IDE) wie Visual Studio oder Visual Studio Code wird empfohlen.
-- Installierte **Extensions** für Visual Studio Code:
+- Installierte **Extensions** fÃ¼r Visual Studio Code:
   - C# Dev Kit
   - Markdown All in One
   - PlantUML
 
 ## Installation - Nuget-Packages
 
-1. Erstellen einer Konsolenanwendung (--name kann frei gewählt werden).
+1. Erstellen einer Konsolenanwendung (--name kann frei gewÃ¤hlt werden).
 
    ```bash
-   dotnet new console --framework net8.0 --use-program-main --name UMLCreator.ConApp
+   dotnet new console --framework net8.0 --use-program-main --name PlantUML.ObjectDiagramSample
    ```
-
 2. Anpassen der Projektdatei (UMLCreator.ConApp.csproj)
 
    ```xml
@@ -44,7 +43,6 @@
 
    </Project>
    ```
-
 3. Anpassen der Programmdatei (*Program.cs*)
 
    ```csharp
@@ -68,8 +66,7 @@
    ```bash
    cd UMLWatcher.ConApp
    ```
-
-2. **Projekt kompilieren und ausführen**:
+2. **Projekt kompilieren und ausfï¿½hren**:
 
    ```bash
    dotnet run

@@ -26,5 +26,16 @@
             "stopAtEntry": false,
             "console": "externalTerminal"
         },
+        {
+            "name": "PlantUML-ConAppSample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/PlantUML.ConAppSample/bin/Debug/net8.0/PlantUML.ConAppSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/PlantUML.ConAppSample",
+            "stopAtEntry": false,
+            "console": "externalTerminal"
+        },
     ]
 }
